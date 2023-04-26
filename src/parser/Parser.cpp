@@ -49,9 +49,6 @@ std::vector<std::string> Parser::splitString(const std::string& str, const char 
 void Parser::parserLocationPath(const std::string &location)
 {
     std::cout << "location: " << location << std::endl;
-    std::string lineTrim = this->trim(location, "\t{");
-    std::vector<std::string> path = this->splitString(location, ' ');
-    std::cout << "path : " << path[1] << std::endl;
 }
 
 
@@ -80,7 +77,6 @@ void Parser::parse(std::string &fileName)
         {
             this->parserLocationPath(line);
             std::string lineTrim = this->trim(line, " {");
-            std::cout << "line : " << line << std::endl;
             if (lineTrim.find("location") != std::string::npos)
             {
                 inServerBlock++;
