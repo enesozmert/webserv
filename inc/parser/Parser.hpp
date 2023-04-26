@@ -7,7 +7,7 @@
 class Parser
 {
     public:
-        Server(/* args */);
-        ~Server();
+        Parser(/* args */);
+        ~Parser();
 };
 

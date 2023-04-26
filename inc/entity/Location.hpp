@@ -12,9 +12,9 @@ class RedirectionUri;
 class Location
 {
     private:
-        std::string root;
-        bool autoindex;
-        std::string index;
+        std::string _root;
+        bool _autoindex;
+        std::string _index;
         ErrorPage _errorPage;
         RedirectionUri _redirectionUri;
     public:

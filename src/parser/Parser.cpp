@@ -1,4 +1,4 @@
-#include "../inc/Parser/Parser.hpp"
+#include "../inc/parser/Parser.hpp"
 
 Parser::Parser(/* args */)
 {
