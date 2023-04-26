@@ -29,6 +29,11 @@ void Server::setErrorPage(ErrorPage errorPage){
     this->_errorPage = errorPage;
 }
 
+void Server::setIsServerNameNothing(bool isServerNameNothing)
+{
+    this->_isServerNameNothing = isServerNameNothing;
+}
+
 std::string Server::getPort(){
     return this->_port;
 }
@@ -45,4 +50,9 @@ std::vector<std::string> Server::getServerName(){
 Location Server::getLocation()
 {
     return (this->_location);
+}
+
+bool Server::getIsServerNameNothing()
+{
+    return (this->_isServerNameNothing);
 }

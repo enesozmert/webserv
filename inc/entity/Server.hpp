@@ -15,7 +15,7 @@ class Server
         std::string _port;// listen(string)[port(8080)]
         std::string _host; // listen(string)[host:port(127.0.0.1:80)]
         std::vector<std::string> _serverNames;
-        bool _isServerNameHere;
+        bool _isServerNameNothing;
         ErrorPage _errorPage;
 
     public:
@@ -27,11 +27,13 @@ class Server
         void setErrorPage(ErrorPage errorPage);
         void setServerName(std::string serverName);
         void setLocation(Location location);
+        void setIsServerNameNothing(bool isServerNameNothing);
 
         std::string getPort();
         std::string getHost();
         ErrorPage getErrorPage();
         std::vector<std::string> getServerName();
         Location getLocation();
+        bool getIsServerNameNothing();
 };
 

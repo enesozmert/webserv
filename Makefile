@@ -24,14 +24,15 @@ SRC_FILE		= 	main
 
 SRC_FILES		+=	$(addprefix $(SRC_ENTITY),$(ENTITY))
 SRC_FILES		+=	$(addprefix $(SRC_PARSER),$(PARSER))
+SRC_FILES		+=	$(SRC_FILE)
 
 INC_FILES		+=	$(addprefix $(SRC_ENTITY),$(ENTITY))
 INC_FILES		+=	$(addprefix $(SRC_PARSER),$(PARSER))
 
 
+
 #FileCreate
-SRC 			= 	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_FILES)))
-SRC 			+= 	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_FILE)))
+SRC 			= 	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_FILE)))
 INC 			= 	$(addprefix $(INC_DIR), $(addsuffix .hpp, $(INC_FILES)))
 OBJ 			= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_FILES)))
 
