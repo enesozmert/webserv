@@ -9,7 +9,7 @@ Location::~Location()
 
 std::string Location::getRoot()
 {
-    return (this->root);
+    return (this->_root);
 }
 bool Location::getAutoindex()
 {
@@ -17,7 +17,7 @@ bool Location::getAutoindex()
 }
 std::string Location::getIndex()
 {
-    return (this->index);
+    return (this->_index);
 }
 ErrorPage Location::getErrorPage()
 {
@@ -30,11 +30,11 @@ RedirectionUri Location::getRedirectionUri()
 
 void Location::setRoot(std::string root)
 {
-    this->root = root;
+    this->_root = root;
 }
 void Location::setIndex(std::string index)
 {
-    this->index = index;
+    this->_index = index;
 }
 void Location::setAutoindex(bool autoIndex)
 {

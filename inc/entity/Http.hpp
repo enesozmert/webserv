@@ -14,7 +14,7 @@ class Http
     private:
         std::string _clientMaxBodySize;
         std::vector<Server> _servers;
-        ErrorPage _errorpage;
+        ErrorPage _errorPage;
     public:
         Http(/* args */);
         Http(char *file);
@@ -22,7 +22,7 @@ class Http
         
 
         std::string getClientMaxBodySize();
-        Server getServer();
+        std::vector<Server> getServer();
         ErrorPage getErrorPage();
 
         void setClientMaxBodySize(std::string clientMaxBodySize);

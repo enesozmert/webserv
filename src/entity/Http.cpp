@@ -4,49 +4,33 @@ Http::Http(/* args */)
 {
 }
 
-Http::Http(char *file)
-{
-    parseConfig(file);
-}
-
 
 Http::~Http()
 {
 }
 
-
-
 std::string Http::getClientMaxBodySize()
 {
-    return (this->clientMaxBodySize);
+    return (this->_clientMaxBodySize);
 }
-Server Http::getServer()
+std::vector<Server> Http::getServer()
 {
-    return (this->server);
+    return (this->_servers);
 }
 ErrorPage Http::getErrorPage()
 {
-    return (this->errorPage);
+    return (this->_errorPage);
 }
 
 void Http::setClientMaxBodySize(std::string clientMaxBodySize)
 {
-    this->clientMaxBodySize = clientMaxBodySize;
+    this->_clientMaxBodySize = clientMaxBodySize;
 }
 void Http::setServer(Server server)
 {
-    this->server = server;
+    this->_servers.push_back(server);
 }
 void Http::setErrorPage(ErrorPage errorPage)
 {
-    this->errorPage = errorPage;
-}
-
-void Http::parseConfig(char *file)
-{
-    std::ifstream ifs(file);
-    if (ifs.is_open())
-    {
-
-    }
+    this->_errorPage = errorPage;
 }
