@@ -14,7 +14,6 @@ OBJ_DIR			=	obj/
 
 SRC_ENTITY		=	entity/
 SRC_PARSER		=	parser/
-SRC_COMMON		=	common/
 
 
 #Files
@@ -26,11 +25,14 @@ SRC_FILE		= 	main
 SRC_FILES		+=	$(addprefix $(SRC_ENTITY),$(ENTITY))
 SRC_FILES		+=	$(addprefix $(SRC_PARSER),$(PARSER))
 
+INC_FILES		+=	$(addprefix $(SRC_ENTITY),$(ENTITY))
+INC_FILES		+=	$(addprefix $(SRC_PARSER),$(PARSER))
+
 
 #FileCreate
 SRC 			= 	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_FILES)))
 SRC 			+= 	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_FILE)))
-INC 			= 	$(addprefix $(INC_DIR), $(addsuffix .hpp, $(SRC_FILES)))
+INC 			= 	$(addprefix $(INC_DIR), $(addsuffix .hpp, $(INC_FILES)))
 OBJ 			= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_FILES)))
 
 OBJF			=	.cache_exists
@@ -39,6 +41,8 @@ all:		welcome $(NAME)
 
 $(OBJF):
 			@mkdir -p $(OBJ_DIR)
+			@mkdir -p $(OBJ_DIR)$(SRC_ENTITY)
+			@mkdir -p $(OBJ_DIR)$(SRC_PARSER)
 
 $(OBJ_DIR)%.o : $(SRC_DIR)%.cpp | $(OBJF)
 			@$(CC) $(CFLAGS) $(INC_DIR) -c $< -o $@
