@@ -21,8 +21,6 @@ class DataBase
 
         }
 
-
-
         void createData(T data) // add new element
         {
             this->_data.push_back(data);
