@@ -12,15 +12,26 @@ SRC_DIR			= 	src/
 INC_DIR			= 	inc/
 OBJ_DIR			=	obj/
 
+SRC_ENTITY		=	entity/
+SRC_PARSER		=	parser/
+SRC_COMMON		=	common/
+
+
 #Files
-SRC_FILE		=   main
-INC_FILE		= 	
+ENTITY			=	ErrorPage Http Location RedirectionUri Server	
+PARSER			=	Parser
+
+SRC_FILE		= 	main
+
+SRC_FILES		+=	$(addprefix $(SRC_ENTITY),$(ENTITY))
+SRC_FILES		+=	$(addprefix $(SRC_PARSER),$(PARSER))
+
 
 #FileCreate
-SRC 			+= 	$(addprefix $(MAIN_DIR), $(addsuffix .cpp, $(MAIN_FILE)))
+SRC 			= 	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_FILES)))
 SRC 			+= 	$(addprefix $(SRC_DIR), $(addsuffix .cpp, $(SRC_FILE)))
-INC 			= 	$(addprefix $(INC_DIR), $(addsuffix .hpp, $(INC_FILE)))
-OBJ 			= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_FILE)))
+INC 			= 	$(addprefix $(INC_DIR), $(addsuffix .hpp, $(SRC_FILES)))
+OBJ 			= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_FILES)))
 
 OBJF			=	.cache_exists
 
