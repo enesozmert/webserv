@@ -15,6 +15,8 @@ class Http
         std::string _clientMaxBodySize;
         std::vector<Server> _servers;
         ErrorPage _errorPage;
+        DataBase<std::string> _keywordDatabase;
+
     public:
         Http(/* args */);
         Http(char *file);
@@ -24,10 +26,14 @@ class Http
         std::string getClientMaxBodySize();
         std::vector<Server> getServer();
         ErrorPage getErrorPage();
+        DataBase<std::string> getKeywordDataBase();
 
         void setClientMaxBodySize(std::string clientMaxBodySize);
         void setServer(Server server);
         void setErrorPage(ErrorPage errorPage);
+        void setKeywordDatabase(DataBase<std::string> keywordDatabase);
 
-        void parseConfig(char *file);
+
+        void keywordFill();
+
 };
