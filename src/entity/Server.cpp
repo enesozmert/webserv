@@ -3,6 +3,7 @@
 
 Server::Server(/* args */)
 { 
+    this->keywordFill();
 }
 
 Server::~Server(){
@@ -34,6 +35,11 @@ void Server::setIsServerNameNothing(bool isServerNameNothing)
     this->_isServerNameNothing = isServerNameNothing;
 }
 
+void Server::setKeywordDatabase(DataBase<std::string> keywordDatabase)
+{
+    this->_keywordDatabase = keywordDatabase;
+}
+
 std::string Server::getPort(){
     return this->_port;
 }
@@ -55,4 +61,23 @@ Location Server::getLocation()
 bool Server::getIsServerNameNothing()
 {
     return (this->_isServerNameNothing);
+}
+
+DataBase<std::string> Server::getKeywordDataBase()
+{
+    return (this->_keywordDatabase);
+}
+
+void Server::keywordFill()
+{
+
+    std::vector<std::string>  datas;
+
+    datas.push_back("listen");
+    datas.push_back("server_name");
+    datas.push_back("root");
+    datas.push_back("index");
+    datas.push_back("cgi_pass");
+
+    this->setKeywordDatabase(datas);
 }
