@@ -2,6 +2,8 @@
 
 Location::Location(/* args */)
 {
+    this->keywordFill();
+
 }
 Location::~Location()
 {
@@ -28,6 +30,12 @@ RedirectionUri Location::getRedirectionUri()
     return (this->_redirectionUri);
 }
 
+DataBase<std::string> Location::getKeywordDataBase()
+{
+    return (this->_keywordDatabase);
+}
+
+
 void Location::setRoot(std::string root)
 {
     this->_root = root;
@@ -47,4 +55,20 @@ void Location::setErrorPage(ErrorPage errorPage)
 void Location::setRedirectionUri(RedirectionUri redirectionUri)
 {
     this->_redirectionUri = redirectionUri;
+}
+
+void Location::setKeywordDatabase(DataBase<std::string> keywordDatabase)
+{
+    this->_keywordDatabase = keywordDatabase;
+}
+
+void Location::keywordFill()
+{
+    std::vector<std::string>  datas;
+
+    datas.push_back("allow");
+    datas.push_back("root");
+    datas.push_back("index");
+
+    this->setKeywordDatabase(datas);
 }

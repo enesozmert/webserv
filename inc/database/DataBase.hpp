@@ -9,8 +9,9 @@ class DataBase
     private:
 
     public:
-        DataBase();
+        std::vector<T> _data;    
 
+        DataBase(){}
         DataBase(std::vector<T> data)
         {
             this->_data = data;
@@ -19,7 +20,6 @@ class DataBase
         {
 
         }
-        std::vector<T> _data;    
 
 
 
