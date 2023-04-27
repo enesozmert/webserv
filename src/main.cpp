@@ -1,21 +1,17 @@
-#include "../inc/entity/ErrorPage.hpp"
-#include "../inc/entity/Http.hpp"
-#include "../inc/entity/Location.hpp"
-#include "../inc/entity/RedirectionUri.hpp"
-#include "../inc/entity/Server.hpp"
+#include "../inc/parser/Parser.hpp"
+
+#include <iostream>
+#include <string>
 
 int main(int ac, char **av)
 {
-    (void)av;
-    if (ac == 2)
+    if (ac != 2)
     {
-
-    }
-    else
-    {
-        std::cout<<"wrong argument"<<std::endl;
+        std::cerr << "Hata" << std::endl;
         return (-1);
     }
-
+    Parser *parser = new Parser();
+    std::string av1 = av[1];
+    parser->parse(av1);
     return (0);
 }
