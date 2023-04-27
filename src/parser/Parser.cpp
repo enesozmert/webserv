@@ -8,40 +8,87 @@ Parser::~Parser()
 {
 }
 
-void Parser::parse(std::string &fileName)
+void Parser::printVec(std::vector<std::string> vec)
+{
+    std::vector<std::string>::iterator it = vec.begin();
+
+    while(it != vec.end())
+    {
+        std::cout<<"I "<<*it<<" I ";
+        it++;
+    }
+    std::cout<<std::endl;
+
+}
+
+Location Parser::locationParse(size_t i, std::vector<std::string> lines)
+{
+    std::vector<Location> locations;
+    int location_index = 0;
+
+    for (; i < lines.size(); i++)
+    {
+        std::string line = lines[i];
+        std::cout<<"i "<<i<<" line :" << line << std::endl;
+        
+        //break;
+        if (line.find("location") != std::string::npos)
+        {
+            //locations[location_index].setRoot();
+//            std::cout<<"line :" << line << std::endl;
+            std::cout<<"test"<<std::endl;
+            break;
+        }
+       
+    }
+    return locations[location_index];
+}
+
+Server Parser::serverParse(size_t i, std::vector<std::string> lines)
+{
+    std::vector<Server> servers;
+    int server_index = 0;
+
+    for (; i < lines.size(); i++)
+    {
+        std::string line = lines[i];
+        //std::cout<<"line :" << line << std::endl;
+        
+        //break;
+        if (line.find("location") != std::string::npos)
+        {
+            i++;
+            
+            servers[server_index].setLocation(locationParse(i, lines));
+            break;
+        }
+       
+    }
+    return servers[server_index];
+}
+
+
+
+void Parser::parse(std::string& fileName)
 {
     File file(fileName);
     std::string fileContents = file.readToString();
     std::vector<std::string> lines;
-    std::string delimiter = "{};";
     size_t pos = 0;
-    while ((pos = fileContents.find_first_of(delimiter)) != std::string::npos)
+    //size_t i = 0;
+    while ((pos = fileContents.find("server")) != std::string::npos)
     {
+        pos = fileContents.find_first_of("\n", pos);
         std::string line = fileContents.substr(0, pos + 1);
         lines.push_back(line);
         fileContents.erase(0, pos + 1);
+
+        //break;
     }
+    Http http; 
+    http.setServer(serverParse(1, lines));
+
     file.close();
 
-    for (size_t i = 0; i < lines.size(); i++)
-    {
-        std::string line = lines[i];
-        if (line.find("server_name") != std::string::npos)
-        {
-            std::cout << "Server name: " << line.substr(line.find("server_name") + 12) << std::endl;
-        }
-        // else if (line.find("listen") != std::string::npos)
-        // {
-        //     std::cout << "Port: " << line.substr(line.find("listen") + 7) << std::endl;
-        // }
-        // else if (line.find("root") != std::string::npos)
-        // {
-        //     std::cout << "Root directory: " << line.substr(line.find("root") + 6) << std::endl;
-        // }
-        // else if (line.find("index") != std::string::npos)
-        // {
-        //     std::cout << "Default file: " << line.substr(line.find("index") + 7) << std::endl;
-        // }
-    }
-    // std::cout << fileContents << std::endl;
 }
+
