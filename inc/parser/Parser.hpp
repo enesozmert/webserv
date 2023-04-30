@@ -7,8 +7,10 @@
 #include <map>
 #include <iterator>
 #include "../file/File.hpp"
+#include "../entity/Http.hpp"
 
 class File;
+class Http;
 class Parser
 {
     private:
@@ -23,6 +25,8 @@ class Parser
 
         void parse(std::string &fileName);
         void parserScope(const std::vector<std::string> &lines);
+
+        void updateValueUsingAt(std::map<std::string, bool>& myMap, const std::string& key, bool newValue);
 
         void parserLocationPath(const std::string &location);
         void location(std::vector<std::string> tempScopes);

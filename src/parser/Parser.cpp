@@ -87,63 +87,75 @@ void Parser::parserLocationPath(const std::string &location)
     std::cout << "locationPath: " << locationPath[1] << std::endl;
 }
 
+void Parser::updateValueUsingAt(std::map<std::string, bool> &myMap, const std::string &key, bool newValue)
+{
+    try
+    {
+        myMap.at(key) = newValue;
+    }
+    catch (const std::out_of_range &oor)
+    {
+        std::cerr << "Key '" << key << "' not found in map." << std::endl;
+    }
+}
+
 void Parser::parserScope(const std::vector<std::string> &lines)
 {
-    std::string scopeTexts[3];
-    int inServerBlockOpen = 0;
-    int inServerBlockClose = 0;
+    // http htpp
+    // Server *server;
+    // if (lines[i] == "server(")
+    // {
+    //     while(lines[i] == '}' && ';' yoksa)
+    //     {
+    //         server[i].server_name = lines[i][j]
+    //         server[i].listen = lines[i][j + 1]
+    //         if (lines[i] == "location")
+    //         {
+    //             server[i].location[k].allow = lines[i][j]
+    //             server[i].location[k].root = lines[i][j + 1]
+    //         }
+    //     }
+    // }
 
-    scopeTexts[0] = "http";
-    scopeTexts[1] = "server";
-    scopeTexts[2] = "location";
-    method_function p[3] = {&Parser::http, &Parser::server, &Parser::location};
-    std::vector<std::string> tmpScopes;
+    // http.server = server;
 
-    for (size_t j = 0; j < 3; j++)
+    std::vector<std::string> scopeNames;
+    for (size_t i = 0; i < lines.size(); i++)
     {
-        for (size_t i = 0; i < lines.size(); i++)
+        std::string line = lines[i];
+        std::string lineTrim = this->trim(line, " \n\t\r{}");
+        if (lineTrim.find("http") != std::string::npos && lineTrim.length() == 4)
         {
-            std::string line = lines[i];
-            std::string lineTrim = this->trim(line, " {");
-            std::string lineTrimScope = this->trim(line, "{}");
-            std::string lineTrimSpace = this->trim(line, " ");
+            scopeNames.push_back(lineTrim);
+        }
+        else if (lineTrim.find("server") != std::string::npos && lineTrim.length() == 6)
+        {
+            scopeNames.push_back(lineTrim);
+        }
+        else if (line.find("location") != std::string::npos)
+        {
+            scopeNames.push_back(lineTrim.substr(0, 8));
+        }
+    }
 
-            if (line.find(scopeTexts[j]) != std::string::npos)
+    // for (size_t i = 0; i < scopeNames.size(); i++)
+    // {
+    //     std::cout << scopeNames[i] << std::endl;
+    // }
+    std::reverse(scopeNames.begin(), scopeNames.end());
+    for (size_t i = lines.size(); i > 0; i--)
+    {
+        std::string line = lines[i];
+        std::string lineTrim = this->trim(line, " \n\t\r{}");
+        for (size_t j = 0; j < scopeNames.size(); j++)
+        {
+            if (lineTrim.find("location") != std::string::npos)
             {
-                if (scopeTexts[j] == "location")
-                    this->parserLocationPath(lineTrim);
-                if (line.find("{") != std::string::npos)
-                {
-                    inServerBlockOpen++;
-                    continue;
-                }
-                // std::cout << "inServerBlock" << inServerBlock << std::endl;
+                lineTrim = "location";
             }
-            if (line.find("{") != std::string::npos)
-                {
-                    inServerBlockOpen++;
-                    continue;
-                }
-            if (line.find("}") != std::string::npos)
+            if (lineTrim == scopeNames[j] && lineTrim.find("{") != std::string::npos)
             {
-                // inServerBlock--;
-                inServerBlockClose++;
-                continue;
-            }
-
-            if (inServerBlockOpen != inServerBlockClose)
-            {
-                // std::cout << "ok 1" << scopeTexts[j] << std::endl;
-                tmpScopes.push_back(lineTrimScope);
-            }
-            else if (inServerBlockOpen == inServerBlockClose)
-            {
-                (this->*p[j])(tmpScopes);
-                inServerBlockClose = 0;
-                inServerBlockOpen = 0;
-                tmpScopes.clear();
-                // tmpScopes.resize(0);
-                // break;
+                std::cout << line << std::endl;
             }
         }
     }

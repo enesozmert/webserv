@@ -51,6 +51,11 @@ class DataBase
             return false;
         }
 
+        int size()
+        {
+            return (_data.size());
+        }
+
 };
 
 
