@@ -54,7 +54,7 @@ void Parser::location(std::vector<std::string> tempScopes)
     // (void)tempScopes;
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
-        std::cout << "Server ok parseLocation: " << tempScopes[i] << std::endl;
+        std::cout << "locaation ok : " << tempScopes[i] << std::endl;
     }
 
     std::cout << "**********parseLocation" << std::endl;
@@ -62,13 +62,22 @@ void Parser::location(std::vector<std::string> tempScopes)
 
 void Parser::server(std::vector<std::string> tempScopes)
 {
-    (void)tempScopes;
+    // (void)tempScopes;
+
+    for (size_t i = 0; i < tempScopes.size(); i++)
+    {
+        std::cout << "Server ok : " << tempScopes[i] << std::endl;
+    }
     std::cout << "**********parseServer" << std::endl;
 }
 
 void Parser::http(std::vector<std::string> tempScopes)
 {
-    (void)tempScopes;
+    // (void)tempScopes;
+    for (size_t i = 0; i < tempScopes.size(); i++)
+    {
+        std::cout << "http ok : " << tempScopes[i] << std::endl;
+    }
     std::cout << "**********parseHttp" << std::endl;
 }
 
@@ -80,10 +89,10 @@ void Parser::parserLocationPath(const std::string &location)
 
 void Parser::parserScope(const std::vector<std::string> &lines)
 {
-    int i;
     std::string scopeTexts[3];
+    int inServerBlockOpen = 0;
+    int inServerBlockClose = 0;
 
-    i = -1;
     scopeTexts[0] = "http";
     scopeTexts[1] = "server";
     scopeTexts[2] = "location";
@@ -92,43 +101,51 @@ void Parser::parserScope(const std::vector<std::string> &lines)
 
     for (size_t j = 0; j < 3; j++)
     {
-        int inServerBlock = 0;
-        int lineCount = 0;
         for (size_t i = 0; i < lines.size(); i++)
         {
             std::string line = lines[i];
             std::string lineTrim = this->trim(line, " {");
-            if (lineTrim.find(scopeTexts[j]) != std::string::npos && line.find("{") != std::string::npos)
+            std::string lineTrimScope = this->trim(line, "{}");
+            std::string lineTrimSpace = this->trim(line, " ");
+
+            if (line.find(scopeTexts[j]) != std::string::npos)
             {
                 if (scopeTexts[j] == "location")
                     this->parserLocationPath(lineTrim);
-                inServerBlock++;
+                if (line.find("{") != std::string::npos)
+                {
+                    inServerBlockOpen++;
+                    continue;
+                }
                 // std::cout << "inServerBlock" << inServerBlock << std::endl;
+            }
+            if (line.find("{") != std::string::npos)
+                {
+                    inServerBlockOpen++;
+                    continue;
+                }
+            if (line.find("}") != std::string::npos)
+            {
+                // inServerBlock--;
+                inServerBlockClose++;
                 continue;
             }
-            if (line.find("}") != std::string::npos && inServerBlock > 0)
+
+            if (inServerBlockOpen != inServerBlockClose)
             {
-                inServerBlock--;
-                continue;
+                // std::cout << "ok 1" << scopeTexts[j] << std::endl;
+                tmpScopes.push_back(lineTrimScope);
             }
-            if (lineTrim.find(scopeTexts[j]) == std::string::npos && inServerBlock > 0)
+            else if (inServerBlockOpen == inServerBlockClose)
             {
-                // server bloğundayız
-                tmpScopes.push_back(line);
-                // std::cout << "Server ok: " << line << std::endl;
-                lineCount++;
-                // burada yapılacak işlemler
-            }
-            else if (inServerBlock == 0)
-            {
-                // std::cout << "scopeTexts[j] " << scopeTexts[j] << "   Server no" << std::endl;
-                // server bloğunda değiliz
-                // burada yapılacak işlemler
+                (this->*p[j])(tmpScopes);
+                inServerBlockClose = 0;
+                inServerBlockOpen = 0;
+                tmpScopes.clear();
+                // tmpScopes.resize(0);
+                // break;
             }
         }
-        (this->*p[j])(tmpScopes);
-        tmpScopes.clear();
-        tmpScopes.resize(0);
     }
 }
 
