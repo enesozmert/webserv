@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+
 class ParseLineProp
 {
 private:
@@ -41,12 +42,12 @@ public:
         return _line;
     }
 
-    bool isScopeOpen() const
+    bool getIsScopeOpen()
     {
         return _isScopeOpen;
     }
 
-    bool isScopeClose() const
+    bool getIsScopeClose()
     {
         return _isScopeClose;
     }
@@ -76,18 +77,19 @@ public:
         this->_line = _line;
     }
 
-    void setIsScopeOpen(bool _isScopeOpen)
+    void setIsScopeOpen(bool isScopeOpen)
     {
-        this->_isScopeOpen = _isScopeOpen;
+        this->_isScopeOpen = isScopeOpen;
+        std::cout << "_isScopeOpen " << _isScopeOpen << std::endl;
     }
 
-    void setIsScopeClose(bool _isScopeClose)
+    void setIsScopeClose(bool isScopeClose)
     {
-        this->_isScopeClose = _isScopeClose;
+        this->_isScopeClose = isScopeClose;
     }
 };
 
-// bool compareByScopeOpenIndexSumScopeCloseIndex(const ParseLineProp &a, const ParseLineProp &b)
-// {
-//     return a.getScopeCloseIndex() + a.getScopeOpenIndex()  > b.getScopeCloseIndex() + b.getScopeOpenIndex();
-// }
+inline bool compareByScopeOpenIndex(const ParseLineProp &a, const ParseLineProp &b)
+{
+    return a.getScopeCloseIndex() < b.getScopeCloseIndex();
+}

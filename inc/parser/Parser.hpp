@@ -13,6 +13,7 @@
 #include "../entity/Location.hpp"
 #include "../entity/ParseLineProp.hpp"
 #include "../entity/IScope.hpp"
+// #include "../function/ParseLinePropFunc.hpp"
 
 class File;
 class Http;
@@ -22,7 +23,7 @@ class ParseLineProp;
 class Parser
 {
     private:
-        std::map<size_t, ParseLineProp> _parseLineProps;
+        std::map<size_t, ParseLineProp *> _parseLineProps;
         // std::vector<std::string> _lines;
         // std::vector<std::string> _linesNotScope;
     public:
@@ -44,7 +45,11 @@ class Parser
 
         void parseScope(const std::vector<std::string> &lines);
 
+        void parseScopeFill();
+
         void parseMatchClass(const std::vector<std::string> &lines);
+
+        void parseMatchedClassFill(std::map<size_t, IScope *> matchedClass);
 
         std::vector<std::string> getScopeOrderNames(const std::vector<std::string> &lines);
         size_t getScopeOrderNameCount(std::vector<std::string> scopeNames, std::string scopeName);
@@ -56,4 +61,3 @@ class Parser
         void server(std::vector<std::string> tempScopes);
         void http(std::vector<std::string> tempScopes);
 };
-
