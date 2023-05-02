@@ -5,12 +5,15 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <set>
 #include <iterator>
 #include "../file/File.hpp"
 #include "../entity/Http.hpp"
+#include "../entity/ParseLineProp.hpp"
 
 class File;
 class Http;
+class ParseLineProp;
 class Parser
 {
     private:
@@ -24,9 +27,12 @@ class Parser
         std::vector<std::string> splitString(const std::string &str, const char delimiter);
 
         void parse(std::string &fileName);
-        void parserScope(const std::vector<std::string> &lines);
+        void parseScope(const std::vector<std::string> &lines);
+        void parseMatchClass(std::vector<ParseLineProp> parseLineProps);
 
-        void updateValueUsingAt(std::map<std::string, bool>& myMap, const std::string& key, bool newValue);
+        std::vector<std::string> getScopeOrderNames(const std::vector<std::string> &lines);
+        size_t getScopeOrderNameCount(std::vector<std::string> scopeNames, std::string scopeName);
+        size_t findClosingScopeIndex(const std::vector<std::string>& lines, size_t startingIndex);
 
         void parserLocationPath(const std::string &location);
         void location(std::vector<std::string> tempScopes);
