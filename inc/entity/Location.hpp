@@ -7,10 +7,11 @@
 #include "ErrorPage.hpp"
 #include "RedirectionUri.hpp"
 #include "../database/DataBase.hpp"
+#include "IScope.hpp"
 
 class ErrorPage;
 class RedirectionUri;
-class Location
+class Location : public IScope
 {
     private:
         std::string _path;
@@ -42,5 +43,5 @@ class Location
 
         void keywordFill();
 
-
+        std::string getName() const;
 };

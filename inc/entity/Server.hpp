@@ -5,11 +5,12 @@
 #include <vector>
 #include "ErrorPage.hpp"
 #include "Location.hpp"
+#include "IScope.hpp"
 
 
 class ErrorPage;
 class Location;
-class Server
+class Server : public IScope
 {
     private:
         std::vector<Location> _locations; //location sinifi gelecek
@@ -41,6 +42,7 @@ class Server
         DataBase<std::string> getKeywordDataBase();
 
         void keywordFill();
-
+        
+        std::string getName() const;
 };
 

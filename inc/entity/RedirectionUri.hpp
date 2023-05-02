@@ -4,8 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "IScope.hpp"
 
-class RedirectionUri
+class RedirectionUri : public IScope
 {
 private:
     std::vector<std::string> _codes;
@@ -18,4 +19,6 @@ public:
     std::string getPageName();
     void setCodes(std::string code);
     void setPageName(std::string pageName);
+
+    std::string getName() const;
 };

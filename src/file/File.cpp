@@ -9,7 +9,7 @@ File::~File()
 {
 }
 
-File::File(const std::string& fileName) : _file(fileName)
+File::File(const std::string& fileName) : _file(fileName.c_str())
 {
     if (!_file.is_open()) {
             throw std::runtime_error("Could not open file");

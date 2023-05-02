@@ -4,8 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "IScope.hpp"
 
-class ErrorPage
+class ErrorPage : public IScope
 {
     private:
         std::vector<std::string> _codes;
@@ -18,4 +19,5 @@ class ErrorPage
         std::string getPageName();
         void setCodes(std::string code);
         void setPageName(std::string pageName);
+        std::string getName() const;
 };
