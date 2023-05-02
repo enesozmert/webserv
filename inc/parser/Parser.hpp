@@ -35,7 +35,15 @@ class Parser
         std::vector<std::string> splitString(const std::string &str, const char delimiter);
 
         void parse(std::string &fileName);
+
+        Server serverParse(size_t i, std::vector<std::string> lines);
+        Location locationParse(size_t i, std::vector<std::string> lines);
+
+
+        void printVec(std::vector<std::string> vec);
+
         void parseScope(const std::vector<std::string> &lines);
+
         void parseMatchClass(const std::vector<std::string> &lines);
 
         std::vector<std::string> getScopeOrderNames(const std::vector<std::string> &lines);

@@ -21,4 +21,6 @@ public:
     void setPageName(std::string pageName);
 
     std::string getName() const;
+    RedirectionUri* clone() const;
+
 };

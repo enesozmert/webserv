@@ -38,4 +38,6 @@ class Http : public IScope
         void keywordFill();
 
         std::string getName() const;
+        Http* clone() const;
+
 };

@@ -32,3 +32,5 @@ std::string RedirectionUri::getName() const
 {
     return (this->name);
 }
+
+RedirectionUri* RedirectionUri::clone() const { return new RedirectionUri(*this); }

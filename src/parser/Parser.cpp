@@ -314,4 +314,7 @@ void Parser::parse(std::string &fileName)
     }
     parseScope(lines);
     file.close();
+
+    // std::cout << "lineCount" << lineCount << std::endl;
+}
 }

@@ -86,3 +86,5 @@ std::string Server::getName() const
 {
     return (this->name);
 }
+
+Server* Server::clone() const { return new Server(*this); }

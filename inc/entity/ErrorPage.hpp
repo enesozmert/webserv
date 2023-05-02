@@ -20,4 +20,5 @@ class ErrorPage : public IScope
         void setCodes(std::string code);
         void setPageName(std::string pageName);
         std::string getName() const;
+        ErrorPage* clone() const;
 };

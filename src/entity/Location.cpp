@@ -87,3 +87,5 @@ std::string Location::getName() const
 {
     return (this->name);
 }
+
+Location* Location::clone() const { return new Location(*this); }

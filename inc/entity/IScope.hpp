@@ -10,6 +10,7 @@ class IScope
     protected:
         std::string name;
     public:
+        IScope() {}
         virtual ~IScope() {}
         virtual std::string getName() const = 0;
         virtual IScope* clone() const = 0;

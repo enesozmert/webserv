@@ -33,3 +33,6 @@ std::string ErrorPage::getName() const
 {
     return (this->name);
 }
+
+
+ErrorPage* ErrorPage::clone() const { return new ErrorPage(*this); }
