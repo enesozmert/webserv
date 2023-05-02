@@ -9,14 +9,22 @@
 #include <iterator>
 #include "../file/File.hpp"
 #include "../entity/Http.hpp"
+#include "../entity/Server.hpp"
+#include "../entity/Location.hpp"
 #include "../entity/ParseLineProp.hpp"
+#include "../entity/IScope.hpp"
 
 class File;
 class Http;
+class Server;
+class Location;
 class ParseLineProp;
 class Parser
 {
     private:
+        std::map<size_t, ParseLineProp> _parseLineProps;
+        // std::vector<std::string> _lines;
+        // std::vector<std::string> _linesNotScope;
     public:
         Parser();
         ~Parser();
@@ -28,11 +36,12 @@ class Parser
 
         void parse(std::string &fileName);
         void parseScope(const std::vector<std::string> &lines);
-        void parseMatchClass(std::vector<ParseLineProp> parseLineProps);
+        void parseMatchClass(const std::vector<std::string> &lines);
 
         std::vector<std::string> getScopeOrderNames(const std::vector<std::string> &lines);
         size_t getScopeOrderNameCount(std::vector<std::string> scopeNames, std::string scopeName);
-        size_t findClosingScopeIndex(const std::vector<std::string>& lines, size_t startingIndex);
+        size_t findClosingScopeIndex(const std::vector<std::string> &lines, size_t startingIndex);
+        size_t findOpeningScopeIndex(const std::vector<std::string> &lines, size_t closingIndex);
 
         void parserLocationPath(const std::string &location);
         void location(std::vector<std::string> tempScopes);

@@ -27,3 +27,8 @@ void RedirectionUri::setPageName(std::string pageName)
 {
     this->_pageName = pageName;
 }
+
+std::string RedirectionUri::getName() const
+{
+    return (this->name);
+}

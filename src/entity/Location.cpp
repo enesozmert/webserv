@@ -82,3 +82,8 @@ void Location::setPath(std::string path)
 {
     this->_path = path;
 }
+
+std::string Location::getName() const
+{
+    return (this->name);
+}

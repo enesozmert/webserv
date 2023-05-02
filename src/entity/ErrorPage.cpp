@@ -27,3 +27,9 @@ void ErrorPage::setPageName(std::string pageName)
 {
     this->_pageName = pageName;
 }
+
+
+std::string ErrorPage::getName() const
+{
+    return (this->name);
+}

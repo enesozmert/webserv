@@ -62,3 +62,8 @@ void Http::keywordFill()
 
     this->setKeywordDatabase(datas);
 }
+
+std::string Http::getName() const
+{
+    return (this->name);
+}

@@ -87,7 +87,7 @@ public:
     }
 };
 
-bool compareByScopeOpenIndexSumScopeCloseIndex(const ParseLineProp &a, const ParseLineProp &b)
-{
-    return a.getScopeCloseIndex() + a.getScopeOpenIndex()  > b.getScopeCloseIndex() + b.getScopeOpenIndex();
-}
+// bool compareByScopeOpenIndexSumScopeCloseIndex(const ParseLineProp &a, const ParseLineProp &b)
+// {
+//     return a.getScopeCloseIndex() + a.getScopeOpenIndex()  > b.getScopeCloseIndex() + b.getScopeOpenIndex();
+// }

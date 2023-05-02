@@ -81,3 +81,8 @@ void Server::keywordFill()
 
     this->setKeywordDatabase(datas);
 }
+
+std::string Server::getName() const
+{
+    return (this->name);
+}
