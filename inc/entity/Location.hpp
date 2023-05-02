@@ -7,12 +7,14 @@
 #include "ErrorPage.hpp"
 #include "RedirectionUri.hpp"
 #include "../database/DataBase.hpp"
+#include "IScope.hpp"
 
 class ErrorPage;
 class RedirectionUri;
-class Location
+class Location : public IScope
 {
     private:
+        std::string _path;
         std::string _root;
         bool _autoindex;
         std::string _index;
@@ -29,7 +31,7 @@ class Location
         ErrorPage getErrorPage();
         RedirectionUri getRedirectionUri();
         DataBase<std::string> getKeywordDataBase();
-
+        std::string getPath();
 
         void setRoot(std::string root);
         void setIndex(std::string index);
@@ -37,8 +39,9 @@ class Location
         void setErrorPage(ErrorPage errorPage);
         void setRedirectionUri(RedirectionUri redirectionUri);
         void setKeywordDatabase(DataBase<std::string> keywordDatabase);
+        void setPath(std::string path);
 
         void keywordFill();
 
-
+        std::string getName() const;
 };

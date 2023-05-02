@@ -35,6 +35,11 @@ DataBase<std::string> Location::getKeywordDataBase()
     return (this->_keywordDatabase);
 }
 
+std::string Location::getPath()
+{
+    return (this->_path);
+}
+
 
 void Location::setRoot(std::string root)
 {
@@ -71,4 +76,14 @@ void Location::keywordFill()
     datas.push_back("index");
 
     this->setKeywordDatabase(datas);
+}
+
+void Location::setPath(std::string path)
+{
+    this->_path = path;
+}
+
+std::string Location::getName() const
+{
+    return (this->name);
 }

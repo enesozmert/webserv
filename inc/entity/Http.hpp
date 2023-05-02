@@ -6,10 +6,11 @@
 #include <string>
 #include "Server.hpp"
 #include "ErrorPage.hpp"
+#include "IScope.hpp"
 
 class Server;
 class ErrorPage;
-class Http
+class Http : public IScope
 {
     private:
         std::string _clientMaxBodySize;
@@ -36,4 +37,5 @@ class Http
 
         void keywordFill();
 
+        std::string getName() const;
 };

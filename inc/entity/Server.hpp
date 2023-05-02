@@ -5,14 +5,15 @@
 #include <vector>
 #include "ErrorPage.hpp"
 #include "Location.hpp"
+#include "IScope.hpp"
 
 
 class ErrorPage;
 class Location;
-class Server
+class Server : public IScope
 {
     private:
-        Location _location; //location sinifi gelecek
+        std::vector<Location> _locations; //location sinifi gelecek
         std::string _port;// listen(string)[port(8080)]
         std::string _host; // listen(string)[host:port(127.0.0.1:80)]
         std::vector<std::string> _serverNames;
@@ -36,11 +37,12 @@ class Server
         std::string getHost();
         ErrorPage getErrorPage();
         std::vector<std::string> getServerName();
-        Location getLocation();
+        std::vector<Location> getLocations();
         bool getIsServerNameNothing();
         DataBase<std::string> getKeywordDataBase();
 
         void keywordFill();
-
+        
+        std::string getName() const;
 };
 

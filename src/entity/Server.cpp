@@ -23,7 +23,7 @@ void Server::setServerName(std::string serverName){
 
 void Server::setLocation(Location location)
 {
-    this->_location = location;
+    this->_locations.push_back(location);
 }
 
 void Server::setErrorPage(ErrorPage errorPage){
@@ -53,9 +53,9 @@ std::vector<std::string> Server::getServerName(){
     return this->_serverNames;
 }
 
-Location Server::getLocation()
+std::vector<Location> Server::getLocations()
 {
-    return (this->_location);
+    return (this->_locations);
 }
 
 bool Server::getIsServerNameNothing()
@@ -80,4 +80,9 @@ void Server::keywordFill()
     datas.push_back("cgi_pass");
 
     this->setKeywordDatabase(datas);
+}
+
+std::string Server::getName() const
+{
+    return (this->name);
 }
