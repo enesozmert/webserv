@@ -67,3 +67,6 @@ std::string Http::getName() const
 {
     return (this->name);
 }
+
+Http* Http::clone() const { return new Http(*this); }
+

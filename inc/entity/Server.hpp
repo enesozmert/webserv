@@ -44,5 +44,7 @@ class Server : public IScope
         void keywordFill();
         
         std::string getName() const;
+        Server* clone() const;
+
 };
 

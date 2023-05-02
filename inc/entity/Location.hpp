@@ -44,4 +44,6 @@ class Location : public IScope
         void keywordFill();
 
         std::string getName() const;
+        Location* clone() const;
+        
 };

@@ -42,7 +42,7 @@ class Parser
 
         void printVec(std::vector<std::string> vec);
 
-        void parserScope(const std::vector<std::string> &lines);
+        void parseScope(const std::vector<std::string> &lines);
 
         void parseMatchClass(const std::vector<std::string> &lines);
 
