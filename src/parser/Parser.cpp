@@ -52,16 +52,18 @@ std::vector<std::string> Parser::splitString(const std::string &str, const char 
 void Parser::parseLocation(std::vector<size_t> tempScopes)
 {
     // (void)tempScopes;
-    std::string temp;
+    std::string tempVariableName;
+    std::string tempVariableValue;
     DataBase<Variable<std::string> > database = this->location.getKeywordDataBase();
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
         std::stringstream s(this->_parseLineProps.at(tempScopes[i]).getLine());
-        s >> temp;
-        Variable<std::string> ver(temp, &temp);
-        if (database.isHere(IsVariableNameEqual))
+        s >> tempVariableName;
+        s >> tempVariableValue;
+        Variable<std::string> ver(tempVariableName, &tempVariableValue);
+        if (database.isHere<IsVariableNameEqual>(tempVariableName))
         {
-            std::cout << "ok *********dklsjfdksjfklsdjfkldsjflksjfl" << temp << std::endl;
+            std::cout << "ok *********variable name : " << tempVariableName << " variable value :" << tempVariableValue << std::endl;
         }
         std::cout << "locaation ok : " << tempScopes[i] << std::endl;
     }

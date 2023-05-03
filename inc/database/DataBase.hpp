@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
-#include <functional>
+#include "../function/VariableFunc.hpp"
 
 template <typename T>
 class DataBase
@@ -12,6 +12,7 @@ class DataBase
     private:
 
     public:
+        typedef bool (*EventFunction)(T);
         std::vector<T> _data;    
 
         DataBase(){}
@@ -44,10 +45,10 @@ class DataBase
                 this->_data.erase(it);
             }
         }
-
-        bool isHere(std::function<bool(T)> event)
+        template <typename K>
+        bool isHere(std::string event)
         {
-            return (std::find_if(_data.begin(), _data.end(), event) != this->_data.end());
+            return (std::find_if(_data.begin(), _data.end(), K(event)) != this->_data.end());
         }
 
         int size()
