@@ -13,7 +13,7 @@ std::string Location::getRoot()
 {
     return (this->_root);
 }
-bool Location::getAutoindex()
+std::string Location::getAutoindex()
 {
     return (this->_autoindex);
 }
@@ -30,7 +30,7 @@ RedirectionUri Location::getRedirectionUri()
     return (this->_redirectionUri);
 }
 
-DataBase<std::string> Location::getKeywordDataBase()
+DataBase<Variable<std::string> > Location::getKeywordDataBase()
 {
     return (this->_keywordDatabase);
 }
@@ -49,7 +49,7 @@ void Location::setIndex(std::string index)
 {
     this->_index = index;
 }
-void Location::setAutoindex(bool autoIndex)
+void Location::setAutoindex(std::string autoIndex)
 {
     this->_autoindex = autoIndex;
 }
@@ -62,18 +62,19 @@ void Location::setRedirectionUri(RedirectionUri redirectionUri)
     this->_redirectionUri = redirectionUri;
 }
 
-void Location::setKeywordDatabase(DataBase<std::string> keywordDatabase)
+void Location::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 {
     this->_keywordDatabase = keywordDatabase;
 }
 
 void Location::keywordFill()
 {
-    std::vector<std::string>  datas;
+    std::vector<Variable<std::string> >  datas;
 
-    datas.push_back("allow");
-    datas.push_back("root");
-    datas.push_back("index");
+    datas.push_back(Variable<std::string>("root", &this->_root));
+    datas.push_back(Variable<std::string>("index", &this->_index));
+    datas.push_back(Variable<std::string>("auto_index", &this->_autoindex));
+    // datas.push_back(Variable<std::string>("path", &this->_path));
 
     this->setKeywordDatabase(datas);
 }

@@ -8,6 +8,7 @@
 #include "RedirectionUri.hpp"
 #include "../database/DataBase.hpp"
 #include "IScope.hpp"
+#include "Variable.hpp"
 
 class ErrorPage;
 class RedirectionUri;
@@ -16,29 +17,29 @@ class Location : public IScope
     private:
         std::string _path;
         std::string _root;
-        bool _autoindex;
+        std::string _autoindex;
         std::string _index;
         ErrorPage _errorPage;
         RedirectionUri _redirectionUri;
-        DataBase<std::string> _keywordDatabase;
+        DataBase<Variable<std::string> > _keywordDatabase;
 
     public:
         Location(/* args */);
         ~Location();
         std::string getRoot();
-        bool getAutoindex();
+        std::string getAutoindex();
         std::string getIndex();
         ErrorPage getErrorPage();
         RedirectionUri getRedirectionUri();
-        DataBase<std::string> getKeywordDataBase();
+        DataBase<Variable<std::string> > getKeywordDataBase();
         std::string getPath();
 
         void setRoot(std::string root);
         void setIndex(std::string index);
-        void setAutoindex(bool autoIndex);
+        void setAutoindex(std::string autoIndex);
         void setErrorPage(ErrorPage errorPage);
         void setRedirectionUri(RedirectionUri redirectionUri);
-        void setKeywordDatabase(DataBase<std::string> keywordDatabase);
+        void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
         void setPath(std::string path);
 
         void keywordFill();

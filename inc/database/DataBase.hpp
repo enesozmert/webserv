@@ -1,7 +1,10 @@
+#pragma once
+
 #include <vector>
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 template <typename T>
 class DataBase
@@ -21,7 +24,7 @@ class DataBase
 
         }
 
-        void createData(T data) // add new element
+        void insertData(T data) // add new element
         {
             this->_data.push_back(data);
         }
@@ -42,13 +45,9 @@ class DataBase
             }
         }
 
-        bool isHere(T dataName)
+        bool isHere(std::function<bool(T)> event)
         {
-            for (int i = 0; i < this->_data.size(); i++) {
-                if (this->_data[i] == dataName)
-                    return true;
-            }
-            return false;
+            return (std::find_if(_data.begin(), _data.end(), event) != this->_data.end());
         }
 
         int size()

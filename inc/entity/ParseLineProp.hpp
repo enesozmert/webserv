@@ -17,10 +17,10 @@ private:
     bool _isScopeClose;
 
 public:
-    ParseLineProp(/* args */) {}
+    ParseLineProp(/* args */) : _index(0) ,_scopeOpenIndex(0), _scopeCloseIndex(0), _isScopeOpen(false), _isScopeClose(false) {}
     ParseLineProp(const ParseLineProp &other) : _index(other._index),
                                                 _scopeOpenIndex(other._scopeOpenIndex), _scopeCloseIndex(other._scopeCloseIndex),
-                                                _scopeName(other._scopeName), _line(other._line)
+                                                _scopeName(other._scopeName), _line(other._line), _isScopeOpen(other._isScopeOpen), _isScopeClose(other._isScopeClose)
     {
     }
     ~ParseLineProp() {}
@@ -77,19 +77,13 @@ public:
         this->_line = _line;
     }
 
-    void setIsScopeOpen(bool isScopeOpen)
+    void setIsScopeOpen(bool _isScopeOpen)
     {
-        this->_isScopeOpen = isScopeOpen;
-        std::cout << "_isScopeOpen " << _isScopeOpen << std::endl;
+        this->_isScopeOpen = _isScopeOpen;
     }
 
-    void setIsScopeClose(bool isScopeClose)
+    void setIsScopeClose(bool _isScopeClose)
     {
-        this->_isScopeClose = isScopeClose;
+        this->_isScopeClose = _isScopeClose;
     }
 };
-
-inline bool compareByScopeOpenIndex(const ParseLineProp &a, const ParseLineProp &b)
-{
-    return a.getScopeCloseIndex() < b.getScopeCloseIndex();
-}

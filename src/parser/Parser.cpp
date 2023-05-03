@@ -1,6 +1,6 @@
 #include "../inc/parser/Parser.hpp"
 
-typedef void (IScope::*method_function)(std::vector<std::string>);
+typedef void (Parser::*method_function)(std::vector<size_t>);
 
 Parser::Parser(/* args */)
 {
@@ -49,21 +49,30 @@ std::vector<std::string> Parser::splitString(const std::string &str, const char 
     return tokens;
 }
 
-void Parser::location(std::vector<std::string> tempScopes)
+void Parser::parseLocation(std::vector<size_t> tempScopes)
 {
     // (void)tempScopes;
+    std::string temp;
+    DataBase<Variable<std::string> > database = this->location.getKeywordDataBase();
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
+        std::stringstream s(this->_parseLineProps.at(tempScopes[i]).getLine());
+        s >> temp;
+        Variable<std::string> ver(temp, &temp);
+        if (database.isHere(IsVariableNameEqual))
+        {
+            std::cout << "ok *********dklsjfdksjfklsdjfkldsjflksjfl" << temp << std::endl;
+        }
         std::cout << "locaation ok : " << tempScopes[i] << std::endl;
     }
 
     std::cout << "**********parseLocation" << std::endl;
 }
 
-void Parser::server(std::vector<std::string> tempScopes)
+void Parser::parseServer(std::vector<size_t> tempScopes)
 {
     // (void)tempScopes;
-
+    // this->server.getKeywordDataBase();
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
         std::cout << "Server ok : " << tempScopes[i] << std::endl;
@@ -71,7 +80,7 @@ void Parser::server(std::vector<std::string> tempScopes)
     std::cout << "**********parseServer" << std::endl;
 }
 
-void Parser::http(std::vector<std::string> tempScopes)
+void Parser::parseHttp(std::vector<size_t> tempScopes)
 {
     // (void)tempScopes;
     for (size_t i = 0; i < tempScopes.size(); i++)
@@ -175,45 +184,53 @@ size_t Parser::findOpeningScopeIndex(const std::vector<std::string> &lines, size
 
 void Parser::parseScopeFill()
 {
-     std::map<size_t, ParseLineProp *> parseLineProps;
+    size_t tempCloseIndex;
+    std::vector<size_t> tempLines;
+    std::vector<ParseLineProp> vectorParseLineProps;
+    std::string method_function_name[3] = {"http", "server", "location"};
+    method_function p[3] = {&Parser::parseHttp, &Parser::parseServer, &Parser::parseLocation};
 
-     parseLineProps = _parseLineProps;
-
-    std::sort(_parseLineProps.begin(), _parseLineProps.end(), compareByScopeOpenIndex);
     for (size_t i = 0; i < _parseLineProps.size(); i++)
     {
-        std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i]->getIndex() << std::endl;
-        std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i]->getLine() << std::endl;
-        std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i]->getScopeOpenIndex() << std::endl;
-        std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i]->getScopeName() << std::endl;
-        std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i]->getScopeCloseIndex() << std::endl;
+        vectorParseLineProps.push_back(_parseLineProps.at(i));
+    }
+    std::sort(vectorParseLineProps.begin(), vectorParseLineProps.end(), compareByScopeOpenIndex);
+    tempCloseIndex = vectorParseLineProps[0].getScopeCloseIndex();//8
+    for (size_t i = 0; i < vectorParseLineProps.size(); i++)
+    {
+        std::cout << "parseLineProps[i].getIndex() : " << vectorParseLineProps[i].getIndex() << std::endl;
+        std::cout << "parseLineProps[i].getLine() : " << vectorParseLineProps[i].getLine() << std::endl;
+        std::cout << "parseLineProps[i].getScopeOpenIndex() : " << vectorParseLineProps[i].getScopeOpenIndex() << std::endl;
+        std::cout << "parseLineProps[i].getScopeName() : " << vectorParseLineProps[i].getScopeName() << std::endl;
+        std::cout << "parseLineProps[i].getScopeCloseIndex() : " << vectorParseLineProps[i].getScopeCloseIndex() << std::endl;
         // std::cout << "parseLineProps[i].getLineNotScope() : " << parseLineProps[i].getLineNotScope() << std::endl;
-        std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i]->getIsScopeOpen() << std::endl;
-        std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i]->getIsScopeClose() << std::endl;
+        std::cout << "parseLineProps[i].getIsScopeOpen() : " << vectorParseLineProps[i].getIsScopeOpen() << std::endl;
+        std::cout << "parseLineProps[i].getIsScopeClose() : " << vectorParseLineProps[i].getIsScopeClose() << std::endl;
         std::cout << "****************************" << std::endl;
     }
-    // for (size_t i = 0; i < _parseLineProps.size(); i++)
-    // {
-    //     if (parseLineProps[parseLineProps[i].getScopeOpenIndex()].getIndex() != parseLineProps[i].getScopeCloseIndex())
-    //     {
-    //         // tempLines.push_back(parseLineProps[i].getLine());
-    //     }
-    //     std::cout << "parseLineProps[i].getIndex() : " << parseLineProps[i].getIndex() << std::endl;
-    //     if (parseLineProps[i].getIndex() == parseLineProps[i].getScopeCloseIndex())
-    //     {
-    //         for (size_t j = 0; j < 3; j++)
-    //         {
-    //             std::cout << "parseLineProps[parseLineProps[i].getScopeOpenIndex()].getScopeName() : " << parseLineProps[parseLineProps[i].getScopeOpenIndex()].getScopeName() << std::endl;
-    //             if (parseLineProps[parseLineProps[i].getScopeOpenIndex()].getScopeName() == method_function_name[j])
-    //             {
-    //                 std::cout << "method_function_name[j]" << method_function_name[j] << std::endl;
-    //                 // (this->*p[j])(tempLines);
-    //                 // tempLines.clear();
-    //                 break;
-    //             }
-    //         }
-    //     }
-    // }
+    for (size_t i = 0; i < vectorParseLineProps.size() + 1; i++)
+    {
+        // std::cout << " vectorParseLineProps[i].getScopeCloseIndex() : " << vectorParseLineProps[i].getScopeCloseIndex() << std::endl;
+        // std::cout << "tempCloseIndex = vectorParseLineProps[i].getScopeCloseIndex();" << tempCloseIndex << std::endl;
+        if (tempCloseIndex != vectorParseLineProps[i].getScopeCloseIndex())
+        {
+            // std::cout << "eşit değil" << vectorParseLineProps[i].getIndex() << std::endl;
+            for (size_t j = 0; j < 3; j++)
+            {
+                if (vectorParseLineProps[i - 1].getScopeName() == method_function_name[j])
+                {
+                    (this->*p[j])(tempLines);
+                    tempLines.clear();
+                }
+            }
+            tempCloseIndex = vectorParseLineProps[i].getScopeCloseIndex();
+        }
+        if (tempCloseIndex == vectorParseLineProps[i].getScopeCloseIndex() && vectorParseLineProps[i].getIsScopeOpen() == false && vectorParseLineProps[i].getIsScopeClose() == false)
+        {
+            // std::cout << "eşit" << vectorParseLineProps[i].getIndex() << std::endl;
+            tempLines.push_back(vectorParseLineProps[i].getIndex());
+        }
+    }
 }
 
 void Parser::parseMatchedClassFill(std::map<size_t, IScope *> matchedClass)
@@ -227,10 +244,7 @@ void Parser::parseMatchedClassFill(std::map<size_t, IScope *> matchedClass)
 void Parser::parseMatchClass(const std::vector<std::string> &lines)
 {
     std::map<size_t, IScope *> matchedClass;
-    Http http;
-    Server server;
-    Location location;
-    IScope* classes[3] = {&http, &server, &location};
+    IScope* classes[3] = {&this->http, &this->server, &this->location};
     std::string method_function_name[3] = {"http", "server", "location"};
     std::vector<std::string> scopeOrderNames;
 
@@ -287,18 +301,21 @@ void Parser::parseScope(const std::vector<std::string> &lines)
         {
             scopeOpenIndex = i;
             scopeName = scopeOrderNames[scopeOpenCount];
-            parseLineProp->setIsScopeOpen(true);
+            // parseLineProp->setIsScopeOpen(true);
             // std::cout << "is open true" << std::endl;
             // scopeOrderNames.erase(scopeOrderNames.begin() + j);
             // parseLineProp->setScopeCloseIndex(findClosingScopeIndex(lines, i));
+            parseLineProp->setIsScopeOpen(true);
             scopeCloseIndex = findClosingScopeIndex(lines, i);
         }
         if (line.find("{") != std::string::npos)
         {
+            parseLineProp->setIsScopeOpen(true);
             scopeOpenIndex = i;
             scopeOpenCount++;
         }
         parseLineProp->setScopeOpenIndex(scopeOpenIndex);
+        parseLineProp->setScopeName(scopeName);
         if (line.find("}") != std::string::npos)
         {
             // size_t open = ;
@@ -307,6 +324,7 @@ void Parser::parseScope(const std::vector<std::string> &lines)
             // parseLineProp->setScopeCloseIndex(i);
             scopeCloseIndex = i;
             parseLineProp->setScopeOpenIndex(findOpeningScopeIndex(lines, i));
+            parseLineProp->setScopeName(_parseLineProps[findOpeningScopeIndex(lines, i)].getScopeName());
             // parseLineProp->setIsScopeClose(true);
             // std::cout << "Opening" << findOpeningScopeIndex(lines, i) << std::endl;
             // continue;
@@ -314,24 +332,24 @@ void Parser::parseScope(const std::vector<std::string> &lines)
         parseLineProp->setScopeCloseIndex(scopeCloseIndex);
         // ParseLineProp temp = *parseLineProp;
         // parseLineProp->setScopeOpenIndex(scopeOpenIndex);
-        parseLineProp->setScopeName(scopeName);
-        _parseLineProps.insert(std::pair<size_t, ParseLineProp *>((parseLineProp)->getIndex(), parseLineProp));
-        // delete parseLineProp;
+        _parseLineProps.insert(std::pair<size_t, ParseLineProp>((parseLineProp)->getIndex(), *parseLineProp));
+        delete parseLineProp;
     }
     // std::sort(parseLineProps.begin(), parseLineProps.end(), compareByScopeCloseIndex);
-
-    for (size_t i = 0; i < _parseLineProps.size(); i++)
-    {
-        std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i]->getIndex() << std::endl;
-        std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i]->getLine() << std::endl;
-        std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i]->getScopeOpenIndex() << std::endl;
-        std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i]->getScopeName() << std::endl;
-        std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i]->getScopeCloseIndex() << std::endl;
-        // std::cout << "parseLineProps[i].getLineNotScope() : " << parseLineProps[i].getLineNotScope() << std::endl;
-        std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i]->getIsScopeOpen() << std::endl;
-        std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i]->getIsScopeClose() << std::endl;
-        std::cout << "****************************" << std::endl;
-    }
+    // for (size_t i = 0; i < _parseLineProps.size(); i++)
+    // {
+    //     std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i].getIndex() << std::endl;
+    //     std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i].getLine() << std::endl;
+    //     std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i].getScopeOpenIndex() << std::endl;
+    //     std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i].getScopeName() << std::endl;
+    //     std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i].getScopeCloseIndex() << std::endl;
+    //     // std::cout << "parseLineProps[i].getLineNotScope() : " << parseLineProps[i].getLineNotScope() << std::endl;
+    //     std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i].getIsScopeOpen() << std::endl;
+    //     std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i].getIsScopeClose() << std::endl;
+    //     std::cout << "****************************" << std::endl;
+    // }
+    // std::cout << "ok*************************************" << std::endl;
+    parseScopeFill();
     parseMatchClass(lines);
 }
 

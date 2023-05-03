@@ -8,12 +8,15 @@
 #include <set>
 #include <iterator>
 #include "../file/File.hpp"
+#include "../database/DataBase.hpp"
 #include "../entity/Http.hpp"
 #include "../entity/Server.hpp"
 #include "../entity/Location.hpp"
 #include "../entity/ParseLineProp.hpp"
 #include "../entity/IScope.hpp"
-// #include "../function/ParseLinePropFunc.hpp"
+#include "../entity/Variable.hpp"
+#include "../function/ParseLinePropFunc.hpp"
+#include "../function/VariableFunc.hpp"
 
 class File;
 class Http;
@@ -23,7 +26,10 @@ class ParseLineProp;
 class Parser
 {
     private:
-        std::map<size_t, ParseLineProp *> _parseLineProps;
+        Http http;
+        Server server;
+        Location location;
+        std::map<size_t, ParseLineProp> _parseLineProps;
         // std::vector<std::string> _lines;
         // std::vector<std::string> _linesNotScope;
     public:
@@ -57,7 +63,7 @@ class Parser
         size_t findOpeningScopeIndex(const std::vector<std::string> &lines, size_t closingIndex);
 
         void parserLocationPath(const std::string &location);
-        void location(std::vector<std::string> tempScopes);
-        void server(std::vector<std::string> tempScopes);
-        void http(std::vector<std::string> tempScopes);
+        void parseLocation(std::vector<size_t> tempScopes);
+        void parseServer(std::vector<size_t> tempScopes);
+        void parseHttp(std::vector<size_t> tempScopes);
 };
