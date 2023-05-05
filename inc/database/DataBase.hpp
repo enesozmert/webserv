@@ -29,10 +29,11 @@ class DataBase
         {
             this->_data.push_back(data);
         }
-
-        void updateData(T oldData, T newData)
+        
+        template <typename K>
+        void updateData(std::string name, T newData)
         {
-            typename std::vector<T>::iterator it = std::find(this->_data.begin(), this->_data.end(), oldData);
+            typename std::vector<T>::iterator it = std::find_if(this->_data.begin(), this->_data.end(), K(name));
 
             if (it != this->_data.end())
                 *it = newData;

@@ -73,6 +73,7 @@ class Parser
 
         void parserLocationPath(const std::string &location);
 
+        void setOrderParseLineProps();
         void parseLocation(std::vector<size_t> tempScopes);
         void parseServer(std::vector<size_t> tempScopes);
         void parseHttp(std::vector<size_t> tempScopes);

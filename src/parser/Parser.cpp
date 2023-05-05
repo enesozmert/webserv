@@ -8,6 +8,7 @@ Parser::Parser(/* args */) : _matchedClassIndex(0)
 
 Parser::~Parser()
 {
+
 }
 
 std::string Parser::cleanString(std::string str)
@@ -53,12 +54,18 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
 {
     // (void)tempScopes;
     std::string tempVariableName;
-    Variable<std::string>  findedVariable;
     std::string tempVariableValue;
+    Variable<std::string>  findedVariable;
     DataBase<Variable<std::string> > database = this->location.getKeywordDataBase();
+    DataBase<Variable<std::string> > databaseLocationPtr;
 
     std::cout << "_matchedClassIndex" << _matchedClassIndex << std::endl;
-    this->locationPtr = dynamic_cast<Location*>(_matchedClass[_matchedClassIndex]);
+    this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(_matchedClassIndex));
+    if (this->locationPtr == NULL)
+    {
+        std::cout << "nulll" << _matchedClassIndex << std::endl;
+    }
+    databaseLocationPtr = locationPtr->getKeywordDataBase();
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
         std::stringstream s(this->trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
@@ -68,7 +75,8 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
         if (database.isHere<IsVariableNameEqual>(tempVariableName))
         {
             findedVariable = this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName);
-            // this->locationPtr->getKeywordDataBase().updateData(findedVariable, variableNew);
+            std::cout << "findedVariable.getName() " << findedVariable.getName() << std::endl;
+            this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual>(tempVariableName, variableNew);
             std::cout << "ok *********variable name : " << tempVariableName << " variable value :" << tempVariableValue << std::endl;
         }
         std::cout << "locaation ok : " << tempScopes[i] << std::endl;
@@ -153,6 +161,15 @@ void Parser::setOrderScopeNames()
 
 }
 
+void Parser::setOrderParseLineProps()
+{
+    for (size_t i = 0; i < _parseLineProps.size(); i++)
+    {
+        _orderParseLineProps.push_back(_parseLineProps.at(i));
+    }
+    std::sort(_orderParseLineProps.begin(), _orderParseLineProps.end(), compareByScopeOpenIndex);
+}
+
 size_t Parser::getScopeOrderNameCount(std::vector<std::string> scopeNames, std::string scopeName)
 {
     size_t scopeCount = 0;
@@ -223,11 +240,6 @@ void Parser::parseScopeFill()
     std::string method_function_name[3] = {"http", "server", "location"};
     method_function p[3] = {&Parser::parseHttp, &Parser::parseServer, &Parser::parseLocation};
 
-    for (size_t i = 0; i < _parseLineProps.size(); i++)
-    {
-        _orderParseLineProps.push_back(_parseLineProps.at(i));
-    }
-    std::sort(_orderParseLineProps.begin(), _orderParseLineProps.end(), compareByScopeOpenIndex);
     tempCloseIndex = _orderParseLineProps[0].getScopeCloseIndex(); // 8
     for (size_t i = 0; i < _orderParseLineProps.size(); i++)
     {
@@ -292,10 +304,10 @@ void Parser::parseMatchClass()
         }
     }
     // std::cout << matchedClass.size() << std::endl;
-    // Http *http1 = dynamic_cast<Http*>(matchedClass.at(0));
-    // http1->setClientMaxBodySize("enes");
-    // std::cout << "matchedClass.at(0)->getName() : " << http1->getClientMaxBodySize() << std::endl;
-    parseMatchedClassFill(_matchedClass);
+    // Location *location = dynamic_cast<Location*>(_matchedClass.at(2));
+    // location->setPath("enes");
+    // std::cout << "matchedClass.at(0)->getName() : " << location->getPath() << std::endl;
+    // parseMatchedClassFill(_matchedClass);
 }
 
 void Parser::parseScope(const std::vector<std::string> &lines)
@@ -376,9 +388,10 @@ void Parser::parseScope(const std::vector<std::string> &lines)
     //     std::cout << "****************************" << std::endl;
     // }
     // std::cout << "ok*************************************" << std::endl;
-    parseScopeFill();
+    setOrderParseLineProps();
     setOrderScopeNames();
     parseMatchClass();
+    parseScopeFill();
 }
 
 void Parser::parse(std::string &fileName)
@@ -397,9 +410,11 @@ void Parser::parse(std::string &fileName)
         // std::cout << "line : " << lineTrim << std::endl;
         fileCleanContents.erase(0, pos + 1);
     }
+    file.close();
     setScopeNames(lines);
     parseScope(lines);
-    file.close();
+    // this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(0));
+    // std::cout << "this->_matchedClass.at(0) : " << this->locationPtr->getAutoindex() << std::endl;
 
     // std::cout << "lineCount" << lineCount << std::endl;
 }
