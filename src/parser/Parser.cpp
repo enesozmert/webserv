@@ -57,7 +57,7 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
     DataBase<Variable<std::string> > database = this->location.getKeywordDataBase();
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
-        std::stringstream s(this->_parseLineProps.at(tempScopes[i]).getLine());
+        std::stringstream s(this->trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         s >> tempVariableValue;
         Variable<std::string> ver(tempVariableName, &tempVariableValue);
