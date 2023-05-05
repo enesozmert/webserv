@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+
 class ParseLineProp
 {
 private:
@@ -16,10 +17,10 @@ private:
     bool _isScopeClose;
 
 public:
-    ParseLineProp(/* args */) {}
+    ParseLineProp(/* args */) : _index(0) ,_scopeOpenIndex(0), _scopeCloseIndex(0), _isScopeOpen(false), _isScopeClose(false) {}
     ParseLineProp(const ParseLineProp &other) : _index(other._index),
                                                 _scopeOpenIndex(other._scopeOpenIndex), _scopeCloseIndex(other._scopeCloseIndex),
-                                                _scopeName(other._scopeName), _line(other._line)
+                                                _scopeName(other._scopeName), _line(other._line), _isScopeOpen(other._isScopeOpen), _isScopeClose(other._isScopeClose)
     {
     }
     ~ParseLineProp() {}
@@ -41,12 +42,12 @@ public:
         return _line;
     }
 
-    bool isScopeOpen() const
+    bool getIsScopeOpen()
     {
         return _isScopeOpen;
     }
 
-    bool isScopeClose() const
+    bool getIsScopeClose()
     {
         return _isScopeClose;
     }
@@ -86,8 +87,3 @@ public:
         this->_isScopeClose = _isScopeClose;
     }
 };
-
-// bool compareByScopeOpenIndexSumScopeCloseIndex(const ParseLineProp &a, const ParseLineProp &b)
-// {
-//     return a.getScopeCloseIndex() + a.getScopeOpenIndex()  > b.getScopeCloseIndex() + b.getScopeOpenIndex();
-// }

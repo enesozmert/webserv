@@ -1,7 +1,10 @@
+#pragma once
+
 #include <vector>
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include "../function/VariableFunc.hpp"
 
 template <typename T>
 class DataBase
@@ -9,6 +12,7 @@ class DataBase
     private:
 
     public:
+        typedef bool (*EventFunction)(T);
         std::vector<T> _data;    
 
         DataBase(){}
@@ -21,7 +25,7 @@ class DataBase
 
         }
 
-        void createData(T data) // add new element
+        void insertData(T data) // add new element
         {
             this->_data.push_back(data);
         }
@@ -41,14 +45,10 @@ class DataBase
                 this->_data.erase(it);
             }
         }
-
-        bool isHere(T dataName)
+        template <typename K>
+        bool isHere(std::string event)
         {
-            for (int i = 0; i < this->_data.size(); i++) {
-                if (this->_data[i] == dataName)
-                    return true;
-            }
-            return false;
+            return (std::find_if(_data.begin(), _data.end(), K(event)) != this->_data.end());
         }
 
         int size()
