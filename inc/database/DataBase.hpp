@@ -30,12 +30,12 @@ class DataBase
             this->_data.push_back(data);
         }
 
-        void updateData(T oldName, T newName)
+        void updateData(T oldData, T newData)
         {
-            typename std::vector<T>::iterator it = std::find(this->_data.begin(), this->_data.end(), oldName);
+            typename std::vector<T>::iterator it = std::find(this->_data.begin(), this->_data.end(), oldData);
 
             if (it != this->_data.end())
-                *it = newName;
+                *it = newData;
         }
 
         void deleteData(T dataName)
@@ -45,10 +45,24 @@ class DataBase
                 this->_data.erase(it);
             }
         }
+
         template <typename K>
-        bool isHere(std::string event)
+        T getByNameData(std::string name)
         {
-            return (std::find_if(_data.begin(), _data.end(), K(event)) != this->_data.end());
+            T classe;
+            typename std::vector<T>::iterator it = std::find_if(this->_data.begin(), this->_data.end(), K(name));
+
+            if (it != this->_data.end())
+            {
+                return *it;
+            }
+            return classe;
+        }
+
+        template <typename K>
+        bool isHere(std::string name)
+        {
+            return (std::find_if(_data.begin(), _data.end(), K(name)) != this->_data.end());
         }
 
         int size()
