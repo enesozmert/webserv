@@ -28,10 +28,24 @@ void ErrorPage::setPageName(std::string pageName)
     this->_pageName = pageName;
 }
 
+void ErrorPage::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
+{
+    this->_keywordDatabase = keywordDatabase;
+}
 
 std::string ErrorPage::getName() const
 {
     return (this->name);
+}
+
+void ErrorPage::keywordFill()
+{
+    std::vector<Variable<std::string> >  datas;
+
+    //datas.push_back(Variable<std::string>("codes", &this->_codes));
+    datas.push_back(Variable<std::string>("pageName", &this->_pageName));
+
+    this->setKeywordDatabase(datas);
 }
 
 
