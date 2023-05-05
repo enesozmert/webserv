@@ -7,7 +7,7 @@
 
 class IScope
 {
-    protected:
+    public:
         std::string name;
     public:
         IScope() {}
