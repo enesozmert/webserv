@@ -76,14 +76,14 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
         {
             findedVariable = this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName);
             std::cout << "findedVariable.getName() " << findedVariable.getName() << std::endl;
-            this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(findedVariable.getName(), *variableNew.getValue());
+            this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(findedVariable.getName(), tempVariableValue);
             std::cout << "matchedClass changed autoIndex : " << this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName).getName() << std::endl;
             std::cout << "ok *********variable name : " << tempVariableName << " variable value :" << tempVariableValue << std::endl;
             std::cout << "findedVariable.getValue() " << *(findedVariable.getValue()) << std::endl;
-            _matchedClass.at(_matchedClassIndex) = this->locationPtr;
             // this->locationPtr->setRoot("abc");
         }
         std::cout << "locaation ok : " << tempScopes[i] << std::endl;
+        _matchedClass.at(_matchedClassIndex) = this->locationPtr;
     }
 
     std::cout << "**********parseLocation" << std::endl;

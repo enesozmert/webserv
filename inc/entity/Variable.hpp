@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <vector>
-#include <iostream>
+#include <utility>
 #include <string>
 
 template <typename T>
@@ -16,6 +16,6 @@ class Variable
         ~Variable() {}
         T getName() const {return (_variable.first);}
         T* getValue() const {return (_variable.second);}
-        void setName(T& name){*_variable.first = name;}
-        void setValue(T* value){*_variable.second = value;}
+        void setName(T name){_variable.first = name;}
+        void setValue(T value){_variable.second = &value;}
 };
