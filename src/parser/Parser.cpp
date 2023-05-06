@@ -76,12 +76,13 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
         {
             findedVariable = this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName);
             std::cout << "findedVariable.getName() " << findedVariable.getName() << std::endl;
-            this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName);
-            this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual>(tempVariableName, variableNew);
+            this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(findedVariable.getName(), *variableNew.getValue());
             std::cout << "matchedClass changed autoIndex : " << this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName).getName() << std::endl;
             std::cout << "ok *********variable name : " << tempVariableName << " variable value :" << tempVariableValue << std::endl;
+            std::cout << "findedVariable.getValue() " << *(findedVariable.getValue()) << std::endl;
+            _matchedClass.at(_matchedClassIndex) = this->locationPtr;
+            // this->locationPtr->setRoot("abc");
         }
-         _matchedClass.at(_matchedClassIndex) = this->locationPtr;
         std::cout << "locaation ok : " << tempScopes[i] << std::endl;
     }
 
@@ -417,7 +418,8 @@ void Parser::parse(std::string &fileName)
     setScopeNames(lines);
     parseScope(lines);
     this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(1));
-    std::cout << "this->_matchedClass.at(0) : " << this->locationPtr->getAutoindex() << std::endl;
+    std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
+    std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
 
     // std::cout << "lineCount" << lineCount << std::endl;
 }
