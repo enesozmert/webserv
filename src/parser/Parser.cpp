@@ -76,9 +76,12 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
         {
             findedVariable = this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName);
             std::cout << "findedVariable.getName() " << findedVariable.getName() << std::endl;
+            this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName);
             this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual>(tempVariableName, variableNew);
+            std::cout << "matchedClass changed autoIndex : " << this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName).getName() << std::endl;
             std::cout << "ok *********variable name : " << tempVariableName << " variable value :" << tempVariableValue << std::endl;
         }
+         _matchedClass.at(_matchedClassIndex) = this->locationPtr;
         std::cout << "locaation ok : " << tempScopes[i] << std::endl;
     }
 
@@ -413,8 +416,8 @@ void Parser::parse(std::string &fileName)
     file.close();
     setScopeNames(lines);
     parseScope(lines);
-    // this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(0));
-    // std::cout << "this->_matchedClass.at(0) : " << this->locationPtr->getAutoindex() << std::endl;
+    this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(1));
+    std::cout << "this->_matchedClass.at(0) : " << this->locationPtr->getAutoindex() << std::endl;
 
     // std::cout << "lineCount" << lineCount << std::endl;
 }
