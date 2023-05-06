@@ -69,14 +69,14 @@ void Location::setKeywordDatabase(DataBase<Variable<std::string> > keywordDataba
 
 void Location::keywordFill()
 {
-    std::vector<Variable<std::string> >  datas;
+    // std::vector<Variable<std::string> >  datas;
 
-    datas.push_back(Variable<std::string>("root", &this->_root));
-    datas.push_back(Variable<std::string>("index", &this->_index));
-    datas.push_back(Variable<std::string>("auto_index", &this->_autoindex));
+    _keywordDatabase.insertData(Variable<std::string>("root", &this->_root));
+    _keywordDatabase.insertData(Variable<std::string>("index", &this->_index));
+    _keywordDatabase.insertData(Variable<std::string>("auto_index", &this->_autoindex));
     // datas.push_back(Variable<std::string>("path", &this->_path));
 
-    this->setKeywordDatabase(datas);
+    // this->setKeywordDatabase(datas);
 }
 
 void Location::setPath(std::string path)
