@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include "../entity/Variable.hpp"
 #include "../function/VariableFunc.hpp"
 
 template <typename T>
@@ -25,18 +26,28 @@ class DataBase
 
         }
 
+        std::vector<T> getAllData()
+        {
+            return (this->_data);
+        }
+
         void insertData(T data) // add new element
         {
             this->_data.push_back(data);
         }
         
-        template <typename K>
-        void updateData(std::string name, T newData)
+        template <typename K, typename M>
+        void updateData(std::string name, std::string newValue)
         {
-            typename std::vector<T>::iterator it = std::find_if(this->_data.begin(), this->_data.end(), K(name));
+            typename std::vector<Variable<M> >::iterator it = std::find_if(this->_data.begin(), this->_data.end(), K(name));
 
             if (it != this->_data.end())
-                *it = newData;
+            {
+                *(it->getValue()) = newValue;
+                std::cout << "*(it->getValue())1 : " << (it->getValue()) << " newValue " << newValue << std::endl;
+
+            }
+            std::cout << "*(it->getValue())2 : " << (it->getValue()) << " newValue " << newValue << std::endl;
         }
 
         void deleteData(T dataName)
