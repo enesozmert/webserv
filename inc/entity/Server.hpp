@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 #include "ErrorPage.hpp"
 #include "Location.hpp"
 #include "IScope.hpp"
@@ -17,7 +18,7 @@ class Server : public IScope
         std::vector<Location> _locations; //location sinifi gelecek
         std::string _port;// listen(string)[port(8080)]
         std::string _host; // listen(string)[host:port(127.0.0.1:80)]
-        std::vector<std::string> _serverNames;
+        std::string _serverNames;
         std::string _root; // root ./tests/test1/;
         std::string _index;
         std::string _cgi_pass;

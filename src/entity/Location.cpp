@@ -21,6 +21,18 @@ std::string Location::getIndex()
 {
     return (this->_index);
 }
+std::vector<std::string> Location::getAllowMethods()
+{
+    std::vector<std::string> allowMethods;
+    std::string tempAllowMethods;
+    std::stringstream sp(this->_allowMethods);
+
+    while (sp << tempAllowMethods)
+    {
+        allowMethods.push_back(tempAllowMethods);
+    }
+    return (allowMethods);
+}
 ErrorPage Location::getErrorPage()
 {
     return (this->_errorPage);
@@ -40,7 +52,6 @@ std::string Location::getPath()
     return (this->_path);
 }
 
-
 void Location::setRoot(std::string root)
 {
     this->_root = root;
@@ -52,6 +63,10 @@ void Location::setIndex(std::string index)
 void Location::setAutoindex(std::string autoIndex)
 {
     this->_autoindex = autoIndex;
+}
+void Location::setAllowMethods(std::string allowMethods)
+{
+    (void)allowMethods;
 }
 void Location::setErrorPage(ErrorPage errorPage)
 {
@@ -69,14 +84,11 @@ void Location::setKeywordDatabase(DataBase<Variable<std::string> > keywordDataba
 
 void Location::keywordFill()
 {
-    // std::vector<Variable<std::string> >  datas;
-
-    _keywordDatabase.insertData(Variable<std::string>("root", &this->_root));
+    _keywordDatabase.insertData(Variable<std::string>("root",&this->_root));
     _keywordDatabase.insertData(Variable<std::string>("index", &this->_index));
     _keywordDatabase.insertData(Variable<std::string>("auto_index", &this->_autoindex));
-    // datas.push_back(Variable<std::string>("path", &this->_path));
-
-    // this->setKeywordDatabase(datas);
+    _keywordDatabase.insertData(Variable<std::string>("location", &this->_path));
+    _keywordDatabase.insertData(Variable<std::string>("allow_methods", &this->_allowMethods));
 }
 
 void Location::setPath(std::string path)
@@ -89,4 +101,4 @@ std::string Location::getName() const
     return (this->name);
 }
 
-Location* Location::clone() const { return new Location(*this); }
+Location* Location::clone() const { return new Location(); }

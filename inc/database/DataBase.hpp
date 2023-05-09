@@ -44,10 +44,7 @@ class DataBase
             if (it != this->_data.end())
             {
                 *(it->getValue()) = newValue;
-                std::cout << "*(it->getValue())1 : " << (it->getValue()) << " newValue " << newValue << std::endl;
-
             }
-            std::cout << "*(it->getValue())2 : " << (it->getValue()) << " newValue " << newValue << std::endl;
         }
 
         void deleteData(T dataName)

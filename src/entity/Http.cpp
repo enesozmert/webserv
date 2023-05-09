@@ -47,11 +47,7 @@ void Http::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 
 void Http::keywordFill()
 {
-
-    std::vector<Variable<std::string> >  datas;
-
-    datas.push_back(Variable<std::string>("client_max_body_size", &this->_clientMaxBodySize));
-    this->setKeywordDatabase(datas);
+    _keywordDatabase.insertData(Variable<std::string>("client_max_body_size", &this->_clientMaxBodySize));
 }
 
 std::string Http::getName() const
@@ -59,5 +55,5 @@ std::string Http::getName() const
     return (this->name);
 }
 
-Http* Http::clone() const { return new Http(*this); }
+Http* Http::clone() const { return new Http(); }
 

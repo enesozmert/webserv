@@ -52,12 +52,9 @@ std::vector<std::string> Parser::splitString(const std::string &str, const char 
 
 void Parser::parseLocation(std::vector<size_t> tempScopes)
 {
-    // (void)tempScopes;
     std::string tempVariableName;
     std::string tempVariableValue;
-    Variable<std::string>  findedVariable;
-    DataBase<Variable<std::string> > database = this->location.getKeywordDataBase();
-    DataBase<Variable<std::string> > databaseLocationPtr;
+    // Variable<std::string>  findedVariable;
 
     std::cout << "_matchedClassIndex" << _matchedClassIndex << std::endl;
     this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(_matchedClassIndex));
@@ -65,22 +62,17 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
     {
         std::cout << "nulll" << _matchedClassIndex << std::endl;
     }
-    databaseLocationPtr = locationPtr->getKeywordDataBase();
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
         std::stringstream s(this->trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         s >> tempVariableValue;
-        Variable<std::string> variableNew(tempVariableName, &tempVariableValue);
-        if (database.isHere<IsVariableNameEqual>(tempVariableName))
+        if (this->location.getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
         {
-            findedVariable = this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName);
-            std::cout << "findedVariable.getName() " << findedVariable.getName() << std::endl;
-            this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(findedVariable.getName(), tempVariableValue);
-            std::cout << "matchedClass changed autoIndex : " << this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName).getName() << std::endl;
-            std::cout << "ok *********variable name : " << tempVariableName << " variable value :" << tempVariableValue << std::endl;
-            std::cout << "findedVariable.getValue() " << *(findedVariable.getValue()) << std::endl;
-            // this->locationPtr->setRoot("abc");
+            // std::cout << "findedVariable.getName() " << findedVariable.getName() << std::endl;
+            this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
+            // std::cout << "matchedClass changed autoIndex : " << this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>(tempVariableName).getName() << std::endl;
+            // std::cout << "ok *********variable name : " << tempVariableName << " variable value :" << tempVariableValue << std::endl;
         }
         std::cout << "locaation ok : " << tempScopes[i] << std::endl;
         _matchedClass.at(_matchedClassIndex) = this->locationPtr;
@@ -91,8 +83,6 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
 
 void Parser::parseServer(std::vector<size_t> tempScopes)
 {
-    // (void)tempScopes;
-    // this->server.getKeywordDataBase();
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
         std::cout << "Server ok : " << tempScopes[i] << std::endl;
@@ -102,7 +92,6 @@ void Parser::parseServer(std::vector<size_t> tempScopes)
 
 void Parser::parseHttp(std::vector<size_t> tempScopes)
 {
-    // (void)tempScopes;
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
         std::cout << "http ok : " << tempScopes[i] << std::endl;
@@ -209,7 +198,7 @@ size_t Parser::findClosingScopeIndex(const std::vector<std::string> &lines, size
             }
         }
     }
-    return 0; // not found
+    return 0;
 }
 
 size_t Parser::findOpeningScopeIndex(const std::vector<std::string> &lines, size_t closingIndex)
@@ -234,7 +223,7 @@ size_t Parser::findOpeningScopeIndex(const std::vector<std::string> &lines, size
             closingScopesCount++;
         }
     }
-    return 0; // not found
+    return 0;
 }
 
 void Parser::parseScopeFill()
@@ -264,7 +253,6 @@ void Parser::parseScopeFill()
         // std::cout << "tempCloseIndex = _orderParseLineProps[i].getScopeCloseIndex();" << tempCloseIndex << std::endl;
         if (tempCloseIndex != _orderParseLineProps[i].getScopeCloseIndex())
         {
-            // std::cout << "eşit değil" << _orderParseLineProps[i].getIndex() << std::endl;
             for (size_t j = 0; j < 3; j++)
             {
                 if (_orderParseLineProps[i - 1].getScopeName() == method_function_name[j])
@@ -278,7 +266,6 @@ void Parser::parseScopeFill()
         }
         if (tempCloseIndex == _orderParseLineProps[i].getScopeCloseIndex() && _orderParseLineProps[i].getIsScopeOpen() == false && _orderParseLineProps[i].getIsScopeClose() == false)
         {
-            // std::cout << "eşit" << _orderParseLineProps[i].getIndex() << std::endl;
             tempLines.push_back(_orderParseLineProps[i].getIndex());
         }
     }
@@ -301,17 +288,11 @@ void Parser::parseMatchClass()
         {
             if (method_function_name[j] == _orderScopeNames[i])
             {
-                // std::cout << "method_function_name[j] " << method_function_name[j] << std::endl;
                 IScope *class_instance = classes[j];
                 _matchedClass.insert(std::make_pair(i, class_instance->clone()));
             }
         }
     }
-    // std::cout << matchedClass.size() << std::endl;
-    // Location *location = dynamic_cast<Location*>(_matchedClass.at(2));
-    // location->setPath("enes");
-    // std::cout << "matchedClass.at(0)->getName() : " << location->getPath() << std::endl;
-    // parseMatchedClassFill(_matchedClass);
 }
 
 void Parser::parseScope(const std::vector<std::string> &lines)
@@ -335,7 +316,6 @@ void Parser::parseScope(const std::vector<std::string> &lines)
 
         parseLineProp->setIndex(i);
         parseLineProp->setLine(lineTrim);
-        // parseLineProp->setLineNotScope(lineTrimScope);
         if (lineTrim.find("location") != std::string::npos)
         {
             lineTrim = "location";
@@ -344,10 +324,6 @@ void Parser::parseScope(const std::vector<std::string> &lines)
         {
             scopeOpenIndex = i;
             scopeName = _scopeNames[scopeOpenCount];
-            // parseLineProp->setIsScopeOpen(true);
-            // std::cout << "is open true" << std::endl;
-            // scopeOrderNames.erase(scopeOrderNames.begin() + j);
-            // parseLineProp->setScopeCloseIndex(findClosingScopeIndex(lines, i));
             parseLineProp->setIsScopeOpen(true);
             scopeCloseIndex = findClosingScopeIndex(lines, i);
         }
@@ -361,37 +337,15 @@ void Parser::parseScope(const std::vector<std::string> &lines)
         parseLineProp->setScopeName(scopeName);
         if (line.find("}") != std::string::npos)
         {
-            // size_t open = ;
-            // parseLineProp->setScopeOpenIndex(parseLineProps[(parseLineProp)->getScopeCloseIndex()].getIndex());
             parseLineProp->setIsScopeClose(true);
-            // parseLineProp->setScopeCloseIndex(i);
             scopeCloseIndex = i;
             parseLineProp->setScopeOpenIndex(findOpeningScopeIndex(lines, i));
             parseLineProp->setScopeName(_parseLineProps[findOpeningScopeIndex(lines, i)].getScopeName());
-            // parseLineProp->setIsScopeClose(true);
-            // std::cout << "Opening" << findOpeningScopeIndex(lines, i) << std::endl;
-            // continue;
         }
         parseLineProp->setScopeCloseIndex(scopeCloseIndex);
-        // ParseLineProp temp = *parseLineProp;
-        // parseLineProp->setScopeOpenIndex(scopeOpenIndex);
         _parseLineProps.insert(std::pair<size_t, ParseLineProp>((parseLineProp)->getIndex(), *parseLineProp));
         delete parseLineProp;
     }
-    // std::sort(parseLineProps.begin(), parseLineProps.end(), compareByScopeCloseIndex);
-    // for (size_t i = 0; i < _parseLineProps.size(); i++)
-    // {
-    //     std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i].getIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i].getLine() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i].getScopeOpenIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i].getScopeName() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i].getScopeCloseIndex() << std::endl;
-    //     // std::cout << "parseLineProps[i].getLineNotScope() : " << parseLineProps[i].getLineNotScope() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i].getIsScopeOpen() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i].getIsScopeClose() << std::endl;
-    //     std::cout << "****************************" << std::endl;
-    // }
-    // std::cout << "ok*************************************" << std::endl;
     setOrderParseLineProps();
     setOrderScopeNames();
     parseMatchClass();
@@ -411,15 +365,12 @@ void Parser::parse(std::string &fileName)
         std::string line = fileCleanContents.substr(0, pos + 1);
         std::string lineTrim = this->trim(line, " \r\t");
         lines.push_back(lineTrim);
-        // std::cout << "line : " << lineTrim << std::endl;
         fileCleanContents.erase(0, pos + 1);
     }
     file.close();
     setScopeNames(lines);
     parseScope(lines);
-    this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(1));
-    std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
-    std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
-
-    // std::cout << "lineCount" << lineCount << std::endl;
+    // this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(0));
+    // std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
+    // std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
 }

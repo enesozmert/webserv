@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "Server.hpp"
 #include "ErrorPage.hpp"
 #include "IScope.hpp"

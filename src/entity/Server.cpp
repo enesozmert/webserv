@@ -18,7 +18,8 @@ void Server::setPort(std::string port){
 }
 
 void Server::setServerName(std::string serverName){
-    this->_serverNames.push_back(serverName);
+    (void)serverName;
+    // this->_serverNames.push_back(serverName);
 }
 
 void Server::setLocation(Location location)
@@ -63,7 +64,15 @@ ErrorPage Server::getErrorPage(){
     return this->_errorPage;
 }
 std::vector<std::string> Server::getServerName(){
-    return this->_serverNames;
+    std::vector<std::string> serverNames;
+    std::string tempServerName;
+    std::stringstream sp(this->_serverNames);
+
+    while (sp << tempServerName)
+    {
+        serverNames.push_back(tempServerName);
+    }
+    return (serverNames);
 }
 
 std::vector<Location> Server::getLocations()
@@ -96,19 +105,12 @@ DataBase<Variable<std::string> > Server::getKeywordDataBase()
 
 void Server::keywordFill()
 {
-
-    std::vector<Variable<std::string> >  datas;
-
-
-    datas.push_back(Variable<std::string>("port", &this->_port));
-    datas.push_back(Variable<std::string>("host", &this->_host));
-    //datas.push_back(Variable<std::vector<std::string> >("server_name", &this->_serverNames));
-    datas.push_back(Variable<std::string>("root", &this->_root));
-    datas.push_back(Variable<std::string>("index", &this->_index));
-    datas.push_back(Variable<std::string>("cgi_pass", &this->_cgi_pass));
-
-    this->setKeywordDatabase(datas);
-
+    _keywordDatabase.insertData(Variable<std::string>("port", &this->_port));
+    _keywordDatabase.insertData(Variable<std::string>("host", &this->_host));
+    _keywordDatabase.insertData(Variable<std::string>("server_name", &this->_serverNames));
+    _keywordDatabase.insertData(Variable<std::string>("root", &this->_root));
+    _keywordDatabase.insertData(Variable<std::string>("index", &this->_index));
+    _keywordDatabase.insertData(Variable<std::string>("cgi_pass", &this->_cgi_pass));
 }
 
 std::string Server::getName() const
@@ -116,4 +118,4 @@ std::string Server::getName() const
     return (this->name);
 }
 
-Server* Server::clone() const { return new Server(*this); }
+Server* Server::clone() const { return new Server(); }
