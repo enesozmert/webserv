@@ -68,7 +68,7 @@ std::vector<std::string> Server::getServerName(){
     std::string tempServerName;
     std::stringstream sp(this->_serverNames);
 
-    while (sp << tempServerName)
+    while (sp >> tempServerName)
     {
         serverNames.push_back(tempServerName);
     }

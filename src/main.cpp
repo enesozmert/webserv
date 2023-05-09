@@ -13,5 +13,6 @@ int main(int ac, char **av)
     Parser *parser = new Parser();
     std::string av1 = av[1];
     parser->parse(av1);
+    
     return (0);
 }
