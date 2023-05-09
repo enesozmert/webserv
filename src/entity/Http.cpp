@@ -6,16 +6,20 @@ Http::Http(/* args */)
 
 }
 
-
 Http::~Http()
 {
+}
+
+Http::Http(const Http &http)
+{
+    *this = http;
 }
 
 std::string Http::getClientMaxBodySize()
 {
     return (this->_clientMaxBodySize);
 }
-std::vector<Server> Http::getServer()
+std::vector<Server *> Http::getServers()
 {
     return (this->_servers);
 }
@@ -32,7 +36,7 @@ void Http::setClientMaxBodySize(std::string clientMaxBodySize)
 {
     this->_clientMaxBodySize = clientMaxBodySize;
 }
-void Http::setServer(Server server)
+void Http::setServer(Server *server)
 {
     this->_servers.push_back(server);
 }
@@ -55,5 +59,6 @@ std::string Http::getName() const
     return (this->name);
 }
 
-Http* Http::clone() const { return new Http(); }
+Http* Http::cloneNew() const { return new Http(); }
+Http* Http::clone() const { return new Http(*this); }
 

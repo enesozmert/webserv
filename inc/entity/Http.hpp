@@ -16,23 +16,22 @@ class Http : public IScope
 {
     private:
         std::string _clientMaxBodySize;
-        std::vector<Server> _servers;
+        std::vector<Server *> _servers;
         ErrorPage _errorPage;
         DataBase<Variable<std::string> > _keywordDatabase;
 
     public:
         Http(/* args */);
-        Http(char *file);
         ~Http();
-        
+        Http(const Http &http);
 
         std::string getClientMaxBodySize();
-        std::vector<Server> getServer();
+        std::vector<Server *> getServers();
         ErrorPage getErrorPage();
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setClientMaxBodySize(std::string clientMaxBodySize);
-        void setServer(Server server);
+        void setServer(Server *server);
         void setErrorPage(ErrorPage errorPage);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
@@ -40,6 +39,7 @@ class Http : public IScope
         void keywordFill();
 
         std::string getName() const;
+        Http* cloneNew() const;
         Http* clone() const;
 
 };

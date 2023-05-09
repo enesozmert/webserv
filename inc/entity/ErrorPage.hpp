@@ -20,6 +20,7 @@ class ErrorPage : public IScope
     public:
         ErrorPage(/* args */);
         ~ErrorPage();
+        ErrorPage(const ErrorPage &errorPage);
     
         std::vector<std::string> getCodes();
         std::string getPageName();
@@ -33,5 +34,6 @@ class ErrorPage : public IScope
 
         void keywordFill();
 
+        ErrorPage* cloneNew() const;
         ErrorPage* clone() const;
 };

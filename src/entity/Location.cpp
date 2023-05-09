@@ -9,6 +9,11 @@ Location::~Location()
 {
 }
 
+Location::Location(const Location &location)
+{
+    *this = location;
+}
+
 std::string Location::getRoot()
 {
     return (this->_root);
@@ -27,7 +32,7 @@ std::vector<std::string> Location::getAllowMethods()
     std::string tempAllowMethods;
     std::stringstream sp(this->_allowMethods);
 
-    while (sp << tempAllowMethods)
+    while (sp >> std::ws >> tempAllowMethods)
     {
         allowMethods.push_back(tempAllowMethods);
     }
@@ -101,4 +106,5 @@ std::string Location::getName() const
     return (this->name);
 }
 
-Location* Location::clone() const { return new Location(); }
+Location* Location::cloneNew() const { return new Location(); }
+Location* Location::clone() const { return new Location(*this); }

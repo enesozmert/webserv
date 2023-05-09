@@ -8,6 +8,11 @@ ErrorPage::~ErrorPage()
 {
 }
 
+ErrorPage::ErrorPage(const ErrorPage &errorPage)
+{
+    *this = errorPage;
+}
+
 std::vector<std::string> ErrorPage::getCodes()
 {
     std::vector<std::string> codes;
@@ -54,4 +59,5 @@ void ErrorPage::keywordFill()
 }
 
 
-ErrorPage* ErrorPage::clone() const { return new ErrorPage(); }
+ErrorPage* ErrorPage::cloneNew() const { return new ErrorPage(); }
+ErrorPage* ErrorPage::clone() const { return new ErrorPage(*this); }

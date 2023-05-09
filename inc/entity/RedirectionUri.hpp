@@ -21,6 +21,7 @@ private:
 public:
     RedirectionUri(/* args */);
     ~RedirectionUri();
+    RedirectionUri(const RedirectionUri &redirectionUri);
 
     std::vector<std::string> getCodes() const;
     void setCodes(std::string code);
@@ -35,6 +36,7 @@ public:
     void keywordFill();
 
 
+    RedirectionUri* cloneNew() const;
     RedirectionUri* clone() const;
 
 };

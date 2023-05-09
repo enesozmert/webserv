@@ -28,13 +28,13 @@ void Parser::parse(std::string &fileName)
     file.close();
     setScopeNames(lines);
     parseScope(lines);
-    this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(0));
-    std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
-    std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
+    // this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(0));
+    // std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
+    // std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
 
-    this->serverPtr = dynamic_cast<Server *>(_matchedClass.at(2));
-    std::cout << "this->_matchedClass.at(0)1 : " << *this->serverPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("server_name").getValue() << std::endl;
-    std::cout << "this->_matchedClass.at(0)2 : " << this->serverPtr->getServerName().at(1) << std::endl;
+    // this->serverPtr = dynamic_cast<Server *>(_matchedClass.at(2));
+    // std::cout << "this->_matchedClass.at(0)1 : " << *this->serverPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("server_name").getValue() << std::endl;
+    // std::cout << "this->_matchedClass.at(0)2 : " << this->serverPtr->getServerName().at(1) << std::endl;
 }
 
 void Parser::parseScope(const std::vector<std::string> &lines)
@@ -92,6 +92,7 @@ void Parser::parseScope(const std::vector<std::string> &lines)
     setOrderScopeNames();
     parseMatchClass();
     parseScopeFill();
+    parseMatchedClassFill();
 }
 
 void Parser::parseMatchClass()
@@ -106,7 +107,7 @@ void Parser::parseMatchClass()
             if (method_function_name[j] == _orderScopeNames[i])
             {
                 IScope *class_instance = classes[j];
-                _matchedClass.insert(std::make_pair(i, class_instance->clone()));
+                _matchedClass.insert(std::make_pair(i, class_instance->cloneNew()));
             }
         }
     }
@@ -155,7 +156,35 @@ void Parser::parseScopeFill()
 
 void Parser::parseMatchedClassFill()
 {
-    
+    size_t serverIndex;
+
+    serverIndex = 0;
+    this->_parsedHttp = new Http();
+    for (size_t i = 0; i < _orderScopeNames.size(); i++)
+    {
+        if (_orderScopeNames[i].find("http") != std::string::npos)
+        {
+            this->httpPtr = dynamic_cast<Http *>(_matchedClass.at(i));
+        }
+        else if (_orderScopeNames[i].find("server") != std::string::npos)
+        {
+            this->serverPtr = dynamic_cast<Server *>(_matchedClass.at(i));
+            this->_parsedHttp->setServer(this->serverPtr->clone());
+        }
+    }
+
+    for (size_t i = 0; i < _orderScopeNames.size(); i++)
+    {
+        if (_orderScopeNames[i].find("location") != std::string::npos)
+        {
+            this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(i));
+            this->_parsedHttp->getServers().at(serverIndex)->setLocation(this->locationPtr->clone());
+        }
+        if (_orderScopeNames[i].find("server") != std::string::npos)
+        {
+            serverIndex++;
+        }
+    }
 }
 
 void Parser::parseHttp(std::vector<size_t> tempScopes)
@@ -377,4 +406,9 @@ std::string Parser::cleanString(std::string str)
         }
     }
     return cleanedStr;
+}
+
+Http *Parser::getHttp()
+{
+    return (this->_parsedHttp);
 }

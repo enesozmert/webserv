@@ -29,6 +29,8 @@ class Location : public IScope
     public:
         Location(/* args */);
         ~Location();
+        Location(const Location &location);
+
         std::string getRoot();
         std::string getAutoindex();
         std::string getIndex();
@@ -51,5 +53,6 @@ class Location : public IScope
 
         std::string getName() const;
         Location* clone() const;
+        Location* cloneNew() const;
         
 };

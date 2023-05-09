@@ -8,6 +8,11 @@ RedirectionUri::~RedirectionUri()
 {
 }
 
+RedirectionUri::RedirectionUri(const RedirectionUri &redirectionUri)
+{
+    *this = redirectionUri;
+}
+
 std::vector<std::string> RedirectionUri::getCodes() const
 {
     std::vector<std::string> codes;
@@ -60,4 +65,5 @@ void RedirectionUri::keywordFill()
     // this->setKeywordDatabase(datas);
 }
 
-RedirectionUri* RedirectionUri::clone() const { return new RedirectionUri(); }
+RedirectionUri* RedirectionUri::cloneNew() const { return new RedirectionUri(); }
+RedirectionUri* RedirectionUri::clone() const { return new RedirectionUri(*this); }

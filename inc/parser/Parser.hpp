@@ -26,6 +26,7 @@ class ParseLineProp;
 class Parser
 {
     private:
+        Http *_parsedHttp;
         Http http;
         Server server;
         Location location;
@@ -74,4 +75,6 @@ class Parser
 
         std::string trim(const std::string& str, const std::string& delimiters);
         std::string cleanString(std::string str);
+
+        Http *getHttp();
 };
