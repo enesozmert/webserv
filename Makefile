@@ -18,7 +18,7 @@ SRC_FILE		=	file/
 
 
 #Files
-ENTITY			=	ErrorPage Http Location RedirectionUri Server	
+ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope	
 PARSER			=	Parser
 FILE			=	File
 

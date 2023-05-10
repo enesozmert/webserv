@@ -5,34 +5,34 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "Server.hpp"
+#include "ServerScope.hpp"
 #include "ErrorPage.hpp"
 #include "IScope.hpp"
 #include "Variable.hpp"
 
-class Server;
+class ServerScope;
 class ErrorPage;
-class Http : public IScope
+class HttpScope : public IScope
 {
     private:
         std::string _clientMaxBodySize;
-        std::vector<Server *> _servers;
+        std::vector<ServerScope *> _servers;
         ErrorPage _errorPage;
         DataBase<Variable<std::string> > _keywordDatabase;
 
     public:
-        Http(/* args */);
-        ~Http();
-        Http(const Http &http);
-        Http &operator=(const Http &http);
+        HttpScope(/* args */);
+        ~HttpScope();
+        HttpScope(const HttpScope &http);
+        HttpScope &operator=(const HttpScope &http);
 
         std::string getClientMaxBodySize();
-        std::vector<Server *> getServers();
+        std::vector<ServerScope *> getServers();
         ErrorPage getErrorPage();
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setClientMaxBodySize(std::string clientMaxBodySize);
-        void setServer(Server *server);
+        void setServer(ServerScope *server);
         void setErrorPage(ErrorPage errorPage);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
@@ -40,7 +40,7 @@ class Http : public IScope
         void keywordFill();
 
         std::string getName() const;
-        Http* cloneNew() const;
-        Http* clone() const;
+        HttpScope* cloneNew() const;
+        HttpScope* clone() const;
 
 };

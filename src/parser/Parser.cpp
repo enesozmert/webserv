@@ -28,11 +28,11 @@ void Parser::parse(std::string &fileName)
     file.close();
     setScopeNames(lines);
     parseScope(lines);
-    // this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(0));
+    // this->locationPtr = dynamic_cast<LocationScope *>(_matchedClass.at(0));
     // std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
     // std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
 
-    // this->serverPtr = dynamic_cast<Server *>(_matchedClass.at(2));
+    // this->serverPtr = dynamic_cast<ServerScope *>(_matchedClass.at(2));
     // std::cout << "this->_matchedClass.at(0)1 : " << *this->serverPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("server_name").getValue() << std::endl;
     // std::cout << "this->_matchedClass.at(0)2 : " << this->serverPtr->getServerName().at(1) << std::endl;
 }
@@ -159,16 +159,16 @@ void Parser::parseMatchedClassFill()
     size_t serverIndex;
 
     serverIndex = 0;
-    this->_parsedHttp = new Http();
+    this->_parsedHttp = new HttpScope();
     for (size_t i = 0; i < _orderScopeNames.size(); i++)
     {
         if (_orderScopeNames[i].find("http") != std::string::npos)
         {
-            this->httpPtr = dynamic_cast<Http *>(_matchedClass.at(i));
+            this->httpPtr = dynamic_cast<HttpScope *>(_matchedClass.at(i));
         }
         else if (_orderScopeNames[i].find("server") != std::string::npos)
         {
-            this->serverPtr = dynamic_cast<Server *>(_matchedClass.at(i));
+            this->serverPtr = dynamic_cast<ServerScope *>(_matchedClass.at(i));
             this->_parsedHttp->setServer(this->serverPtr->clone());
         }
     }
@@ -177,7 +177,7 @@ void Parser::parseMatchedClassFill()
     {
         if (_orderScopeNames[i].find("location") != std::string::npos)
         {
-            this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(i));
+            this->locationPtr = dynamic_cast<LocationScope *>(_matchedClass.at(i));
             this->_parsedHttp->getServers().at(serverIndex)->setLocation(this->locationPtr->clone());
         }
         if (_orderScopeNames[i].find("server") != std::string::npos)
@@ -192,7 +192,7 @@ void Parser::parseHttp(std::vector<size_t> tempScopes)
     std::string tempVariableName;
     std::string tempVariableValue;
 
-    this->httpPtr = dynamic_cast<Http *>(_matchedClass.at(_matchedClassIndex));
+    this->httpPtr = dynamic_cast<HttpScope *>(_matchedClass.at(_matchedClassIndex));
     if (this->httpPtr == NULL)
     {
         std::cout << "nulll" << _matchedClassIndex << std::endl;
@@ -216,7 +216,7 @@ void Parser::parseServer(std::vector<size_t> tempScopes)
     std::string tempVariableName;
     std::string tempVariableValue;
 
-    this->serverPtr = dynamic_cast<Server *>(_matchedClass.at(_matchedClassIndex));
+    this->serverPtr = dynamic_cast<ServerScope *>(_matchedClass.at(_matchedClassIndex));
     if (this->serverPtr == NULL)
     {
         std::cout << "nulll" << _matchedClassIndex << std::endl;
@@ -230,7 +230,7 @@ void Parser::parseServer(std::vector<size_t> tempScopes)
         {
             this->serverPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        std::cout << "Server ok : " << tempScopes[i] << std::endl;
+        std::cout << "ServerScope ok : " << tempScopes[i] << std::endl;
     }
     std::cout << "**********parseServer" << std::endl;
 }
@@ -240,7 +240,7 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
     std::string tempVariableName;
     std::string tempVariableValue;
 
-    this->locationPtr = dynamic_cast<Location *>(_matchedClass.at(_matchedClassIndex));
+    this->locationPtr = dynamic_cast<LocationScope *>(_matchedClass.at(_matchedClassIndex));
     if (this->locationPtr == NULL)
     {
         std::cout << "nulll" << _matchedClassIndex << std::endl;
@@ -408,7 +408,7 @@ std::string Parser::cleanString(std::string str)
     return cleanedStr;
 }
 
-Http *Parser::getHttp()
+HttpScope *Parser::getHttp()
 {
     return (this->_parsedHttp);
 }

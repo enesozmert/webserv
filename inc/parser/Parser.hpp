@@ -9,9 +9,9 @@
 #include <iterator>
 #include "../file/File.hpp"
 #include "../database/DataBase.hpp"
-#include "../entity/Http.hpp"
-#include "../entity/Server.hpp"
-#include "../entity/Location.hpp"
+#include "../entity/HttpScope.hpp"
+#include "../entity/ServerScope.hpp"
+#include "../entity/LocationScope.hpp"
 #include "../entity/ParseLineProp.hpp"
 #include "../entity/IScope.hpp"
 #include "../entity/Variable.hpp"
@@ -19,21 +19,21 @@
 #include "../function/VariableFunc.hpp"
 
 class File;
-class Http;
-class Server;
-class Location;
+class HttpScope;
+class ServerScope;
+class LocationScope;
 class ParseLineProp;
 class Parser
 {
     private:
-        Http *_parsedHttp;
-        Http http;
-        Server server;
-        Location location;
+        HttpScope *_parsedHttp;
+        HttpScope http;
+        ServerScope server;
+        LocationScope location;
 
-        Http *httpPtr;
-        Server *serverPtr;
-        Location *locationPtr;
+        HttpScope *httpPtr;
+        ServerScope *serverPtr;
+        LocationScope *locationPtr;
 
         std::map<size_t, ParseLineProp> _parseLineProps;
         std::vector<ParseLineProp> _orderParseLineProps;
@@ -76,5 +76,5 @@ class Parser
         std::string trim(const std::string& str, const std::string& delimiters);
         std::string cleanString(std::string str);
 
-        Http *getHttp();
+        HttpScope *getHttp();
 };
