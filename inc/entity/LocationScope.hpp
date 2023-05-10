@@ -13,7 +13,7 @@
 
 class ErrorPage;
 class RedirectionUri;
-class Location : public IScope
+class LocationScope : public IScope
 {
     private:
         std::string _path;
@@ -27,10 +27,10 @@ class Location : public IScope
         DataBase<Variable<std::string> > _keywordDatabase;
 
     public:
-        Location(/* args */);
-        ~Location();
-        Location(const Location &location);
-        Location &operator=(const Location &location);
+        LocationScope(/* args */);
+        ~LocationScope();
+        LocationScope(const LocationScope &location);
+        LocationScope &operator=(const LocationScope &location);
         std::string getRoot();
         std::string getAutoindex();
         std::string getIndex();
@@ -52,7 +52,7 @@ class Location : public IScope
         void keywordFill();
 
         std::string getName() const;
-        Location* clone() const;
-        Location* cloneNew() const;
+        LocationScope* clone() const;
+        LocationScope* cloneNew() const;
         
 };

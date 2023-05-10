@@ -1,20 +1,20 @@
-#include "../inc/entity/Server.hpp"
+#include "../inc/entity/ServerScope.hpp"
 
-Server::Server(/* args */)
+ServerScope::ServerScope(/* args */)
 {
     this->keywordFill();
 }
 
-Server::~Server()
+ServerScope::~ServerScope()
 {
 }
 
-Server::Server(const Server &server)
+ServerScope::ServerScope(const ServerScope &server)
 {
     *this = server;
 }
 
-Server	&Server::operator=(const Server &server)
+ServerScope	&ServerScope::operator=(const ServerScope &server)
 {
     if (this == &server)
         return (*this);
@@ -28,55 +28,55 @@ Server	&Server::operator=(const Server &server)
     return (*this);
 }
 
-void Server::setHost(std::string host)
+void ServerScope::setHost(std::string host)
 {
     this->_host = host;
 }
-void Server::setPort(std::string port)
+void ServerScope::setPort(std::string port)
 {
     this->_port = port;
 }
 
-void Server::setServerName(std::string serverName)
+void ServerScope::setServerName(std::string serverName)
 {
     (void)serverName;
     // this->_serverNames.push_back(serverName);
 }
 
-void Server::setLocation(Location *location)
+void ServerScope::setLocation(LocationScope *location)
 {
     this->_locations.push_back(location);
 }
 
-void Server::setErrorPage(ErrorPage errorPage)
+void ServerScope::setErrorPage(ErrorPage errorPage)
 {
     this->_errorPage = errorPage;
 }
 
-void Server::setIsServerNameNothing(bool isServerNameNothing)
+void ServerScope::setIsServerNameNothing(bool isServerNameNothing)
 {
     this->_isServerNameNothing = isServerNameNothing;
 }
 
-void Server::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
+void ServerScope::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 {
     this->_keywordDatabase = keywordDatabase;
 }
 
-void Server::setRoot(std::string root)
+void ServerScope::setRoot(std::string root)
 {
     this->_root = root;
 }
-void Server::setIndex(std::string index)
+void ServerScope::setIndex(std::string index)
 {
     this->_index = index;
 }
-void Server::setCgi_pass(std::string cgi_pass)
+void ServerScope::setCgi_pass(std::string cgi_pass)
 {
     this->_cgi_pass = cgi_pass;
 }
 
-std::string Server::getPort()
+std::string ServerScope::getPort()
 {
     std::string tempPort;
     std::istringstream sp(this->_listen);
@@ -84,7 +84,7 @@ std::string Server::getPort()
     std::getline(sp, tempPort, ':');
     return tempPort;
 }
-std::string Server::getHost()
+std::string ServerScope::getHost()
 {
     std::string tempHost;
     std::istringstream sp(this->_listen);
@@ -95,11 +95,11 @@ std::string Server::getHost()
     std::getline(sp >> std::ws, tempHost);
     return tempHost;
 }
-ErrorPage Server::getErrorPage()
+ErrorPage ServerScope::getErrorPage()
 {
     return this->_errorPage;
 }
-std::vector<std::string> Server::getServerName()
+std::vector<std::string> ServerScope::getServerName()
 {
     std::vector<std::string> serverNames;
     std::string tempServerName;
@@ -112,35 +112,35 @@ std::vector<std::string> Server::getServerName()
     return (serverNames);
 }
 
-std::vector<Location *> Server::getLocations()
+std::vector<LocationScope *> ServerScope::getLocations()
 {
     return (this->_locations);
 }
 
-bool Server::getIsServerNameNothing()
+bool ServerScope::getIsServerNameNothing()
 {
     return (this->_isServerNameNothing);
 }
 
-std::string Server::getRoot()
+std::string ServerScope::getRoot()
 {
     return (this->_root);
 }
-std::string Server::getIndex()
+std::string ServerScope::getIndex()
 {
     return (this->_index);
 }
-std::string Server::getCgi_pass()
+std::string ServerScope::getCgi_pass()
 {
     return (this->_cgi_pass);
 }
 
-DataBase<Variable<std::string> > Server::getKeywordDataBase()
+DataBase<Variable<std::string> > ServerScope::getKeywordDataBase()
 {
     return (this->_keywordDatabase);
 }
 
-void Server::keywordFill()
+void ServerScope::keywordFill()
 {
     _keywordDatabase.insertData(Variable<std::string>("port", &this->_port));
     _keywordDatabase.insertData(Variable<std::string>("host", &this->_host));
@@ -151,10 +151,10 @@ void Server::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("listen", &this->_listen));
 }
 
-std::string Server::getName() const
+std::string ServerScope::getName() const
 {
     return (this->name);
 }
 
-Server *Server::cloneNew() const { return new Server(); }
-Server *Server::clone() const { return new Server(*this); }
+ServerScope *ServerScope::cloneNew() const { return new ServerScope(); }
+ServerScope *ServerScope::clone() const { return new ServerScope(*this); }

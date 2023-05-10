@@ -12,7 +12,7 @@ int main(int ac, char **av)
     }
     std::string av1;
     Parser *parser = new Parser();
-    Http *http;
+    HttpScope *http;
 
     av1 = av[1];
     parser->parse(av1);

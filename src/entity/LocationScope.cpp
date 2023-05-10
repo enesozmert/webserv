@@ -1,20 +1,20 @@
-#include "../inc/entity/Location.hpp"
+#include "../inc/entity/LocationScope.hpp"
 
-Location::Location(/* args */)
+LocationScope::LocationScope(/* args */)
 {
     this->keywordFill();
 }
 
-Location::~Location()
+LocationScope::~LocationScope()
 {
 }
 
-Location::Location(const Location &location)
+LocationScope::LocationScope(const LocationScope &location)
 {
     *this = location;
 }
 
-Location	&Location::operator=(const Location &location)
+LocationScope	&LocationScope::operator=(const LocationScope &location)
 {
     if (this == &location)
         return (*this);
@@ -27,19 +27,19 @@ Location	&Location::operator=(const Location &location)
     return (*this);
 }
 
-std::string Location::getRoot()
+std::string LocationScope::getRoot()
 {
     return (this->_root);
 }
-std::string Location::getAutoindex()
+std::string LocationScope::getAutoindex()
 {
     return (this->_autoindex);
 }
-std::string Location::getIndex()
+std::string LocationScope::getIndex()
 {
     return (this->_index);
 }
-std::vector<std::string> Location::getAllowMethods()
+std::vector<std::string> LocationScope::getAllowMethods()
 {
     std::vector<std::string> allowMethods;
     std::string tempAllowMethods;
@@ -51,56 +51,56 @@ std::vector<std::string> Location::getAllowMethods()
     }
     return (allowMethods);
 }
-ErrorPage Location::getErrorPage()
+ErrorPage LocationScope::getErrorPage()
 {
     return (this->_errorPage);
 }
-RedirectionUri Location::getRedirectionUri()
+RedirectionUri LocationScope::getRedirectionUri()
 {
     return (this->_redirectionUri);
 }
 
-DataBase<Variable<std::string> > Location::getKeywordDataBase()
+DataBase<Variable<std::string> > LocationScope::getKeywordDataBase()
 {
     return (this->_keywordDatabase);
 }
 
-std::string Location::getPath()
+std::string LocationScope::getPath()
 {
     return (this->_path);
 }
 
-void Location::setRoot(std::string root)
+void LocationScope::setRoot(std::string root)
 {
     this->_root = root;
 }
-void Location::setIndex(std::string index)
+void LocationScope::setIndex(std::string index)
 {
     this->_index = index;
 }
-void Location::setAutoindex(std::string autoIndex)
+void LocationScope::setAutoindex(std::string autoIndex)
 {
     this->_autoindex = autoIndex;
 }
-void Location::setAllowMethods(std::string allowMethods)
+void LocationScope::setAllowMethods(std::string allowMethods)
 {
     (void)allowMethods;
 }
-void Location::setErrorPage(ErrorPage errorPage)
+void LocationScope::setErrorPage(ErrorPage errorPage)
 {
     this->_errorPage = errorPage;
 }
-void Location::setRedirectionUri(RedirectionUri redirectionUri)
+void LocationScope::setRedirectionUri(RedirectionUri redirectionUri)
 {
     this->_redirectionUri = redirectionUri;
 }
 
-void Location::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
+void LocationScope::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 {
     this->_keywordDatabase = keywordDatabase;
 }
 
-void Location::keywordFill()
+void LocationScope::keywordFill()
 {
     _keywordDatabase.insertData(Variable<std::string>("root",&this->_root));
     _keywordDatabase.insertData(Variable<std::string>("index", &this->_index));
@@ -109,15 +109,15 @@ void Location::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("allow_methods", &this->_allowMethods));
 }
 
-void Location::setPath(std::string path)
+void LocationScope::setPath(std::string path)
 {
     this->_path = path;
 }
 
-std::string Location::getName() const
+std::string LocationScope::getName() const
 {
     return (this->name);
 }
 
-Location* Location::cloneNew() const { return new Location(); }
-Location* Location::clone() const { return new Location(*this); }
+LocationScope* LocationScope::cloneNew() const { return new LocationScope(); }
+LocationScope* LocationScope::clone() const { return new LocationScope(*this); }
