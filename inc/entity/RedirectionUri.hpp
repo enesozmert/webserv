@@ -22,6 +22,7 @@ public:
     RedirectionUri(/* args */);
     ~RedirectionUri();
     RedirectionUri(const RedirectionUri &redirectionUri);
+    RedirectionUri	&operator=(const RedirectionUri &redirectionUri);
 
     std::vector<std::string> getCodes() const;
     void setCodes(std::string code);

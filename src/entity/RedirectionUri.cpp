@@ -13,6 +13,15 @@ RedirectionUri::RedirectionUri(const RedirectionUri &redirectionUri)
     *this = redirectionUri;
 }
 
+RedirectionUri	&RedirectionUri::operator=(const RedirectionUri &redirectionUri)
+{
+    if (this == &redirectionUri)
+        return (*this);
+    this->_codes = redirectionUri._codes;
+    this->_pageName = redirectionUri._pageName;
+    return (*this);
+}
+
 std::vector<std::string> RedirectionUri::getCodes() const
 {
     std::vector<std::string> codes;

@@ -24,6 +24,7 @@ class Http : public IScope
         Http(/* args */);
         ~Http();
         Http(const Http &http);
+        Http &operator=(const Http &http);
 
         std::string getClientMaxBodySize();
         std::vector<Server *> getServers();

@@ -400,7 +400,7 @@ std::string Parser::cleanString(std::string str)
     const char *ch = str.c_str();
     for (size_t i = 0; i < str.length(); i++)
     {
-        if (ch[i] != '\t' && ch[i] != '\n')
+        if (ch[i] != '\t' || ch[i] != '\n')
         {
             cleanedStr += ch[i];
         }

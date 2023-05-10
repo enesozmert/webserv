@@ -15,11 +15,11 @@ class Location;
 class Server : public IScope
 {
     private:
-        std::vector<Location *> _locations; //location sinifi gelecek
-        std::string _port;// listen(string)[port(8080)]
-        std::string _host; // listen(string)[host:port(127.0.0.1:80)]
+        std::vector<Location *> _locations;
+        std::string _port;
+        std::string _host;
         std::string _serverNames;
-        std::string _root; // root ./tests/test1/;
+        std::string _root;
         std::string _index;
         std::string _cgi_pass;
         std::string _listen;
@@ -32,6 +32,7 @@ class Server : public IScope
         Server(/* args */);
         ~Server();
         Server(const Server &server);
+        Server	&operator=(const Server &server);
 
         void setPort(std::string port);
         void setHost(std::string host);

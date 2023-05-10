@@ -3,8 +3,8 @@
 Location::Location(/* args */)
 {
     this->keywordFill();
-
 }
+
 Location::~Location()
 {
 }
@@ -12,6 +12,19 @@ Location::~Location()
 Location::Location(const Location &location)
 {
     *this = location;
+}
+
+Location	&Location::operator=(const Location &location)
+{
+    if (this == &location)
+        return (*this);
+    this->_path = location._path;
+    this->_root = location._root;
+    this->_autoindex = location._autoindex;
+    this->_index = location._index;
+    this->_allowMethods = location._allowMethods;
+    this->_clientBodyBufferSize = location._clientBodyBufferSize;
+    return (*this);
 }
 
 std::string Location::getRoot()

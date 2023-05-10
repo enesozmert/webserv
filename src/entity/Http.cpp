@@ -15,6 +15,14 @@ Http::Http(const Http &http)
     *this = http;
 }
 
+Http	&Http::operator=(const Http &http)
+{
+    if (this == &http)
+        return (*this);
+    this->_clientMaxBodySize = http._clientMaxBodySize;
+    return (*this);
+}
+
 std::string Http::getClientMaxBodySize()
 {
     return (this->_clientMaxBodySize);

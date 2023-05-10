@@ -13,6 +13,15 @@ ErrorPage::ErrorPage(const ErrorPage &errorPage)
     *this = errorPage;
 }
 
+ErrorPage	&ErrorPage::operator=(const ErrorPage &errorPage)
+{
+    if (this == &errorPage)
+        return (*this);
+    this->_codes = errorPage._codes;
+    this->_pageName = errorPage._pageName;
+    return (*this);
+}
+
 std::vector<std::string> ErrorPage::getCodes()
 {
     std::vector<std::string> codes;

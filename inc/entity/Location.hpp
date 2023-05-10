@@ -30,7 +30,7 @@ class Location : public IScope
         Location(/* args */);
         ~Location();
         Location(const Location &location);
-
+        Location &operator=(const Location &location);
         std::string getRoot();
         std::string getAutoindex();
         std::string getIndex();

@@ -18,7 +18,7 @@ int main(int ac, char **av)
     parser->parse(av1);
     http = parser->getHttp();
 
-    std::cout << "result : " << http->getServers().at(0)->getLocations().at(0)->getAllowMethods().at(1) << std::endl;
+    std::cout << "result : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
     std::cout << "result : " << http->getServers().at(0)->getHost() << std::endl;
     return (0);
 }

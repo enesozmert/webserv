@@ -14,6 +14,20 @@ Server::Server(const Server &server)
     *this = server;
 }
 
+Server	&Server::operator=(const Server &server)
+{
+    if (this == &server)
+        return (*this);
+    this->_port = server._port;
+    this->_host = server._host;
+    this->_root = server._root;
+    this->_index = server._index;
+    this->_serverNames = server._serverNames;
+    this->_cgi_pass = server._cgi_pass;
+    this->_listen = server._listen;
+    return (*this);
+}
+
 void Server::setHost(std::string host)
 {
     this->_host = host;
@@ -91,7 +105,7 @@ std::vector<std::string> Server::getServerName()
     std::string tempServerName;
     std::stringstream sp(this->_serverNames);
 
-    while (sp >> tempServerName)
+    while (sp >> std::ws >> tempServerName)
     {
         serverNames.push_back(tempServerName);
     }

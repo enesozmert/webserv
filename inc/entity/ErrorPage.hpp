@@ -21,6 +21,7 @@ class ErrorPage : public IScope
         ErrorPage(/* args */);
         ~ErrorPage();
         ErrorPage(const ErrorPage &errorPage);
+        ErrorPage &operator=(const ErrorPage &errorPage);
     
         std::vector<std::string> getCodes();
         std::string getPageName();
