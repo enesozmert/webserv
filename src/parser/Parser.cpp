@@ -21,7 +21,7 @@ void Parser::parse(std::string &fileName)
     while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
-        std::string lineTrim = this->trim(line, " \r\t");
+        std::string lineTrim = trim(line, " \r\t");
         lines.push_back(lineTrim);
         fileCleanContents.erase(0, pos + 1);
     }
@@ -53,8 +53,8 @@ void Parser::parseScope(const std::vector<std::string> &lines)
         ParseLineProp *parseLineProp = new ParseLineProp();
 
         line = lines[i];
-        lineTrim = this->trim(line, " \n\t\r");
-        lineTrimScope = this->trim(line, " \n\t\r{}");
+        lineTrim = trim(line, " \n\t\r");
+        lineTrimScope = trim(line, " \n\t\r{}");
 
         parseLineProp->setIndex(i);
         parseLineProp->setLine(lineTrim);
@@ -199,7 +199,7 @@ void Parser::parseHttp(std::vector<size_t> tempScopes)
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
-        std::istringstream s(this->trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
+        std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
         if (this->httpPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
@@ -223,7 +223,7 @@ void Parser::parseServer(std::vector<size_t> tempScopes)
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
-        std::istringstream s(this->trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
+        std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
         if (this->serverPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
@@ -247,7 +247,7 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
-        std::istringstream s(this->trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
+        std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
         if (this->locationPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
@@ -317,7 +317,7 @@ void Parser::setScopeNames(const std::vector<std::string> &lines)
     for (size_t i = 0; i < lines.size(); i++)
     {
         std::string line = lines[i];
-        std::string lineTrim = this->trim(line, " \n\t\r{}");
+        std::string lineTrim = trim(line, " \n\t\r{}");
         if (lineTrim.find("http") != std::string::npos && lineTrim.length() == 4)
         {
             _scopeNames.push_back(lineTrim);
@@ -381,31 +381,6 @@ std::vector<ParseLineProp> Parser::getOrderParseLineProps()
 std::map<size_t, IScope *> Parser::getMatchedClass()
 {
     return (this->_matchedClass);
-}
-
-std::string Parser::trim(const std::string &str, const std::string &delimiters)
-{
-    size_t first = str.find_first_not_of(delimiters);
-    if (first == std::string::npos)
-    {
-        return "";
-    }
-    size_t last = str.find_last_not_of(delimiters);
-    return str.substr(first, (last - first + 1));
-}
-
-std::string Parser::cleanString(std::string str)
-{
-    std::string cleanedStr;
-    const char *ch = str.c_str();
-    for (size_t i = 0; i < str.length(); i++)
-    {
-        if (ch[i] != '\t' || ch[i] != '\n')
-        {
-            cleanedStr += ch[i];
-        }
-    }
-    return cleanedStr;
 }
 
 HttpScope *Parser::getHttp()
