@@ -17,6 +17,7 @@
 #include "../entity/Variable.hpp"
 #include "../function/ParseLinePropFunc.hpp"
 #include "../function/VariableFunc.hpp"
+#include "../utils/Utils.hpp"
 
 class File;
 class HttpScope;
@@ -72,9 +73,6 @@ class Parser
         std::vector<ParseLineProp> getOrderParseLineProps();
 
         std::map<size_t, IScope *> getMatchedClass();
-
-        std::string trim(const std::string& str, const std::string& delimiters);
-        std::string cleanString(std::string str);
 
         HttpScope *getHttp();
 };
