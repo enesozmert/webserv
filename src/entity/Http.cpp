@@ -6,16 +6,28 @@ Http::Http(/* args */)
 
 }
 
-
 Http::~Http()
 {
+}
+
+Http::Http(const Http &http)
+{
+    *this = http;
+}
+
+Http	&Http::operator=(const Http &http)
+{
+    if (this == &http)
+        return (*this);
+    this->_clientMaxBodySize = http._clientMaxBodySize;
+    return (*this);
 }
 
 std::string Http::getClientMaxBodySize()
 {
     return (this->_clientMaxBodySize);
 }
-std::vector<Server> Http::getServer()
+std::vector<Server *> Http::getServers()
 {
     return (this->_servers);
 }
@@ -32,7 +44,7 @@ void Http::setClientMaxBodySize(std::string clientMaxBodySize)
 {
     this->_clientMaxBodySize = clientMaxBodySize;
 }
-void Http::setServer(Server server)
+void Http::setServer(Server *server)
 {
     this->_servers.push_back(server);
 }
@@ -47,11 +59,7 @@ void Http::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 
 void Http::keywordFill()
 {
-
-    std::vector<Variable<std::string> >  datas;
-
-    datas.push_back(Variable<std::string>("client_max_body_size", &this->_clientMaxBodySize));
-    this->setKeywordDatabase(datas);
+    _keywordDatabase.insertData(Variable<std::string>("client_max_body_size", &this->_clientMaxBodySize));
 }
 
 std::string Http::getName() const
@@ -59,5 +67,6 @@ std::string Http::getName() const
     return (this->name);
 }
 
+Http* Http::cloneNew() const { return new Http(); }
 Http* Http::clone() const { return new Http(*this); }
 

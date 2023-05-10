@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "IScope.hpp"
 #include "../database/DataBase.hpp"
 #include "Variable.hpp"
@@ -13,13 +14,15 @@
 class RedirectionUri : public IScope
 {
 private:
-    std::vector<std::string> _codes;
+    std::string _codes;
     std::string _pageName;
     DataBase<Variable<std::string> > _keywordDatabase;
 
 public:
     RedirectionUri(/* args */);
     ~RedirectionUri();
+    RedirectionUri(const RedirectionUri &redirectionUri);
+    RedirectionUri	&operator=(const RedirectionUri &redirectionUri);
 
     std::vector<std::string> getCodes() const;
     void setCodes(std::string code);
@@ -34,6 +37,7 @@ public:
     void keywordFill();
 
 
+    RedirectionUri* cloneNew() const;
     RedirectionUri* clone() const;
 
 };

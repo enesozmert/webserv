@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 #include "ErrorPage.hpp"
 #include "Location.hpp"
 #include "IScope.hpp"
@@ -14,13 +15,14 @@ class Location;
 class Server : public IScope
 {
     private:
-        std::vector<Location> _locations; //location sinifi gelecek
-        std::string _port;// listen(string)[port(8080)]
-        std::string _host; // listen(string)[host:port(127.0.0.1:80)]
-        std::vector<std::string> _serverNames;
-        std::string _root; // root ./tests/test1/;
+        std::vector<Location *> _locations;
+        std::string _port;
+        std::string _host;
+        std::string _serverNames;
+        std::string _root;
         std::string _index;
         std::string _cgi_pass;
+        std::string _listen;
 
         bool _isServerNameNothing;
         ErrorPage _errorPage;
@@ -29,6 +31,8 @@ class Server : public IScope
     public:
         Server(/* args */);
         ~Server();
+        Server(const Server &server);
+        Server	&operator=(const Server &server);
 
         void setPort(std::string port);
         void setHost(std::string host);
@@ -38,7 +42,7 @@ class Server : public IScope
         void setIndex(std::string index);
         void setCgi_pass(std::string cgi_pass);
 
-        void setLocation(Location location);
+        void setLocation(Location *location);
         void setIsServerNameNothing(bool isServerNameNothing);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
@@ -50,13 +54,14 @@ class Server : public IScope
         std::string getIndex();
         std::string getCgi_pass();
 
-        std::vector<Location> getLocations();
+        std::vector<Location *> getLocations();
         bool getIsServerNameNothing();
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void keywordFill();
         
         std::string getName() const;
+        Server* cloneNew() const;
         Server* clone() const;
 
 };

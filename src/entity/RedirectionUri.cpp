@@ -8,9 +8,31 @@ RedirectionUri::~RedirectionUri()
 {
 }
 
+RedirectionUri::RedirectionUri(const RedirectionUri &redirectionUri)
+{
+    *this = redirectionUri;
+}
+
+RedirectionUri	&RedirectionUri::operator=(const RedirectionUri &redirectionUri)
+{
+    if (this == &redirectionUri)
+        return (*this);
+    this->_codes = redirectionUri._codes;
+    this->_pageName = redirectionUri._pageName;
+    return (*this);
+}
+
 std::vector<std::string> RedirectionUri::getCodes() const
 {
-    return (this->_codes);
+    std::vector<std::string> codes;
+    std::string tempCodes;
+    std::stringstream sp(this->_codes);
+
+    while (sp << tempCodes)
+    {
+        codes.push_back(tempCodes);
+    }
+    return (codes);
 }
 
 std::string RedirectionUri::getPageName() const
@@ -20,7 +42,8 @@ std::string RedirectionUri::getPageName() const
 
 void RedirectionUri::setCodes(std::string code)
 {
-    this->_codes.push_back(code);
+    (void)code;
+    // this->_codes.push_back(code);
 }
 
 void RedirectionUri::setPageName(std::string pageName)
@@ -43,12 +66,13 @@ std::string RedirectionUri::getName() const
 
 void RedirectionUri::keywordFill()
 {
-    std::vector<Variable<std::string> >  datas;
+    // std::vector<Variable<std::string> >  datas;
 
-    //datas.push_back(Variable<std::string>("codes", &this->_codes));
-    datas.push_back(Variable<std::string>("pageName", &this->_pageName));
+    _keywordDatabase.insertData(Variable<std::string>("codes", &this->_codes));
+    _keywordDatabase.insertData(Variable<std::string>("pageName", &this->_pageName));
 
-    this->setKeywordDatabase(datas);
+    // this->setKeywordDatabase(datas);
 }
 
+RedirectionUri* RedirectionUri::cloneNew() const { return new RedirectionUri(); }
 RedirectionUri* RedirectionUri::clone() const { return new RedirectionUri(*this); }
