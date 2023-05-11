@@ -23,7 +23,7 @@ SRC_UTILS		=	utils/
 
 #Files
 ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope	
-PARSER			=	Parser
+PARSER			=	ParserConfig
 FILE			=	File
 SERVER			=	Server Cluster
 REQUEST			=	Request

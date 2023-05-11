@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -6,6 +7,8 @@
 #include <string>
 #include <algorithm>
 #include <cstdlib>
+#include "../database/DataBase.hpp"
+#include "../entity/Variable.hpp"
 #include "../utils/Utils.hpp"
 
 class Request
@@ -21,11 +24,12 @@ class Request
     	std::map<std::string, std::string> 			_headers;
     	std::map<std::string, std::string>			_env_for_cgi;
     	std::vector<std::pair<std::string, float> >	_languages;
-    	const std::string&							_raw;
+    	std::string									_raw;
     	int 										return_code;
 
+
     public:
-    	Request(const std::string& request_str);
+    	Request();
     	~Request();
 
     	//getter

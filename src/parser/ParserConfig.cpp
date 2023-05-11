@@ -1,16 +1,16 @@
-#include "../inc/parser/Parser.hpp"
+#include "../inc/parser/ParserConfig.hpp"
 
-typedef void (Parser::*method_function)(std::vector<size_t>);
+typedef void (ParserConfig::*method_function)(std::vector<size_t>);
 
-Parser::Parser(/* args */) : _matchedClassIndex(0)
+ParserConfig::ParserConfig(/* args */) : _matchedClassIndex(0)
 {
 }
 
-Parser::~Parser()
+ParserConfig::~ParserConfig()
 {
 }
 
-void Parser::parse(std::string &fileName)
+void ParserConfig::parse(std::string &fileName)
 {
     File file(fileName);
     size_t pos = 0;
@@ -37,7 +37,7 @@ void Parser::parse(std::string &fileName)
     // std::cout << "this->_matchedClass.at(0)2 : " << this->serverPtr->getServerName().at(1) << std::endl;
 }
 
-void Parser::parseScope(const std::vector<std::string> &lines)
+void ParserConfig::parseScope(const std::vector<std::string> &lines)
 {
     std::string line;
     std::string lineTrim;
@@ -95,7 +95,7 @@ void Parser::parseScope(const std::vector<std::string> &lines)
     parseMatchedClassFill();
 }
 
-void Parser::parseMatchClass()
+void ParserConfig::parseMatchClass()
 {
     IScope *classes[3] = {&this->http, &this->server, &this->location};
     std::string method_function_name[3] = {"http", "server", "location"};
@@ -113,12 +113,12 @@ void Parser::parseMatchClass()
     }
 }
 
-void Parser::parseScopeFill()
+void ParserConfig::parseScopeFill()
 {
     size_t tempCloseIndex;
     std::vector<size_t> tempLines;
     std::string method_function_name[3] = {"http", "server", "location"};
-    method_function p[3] = {&Parser::parseHttp, &Parser::parseServer, &Parser::parseLocation};
+    method_function p[3] = {&ParserConfig::parseHttp, &ParserConfig::parseServer, &ParserConfig::parseLocation};
 
     tempCloseIndex = _orderParseLineProps[0].getScopeCloseIndex();
     // for (size_t i = 0; i < _orderParseLineProps.size(); i++)
@@ -154,7 +154,7 @@ void Parser::parseScopeFill()
     }
 }
 
-void Parser::parseMatchedClassFill()
+void ParserConfig::parseMatchedClassFill()
 {
     size_t serverIndex;
 
@@ -187,7 +187,7 @@ void Parser::parseMatchedClassFill()
     }
 }
 
-void Parser::parseHttp(std::vector<size_t> tempScopes)
+void ParserConfig::parseHttp(std::vector<size_t> tempScopes)
 {
     std::string tempVariableName;
     std::string tempVariableValue;
@@ -211,7 +211,7 @@ void Parser::parseHttp(std::vector<size_t> tempScopes)
     std::cout << "**********parseHttp" << std::endl;
 }
 
-void Parser::parseServer(std::vector<size_t> tempScopes)
+void ParserConfig::parseServer(std::vector<size_t> tempScopes)
 {
     std::string tempVariableName;
     std::string tempVariableValue;
@@ -235,7 +235,7 @@ void Parser::parseServer(std::vector<size_t> tempScopes)
     std::cout << "**********parseServer" << std::endl;
 }
 
-void Parser::parseLocation(std::vector<size_t> tempScopes)
+void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
 {
     std::string tempVariableName;
     std::string tempVariableValue;
@@ -261,7 +261,7 @@ void Parser::parseLocation(std::vector<size_t> tempScopes)
     std::cout << "**********parseLocation" << std::endl;
 }
 
-size_t Parser::findClosingScopeIndex(const std::vector<std::string> &lines, size_t startingIndex)
+size_t ParserConfig::findClosingScopeIndex(const std::vector<std::string> &lines, size_t startingIndex)
 {
     size_t openingScopesCount = 1;
     size_t closingScopesCount = 0;
@@ -286,7 +286,7 @@ size_t Parser::findClosingScopeIndex(const std::vector<std::string> &lines, size
     return 0;
 }
 
-size_t Parser::findOpeningScopeIndex(const std::vector<std::string> &lines, size_t closingIndex)
+size_t ParserConfig::findOpeningScopeIndex(const std::vector<std::string> &lines, size_t closingIndex)
 {
     size_t openingScopesCount = 0;
     size_t closingScopesCount = 1;
@@ -311,7 +311,7 @@ size_t Parser::findOpeningScopeIndex(const std::vector<std::string> &lines, size
     return 0;
 }
 
-void Parser::setScopeNames(const std::vector<std::string> &lines)
+void ParserConfig::setScopeNames(const std::vector<std::string> &lines)
 {
 
     for (size_t i = 0; i < lines.size(); i++)
@@ -333,12 +333,12 @@ void Parser::setScopeNames(const std::vector<std::string> &lines)
     }
 }
 
-std::vector<std::string> Parser::getScopeNames()
+std::vector<std::string> ParserConfig::getScopeNames()
 {
     return (this->_scopeNames);
 }
 
-void Parser::setOrderScopeNames()
+void ParserConfig::setOrderScopeNames()
 {
     ParseLineProp parseLineProp;
 
@@ -354,17 +354,17 @@ void Parser::setOrderScopeNames()
     }
 }
 
-std::vector<std::string> Parser::getOrderScopeNames()
+std::vector<std::string> ParserConfig::getOrderScopeNames()
 {
     return (this->_orderScopeNames);
 }
 
-std::map<size_t, ParseLineProp> Parser::getParseLineProps()
+std::map<size_t, ParseLineProp> ParserConfig::getParseLineProps()
 {
     return (this->_parseLineProps);
 }
 
-void Parser::setOrderParseLineProps()
+void ParserConfig::setOrderParseLineProps()
 {
     for (size_t i = 0; i < _parseLineProps.size(); i++)
     {
@@ -373,17 +373,17 @@ void Parser::setOrderParseLineProps()
     std::sort(_orderParseLineProps.begin(), _orderParseLineProps.end(), compareByScopeOpenIndex);
 }
 
-std::vector<ParseLineProp> Parser::getOrderParseLineProps()
+std::vector<ParseLineProp> ParserConfig::getOrderParseLineProps()
 {
     return (this->_orderParseLineProps);
 }
 
-std::map<size_t, IScope *> Parser::getMatchedClass()
+std::map<size_t, IScope *> ParserConfig::getMatchedClass()
 {
     return (this->_matchedClass);
 }
 
-HttpScope *Parser::getHttp()
+HttpScope *ParserConfig::getHttp()
 {
     return (this->_parsedHttp);
 }

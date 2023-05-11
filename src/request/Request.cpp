@@ -1,14 +1,15 @@
 #include "../inc/request/Request.hpp"
 
-Request::Request(const std::string &str) : _port(80), _raw(str), return_code(200)
+Request::Request(): _port(80), return_code(200)
 {
 	initMethods();
 	this->resetHeaders();
 	this->_env_for_cgi.clear();
-	this->parse(str);
 	if (this->return_code != 200)
 		std::cerr << "Parse error : " << this->return_code << std::endl;
 }
+
+Request::~Request() {}
 
 /*** GETTERS ***/
 
@@ -185,26 +186,26 @@ void Request::parseFirstline(const std::string &str)
 	this->checkVersion();
 }
 
-std::string Request::GetnextLine(const std::string &str, size_t &i)
-{
-	std::string subStr;
-	size_t j;
+// std::string Request::GetnextLine(const std::string &str, size_t &i)
+// {
+// 	std::string subStr;
+// 	size_t j;
 
-	if (i == std::string::npos)
-		return "";
-	j = str.find_first_of('\n', i);
-	subStr = str.substr(i, j - i);
-	if (subStr[subStr.size() - 1] == '\r')
-	{
-		if (subStr.size())
-			subStr.resize(subStr.size() - 1);
-	}
-	if (j == std::string::npos)
-		i = j;
-	i = j + 1; // i adres olarak geldi o yüzden geldiği yerde de değişecek
-	// sonunda /r/n olmadan satırı döndürür.
-	return subStr;
-}
+// 	if (i == std::string::npos)
+// 		return "";
+// 	j = str.find_first_of('\n', i);
+// 	subStr = str.substr(i, j - i);
+// 	if (subStr[subStr.size() - 1] == '\r')
+// 	{
+// 		if (subStr.size())
+// 			subStr.resize(subStr.size() - 1);
+// 	}
+// 	if (j == std::string::npos)
+// 		i = j;
+// 	i = j + 1; // i adres olarak geldi o yüzden geldiği yerde de değişecek
+// 	// sonunda /r/n olmadan satırı döndürür.
+// 	return subStr;
+// }
 
 std::string Request::convertHeadertoCGIformat(std::string &key)
 {
@@ -231,18 +232,29 @@ void Request::findQuery()
 
 int Request::parse(const std::string &str)
 {
+	std::cout << "str : " << str << std::endl;
+	std::cout << "*********----------------**************" << std::endl;
 	std::string key;
 	std::string value;
 	std::string line;
-	size_t i;
-	i = 0;
+	std::string fileCleanContents = str;
+	std::string delimiter = "\n";
+	size_t pos = 0;
 
-	line = GetnextLine(str, i);
-	this->parseFirstline(line);
-	line.clear();
+	if ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
+    {
+        line = fileCleanContents.substr(0, pos + 1);
+        fileCleanContents.erase(0, pos + 1);
+        std::cout << "line : " << trim(line, "\n\r") << std::endl;
+        this->parseFirstline(line);
+        line.clear();
+    }
 
-	while ((line = GetnextLine(str, i)) != "\r" && line != "" && this->return_code != 400)
+	while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
 	{
+		line = fileCleanContents.substr(0, pos + 1);
+		fileCleanContents.erase(0, pos + 1);
+		// std::cout << "line : " << trim(line, "\n\r") << std::endl;
 		key = createKey(line);
 		value = createValue(line);
 		// key-value'leri _headers mapine ekliyoruz.
@@ -255,7 +267,7 @@ int Request::parse(const std::string &str)
 		this->_env_for_cgi["Www-Authenticate"] = this->_headers["Www-Authenticate"];
 	this->setLanguage();
 	// burayı kontrol et i hangi karakterin üstünde?
-	this->setBody(str.substr(i, std::string::npos));
+	// this->setBody(str.substr(i, std::string::npos));
 	this->findQuery();
 	return this->return_code;
 }
@@ -278,5 +290,3 @@ std::ostream &operator<<(std::ostream &os, const Request &re)
 
 	return os;
 }
-
-Request::~Request() {}

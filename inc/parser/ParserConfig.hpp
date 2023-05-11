@@ -24,7 +24,7 @@ class HttpScope;
 class ServerScope;
 class LocationScope;
 class ParseLineProp;
-class Parser
+class ParserConfig
 {
     private:
         HttpScope *_parsedHttp;
@@ -44,8 +44,8 @@ class Parser
 
         size_t _matchedClassIndex;
     public:
-        Parser();
-        ~Parser();
+        ParserConfig();
+        ~ParserConfig();
 
         void parse(std::string &fileName);
 
