@@ -64,11 +64,10 @@ long Server::accept(void)
 void    Server::process(long socket, HttpScope &httpScope)
 {
     (void)httpScope;
-    // RequestConfig	request_config;
-    // http class?
-    // Response response;
+    Response response;
+    ServerRequestSet    ServerRequestSet;//böyle bir ara class oluşturalım.
 
-    // chunked neyse processChunked üzerinden işlem görecek
+    // chunked neyse processChunked üzerinden işlem görecek, araştırılacak
     if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos && _requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
         this->processChunk(socket);
 
@@ -81,15 +80,16 @@ void    Server::process(long socket, HttpScope &httpScope)
 
     if (_requests[socket] != "")
     {
-        // Request request(_requests[socket]); // aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
+        Request request(_requests[socket]); // aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
 
-        // Config dosyasından veriler çekilecek, http class?
-        // response.call(request, <çekilen verilerin tutulduğu class>); // http class gelecek
+        //ServerRequestSet = httpScope'tan aşağıdaki veriler set edilip bu classta tutulacak.
+        //requestConf = conf.getConfigForRequest(this->_listen,  request.getPath(), request.getHeaders().at("Host"), request.getMethod(), request);
+        response.call(request, ServerRequestSet);
 
         // socket,request olan map yapısının requestini siliyoruz
-        // _requests.erase(socket);
+        _requests.erase(socket);
         // requeste cevap oluşturup map içinde socket,response şeklinde tutuyoruz.
-        // _requests.insert(std::make_pair(socket, response.getResponse()));
+        _requests.insert(std::make_pair(socket, response.getResponse()));
     }
 }
 
@@ -198,6 +198,11 @@ int Server::send(long socket)
 long Server::get_fd(void)
 {
     return (fd);
+}
+
+t_listen   Server::get_listen()
+{
+    return (_listen);
 }
 
 void Server::close(int socket)

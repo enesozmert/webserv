@@ -10,6 +10,8 @@
 
 #include "../entity/Listen.hpp"
 #include "../entity/HttpScope.hpp"
+#include "../entity/Request.hpp"
+# include "../entity/Response.hpp"
 
 # define RECV_SIZE 65536
 
@@ -27,6 +29,7 @@ class Server {
         ~Server();
 
         long	get_fd();
+        t_listen   get_listen();
 
         int     setUpServer();
         void    setAddr();
