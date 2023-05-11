@@ -65,9 +65,8 @@ void    Server::process(long socket, HttpScope &httpScope)
 {
     (void)httpScope;
     Response response;
-    ServerRequestSet    ServerRequestSet;//böyle bir ara class oluşturalım.
 
-    // chunked neyse processChunked üzerinden işlem görecek, araştırılacak
+    //chunked request ayrı bir fonksiyonda işlem görecek.
     if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos && _requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
         this->processChunk(socket);
 
@@ -82,6 +81,7 @@ void    Server::process(long socket, HttpScope &httpScope)
     {
         Request request(_requests[socket]); // aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
 
+
         //ServerRequestSet = httpScope'tan aşağıdaki veriler set edilip bu classta tutulacak.
         //requestConf = conf.getConfigForRequest(this->_listen,  request.getPath(), request.getHeaders().at("Host"), request.getMethod(), request);
         response.call(request, ServerRequestSet);
@@ -93,8 +93,14 @@ void    Server::process(long socket, HttpScope &httpScope)
     }
 }
 
-// chunk olayını araştır???
-void Server::processChunk(long socket)
+//Chunked request, HTTP protokolünde kullanılan bir veri transfer yöntemidir.
+//Bu yöntemde, gönderilecek veri belirli boyutlarda parçalara ayrılır ve her bir parça ayrı bir "chunk" olarak gönderilir. 
+//Bu sayede, verinin tamamı gönderilmeden önce tüm parçaların bir arada toplanması beklenmez,
+//böylece büyük boyutlu verilerin transferi daha verimli bir şekilde gerçekleştirilebilir.
+//Veri gönderimi tamamlandığında, son "chunk" gönderildikten sonra bir "terminator" chunk eklenir 
+//ve böylece alıcı taraf, verinin tamamının gönderildiğini anlar.
+//body kısmı çok uzunsa bu şekilde parçalı olarak alıp sonra birleştiririz.
+/* void Server::processChunk(long socket)
 {
     std::string head = _requests[socket].substr(0, _requests[socket].find("\r\n\r\n"));
     std::string chunks = _requests[socket].substr(_requests[socket].find("\r\n\r\n") + 4, _requests[socket].size() - 1);
@@ -113,6 +119,34 @@ void Server::processChunk(long socket)
     }
 
     _requests[socket] = head + "\r\n\r\n" + body + "\r\n\r\n";
+} */
+//chatgpt
+void Server::processChunk(long socket)
+{
+    const std::string& request = _requests[socket];
+
+    // İstek başlığı (header) ile body arasındaki bölgeyi bulur.
+    const std::string::size_type header_end = request.find("\r\n\r\n");
+    if (header_end == std::string::npos) {
+        // İstek başlığı tamamlanmadığı için işlem yapılamaz.
+        return;
+    }
+
+    // Body'yi "chunked" encoding kullanarak parçalara ayırır.
+    std::istringstream body_stream(request.substr(header_end + 4));
+    std::string chunk_str;
+    std::string body;
+    while (std::getline(body_stream, chunk_str), !chunk_str.empty()) {
+        // Chunk boyutunu hex değerinden decimal değere çevirir.
+        const std::string::size_type pos = chunk_str.find(';');
+        const int chunk_size = std::stoul(pos != std::string::npos ? chunk_str.substr(0, pos) : chunk_str, nullptr, 16);
+
+        // Chunk boyutu kadar veriyi body'ye ekler.
+        body.append(chunk_str.substr(chunk_str.find('\n') + 1, chunk_size));
+    }
+
+    // İstek başlığı ve yeni body'yi birleştirip isteği günceller.
+    _requests[socket] = request.substr(0, header_end + 4) + body + "\r\n\r\n";
 }
 
 int Server::recv(long socket)
