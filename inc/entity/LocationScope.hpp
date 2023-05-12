@@ -37,8 +37,8 @@ class LocationScope : public IScope
         std::vector<std::string> getAllowMethods();
         ErrorPage getErrorPage();
         RedirectionUri getRedirectionUri();
-        DataBase<Variable<std::string> > getKeywordDataBase();
         std::string getPath();
+        DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setRoot(std::string root);
         void setIndex(std::string index);

@@ -8,6 +8,7 @@
 #include "../database/DataBase.hpp"
 #include "IRequest.hpp"
 #include "Variable.hpp"
+#include "HttpMethod.hpp"
 
 class Request : public IRequest
 {
@@ -16,10 +17,20 @@ class Request : public IRequest
     	std::string _path;
     	std::string _body;
     	std::string	_query;
-        std::string _env_for_cgi;
+        std::string _envForCgi;
     	std::string _port;
-        std::string	_languages;
+        std::string	_acceptLanguages;
         std::string _raw;
+        std::string _host;
+        std::string _userAgent;
+        std::string _accept;
+        std::string _acceptEncoding;
+        std::string _acceptCharset;
+        std::string _keepAlive;
+        std::string _connection;
+        std::string _referer;
+        std::string _contentType;
+        std::string _contentLength;
         int return_code;
 
         DataBase<Variable<std::string> > _keywordDatabase;
@@ -34,8 +45,41 @@ class Request : public IRequest
         std::string getQuery();
         std::string getEnvForCgi();
         int         getPort();
-        std::vector<std::pair<std::string, float> > getLanguages();
+        std::vector<std::pair<std::string, float> > getAcceptLanguages();
         std::string getRaw();
+        std::string getHost();
+        std::string getUserAgent();
+        std::string getAccept();
+        std::string getAcceptEncoding();
+        std::string getAcceptCharset();
+        std::string getKeepAlive();
+        std::string getConnection();
+        std::string getReferer();
+        std::string getContentType();
+        int         getContentLength();
+        DataBase<Variable<std::string> > getKeywordDataBase();
+
+        void setVersion(std::string version);
+        void setPath(std::string path);
+        void setBody(std::string body);
+        void setQuery(std::string query);
+        void setEnvForCgi(std::string envForCgi);
+        void setPort(std::string port);
+        void setAcceptLanguage(std::string acceptLanguage);
+        void setRaw(std::string raw);
+        void setHost(std::string host);
+        void setUserAgent(std::string userAgent);
+        void setAccept(std::string accept);
+        void setAcceptEncoding(std::string acceptEncoding);
+        void setAcceptCharset(std::string acceptCharset);
+        void setKeepAlive(std::string keepAlive);
+        void setConnection(std::string connection);
+        void setReferer(std::string referer);
+        void setContentType(std::string contentType);
+        void setContentLength(std::string contentLength);
+        void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
+
+        void keywordFill();
 
         std::string getName() const;
         Request* clone() const;

@@ -1,5 +1,4 @@
 #include "../inc/parser/ParserConfig.hpp"
-#include "../inc/request/Request.hpp"
 
 #include <iostream>
 #include <string>
@@ -21,7 +20,7 @@ int main(int ac, char **av)
 
     std::cout << "result : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
     std::cout << "result : " << http->getServers().at(0)->getHost() << std::endl;
- std::string httpRequest = "POST /processsampleform.php HTTp/1.1\r\n"
+    std::string httpRequest = "POST /processsampleform.php HTTp/1.1\r\n"
                               "Host: 128.2.210.139\r\n"
                               "User-Agent: Mozilla/5.0 (windows; U; Windows NT 6.0; en-Us; rv:1.9.0.19) Gecko/2010031422 Firefox/3.0.19 (.NET CLR 3.5.30729)\r\n"
                               "Accept: text/html,application/xhtml+xm1,application/xm1;q=0.9,*/*;q=0.8\r\n"
@@ -35,8 +34,5 @@ int main(int ac, char **av)
                               "Content-Length: 28\r\n"
                               "\r\n"
                               "[Full request URI: http://128.2.210.139/processsampleform.php]";
-    Request *req = new Request();
-
-    req->parse(httpRequest);
     return (0);
 }

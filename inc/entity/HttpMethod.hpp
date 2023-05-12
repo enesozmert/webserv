@@ -9,14 +9,14 @@
 #include "IRequest.hpp"
 #include "Variable.hpp"
 
-class RequestMethod
+class HttpMethod
 {
     private:
         std::vector<std::string> _methods;
     public:
-        RequestMethod();
-        ~RequestMethod();
-        RequestMethod(const RequestMethod &requestMethod);
+        HttpMethod();
+        ~HttpMethod();
+        HttpMethod(const HttpMethod &requestMethod);
 
         std::vector<std::string> get();
         void set();
