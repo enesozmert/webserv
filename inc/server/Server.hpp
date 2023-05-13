@@ -23,12 +23,6 @@ class Server {
     	long						fd;
     	struct sockaddr_in			addr;//host ve port ayarlanacak
 
-        std::string	                    _hostname;//http'den çek
-        std::vector<ServerScope *>       matchingServers;
-        std::vector<Server> 		    _servers;//http'den çek
-        std::string                     locationPath;
-        std::map<std::string, Server>   _location;//http'den çek
-
     public:
         Server();
         Server(const t_listen &listen);
@@ -49,7 +43,7 @@ class Server {
         int		send(long socket);
         int		recv(long socket);
 
-        HttpScope  getConfigForRequest(Request &request);
+        ServerScope*    getServerForRequest(t_listen& address, std::string& hostname, HttpScope& http);
         Server		getServerForRequest();
-        Server		getLocationForRequest(std::string const path);
+        LocationScope*  getLocationForRequest(std::string& const path); 
 };

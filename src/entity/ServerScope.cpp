@@ -82,6 +82,12 @@ void ServerScope::setListen(std::string port, std::string host)
     this->listen.host = strToIp(this->getHost());
 }
 
+//default location initialization yap
+//en genel ayarlara sahip olanı seçebilirsin. Örneğin, tüm istekleri karşılamak için "/", "*/", ya da "/default" gibi bir path'e sahip olanı
+/*void ServerScope::setDefaultLocation()
+{
+}*/
+
 t_listen    ServerScope::getListen() const
 {
     return this->listen;
@@ -169,3 +175,15 @@ std::string ServerScope::getName() const
 
 ServerScope *ServerScope::cloneNew() const { return new ServerScope(); }
 ServerScope *ServerScope::clone() const { return new ServerScope(*this); }
+
+//fatma ekledi
+LocationScope* ServerScope::getDefaultLocation() const {
+    // Eğer default location tanımlanmamışsa, null döndürür
+    if (defaultLocation == nullptr) {
+        return nullptr;
+    }
+    // Eğer default location tanımlanmışsa, ilgili location döndürür
+    else {
+        return defaultLocation;
+    }
+}
