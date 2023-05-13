@@ -2,6 +2,7 @@
 
 ErrorPage::ErrorPage()
 {
+    this->name = "ErrorPage";
 }
 
 ErrorPage::~ErrorPage()
@@ -42,8 +43,7 @@ std::string ErrorPage::getPageName()
 
 void ErrorPage::setCodes(std::string code)
 {
-    (void)code;
-    // this->_codes.push_back(code);
+    this->_codes = code;
 }
 
 void ErrorPage::setPageName(std::string pageName)
@@ -65,6 +65,20 @@ void ErrorPage::keywordFill()
 {
     _keywordDatabase.insertData(Variable<std::string>("codes", &this->_codes));
     _keywordDatabase.insertData(Variable<std::string>("pageName", &this->_pageName));
+}
+
+void ErrorPage::fillErrorPage(std::string errorPageString)
+{
+    std::string splitErrorPage;
+    std::string splitErrorPage2;
+    std::istringstream s(errorPageString);
+
+    s >> std::ws >> splitErrorPage;
+    // std::getline(s >> std::ws, splitErrorPage);
+    this->setCodes(splitErrorPage); //dışarıdan gelen indexe gore ilgili elemanın code ve page'ini doldursun
+    s >> std::ws >> splitErrorPage2;
+    // std::getline(s >> std::ws, splitErrorPage);
+    this->setPageName(splitErrorPage2);
 }
 
 

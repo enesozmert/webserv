@@ -2,6 +2,8 @@
 
 LocationScope::LocationScope(/* args */)
 {
+    this->setErrorPageCount(0);
+    this->setErrorPageString("error_page");
     this->keywordFill();
 }
 
@@ -24,8 +26,11 @@ LocationScope	&LocationScope::operator=(const LocationScope &location)
     this->_index = location._index;
     this->_allowMethods = location._allowMethods;
     this->_clientBodyBufferSize = location._clientBodyBufferSize;
+    this->_errorPageString = location._errorPageString;
+    this->_errorPageCount = location._errorPageCount;
     return (*this);
 }
+
 
 std::string LocationScope::getRoot()
 {
@@ -51,7 +56,7 @@ std::vector<std::string> LocationScope::getAllowMethods()
     }
     return (allowMethods);
 }
-ErrorPage LocationScope::getErrorPage()
+std::vector<ErrorPage *> LocationScope::getErrorPage()
 {
     return (this->_errorPage);
 }
@@ -70,6 +75,11 @@ std::string LocationScope::getPath()
     return (this->_path);
 }
 
+size_t LocationScope::getErrorPageCount()
+{
+    return (this->_errorPageCount);
+}
+
 void LocationScope::setRoot(std::string root)
 {
     this->_root = root;
@@ -86,9 +96,10 @@ void LocationScope::setAllowMethods(std::string allowMethods)
 {
     (void)allowMethods;
 }
-void LocationScope::setErrorPage(ErrorPage errorPage)
+void LocationScope::setErrorPage(ErrorPage &errorPage)
 {
-    this->_errorPage = errorPage;
+    this->_errorPage.push_back(&errorPage);
+    //this->_errorPage.push_back(errorPage);
 }
 void LocationScope::setRedirectionUri(RedirectionUri redirectionUri)
 {
@@ -107,6 +118,7 @@ void LocationScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("auto_index", &this->_autoindex));
     _keywordDatabase.insertData(Variable<std::string>("location", &this->_path));
     _keywordDatabase.insertData(Variable<std::string>("allow_methods", &this->_allowMethods));
+    _keywordDatabase.insertData(Variable<std::string>("error_page", &this->_errorPageString));
 }
 
 void LocationScope::setPath(std::string path)
@@ -114,9 +126,24 @@ void LocationScope::setPath(std::string path)
     this->_path = path;
 }
 
+void LocationScope::setErrorPageString(std::string errorPageString)
+{
+    this->_errorPageString = errorPageString;
+}
+
+void LocationScope::setErrorPageCount(size_t errorPageCount)
+{
+    this->_errorPageCount = errorPageCount;
+}
+
 std::string LocationScope::getName() const
 {
     return (this->name);
+}
+
+std::string LocationScope::getErrorPageString()
+{
+    return (this->_errorPageString);
 }
 
 LocationScope* LocationScope::cloneNew() const { return new LocationScope(); }

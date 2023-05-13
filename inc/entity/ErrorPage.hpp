@@ -34,6 +34,7 @@ class ErrorPage : public IScope
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
         void keywordFill();
+        void fillErrorPage(std::string errorPageString);
 
         ErrorPage* cloneNew() const;
         ErrorPage* clone() const;

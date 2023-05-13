@@ -239,6 +239,7 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
 {
     std::string tempVariableName;
     std::string tempVariableValue;
+    std::string er = "error_page";
 
     this->locationPtr = dynamic_cast<LocationScope *>(_matchedClass.at(_matchedClassIndex));
     if (this->locationPtr == NULL)
@@ -253,6 +254,21 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
         if (this->locationPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
         {
             this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
+            if (tempVariableName.compare(er) == 0)
+            {
+                ErrorPage erPa;
+                //this->locationPtr->fillErrorPage(this->locationPtr->getErrorPageCount());
+                erPa.fillErrorPage(this->locationPtr->getErrorPageString());
+                //this->_parsedHttp->setServer(this->serverPtr->clone());
+                //this->locationPtr->setErrorPage()
+                //this->locationPtr->setErrorPage(erPa->clone());
+                ErrorPage &ref = erPa;
+                this->locationPtr->setErrorPage(ref);
+                //std::cout <<"tempVariableName: " << tempVariableName <<" parseLocation tempVariableValue: " << tempVariableValue <<std::endl;
+                //std::cout<< "TEST "<<this->locationPtr->getErrorPageCount()<<std::endl;
+                this->locationPtr->setErrorPageCount(this->locationPtr->getErrorPageCount() + 1);
+                //delete erPa;
+            }
         }
         // std::cout << "locaation ok : " << tempScopes[i] << std::endl;
     }
