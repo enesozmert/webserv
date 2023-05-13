@@ -14,7 +14,7 @@ Server::Server(const t_listen &_listen)
     this->_listen = _listen;
     fd = -1;
     this->setAddr();
-    this->setUpServer();
+    this->setUpSocket();
 }
 
 void Server::setAddr(void)
@@ -25,7 +25,7 @@ void Server::setAddr(void)
     addr.sin_port = htons(_listen.port);
 }
 
-int Server::setUpServer()
+int Server::setUpSocket()
 {
     fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
     if (fd == -1)
@@ -61,10 +61,14 @@ long Server::accept(void)
     return (client_fd);
 }
 
-void    Server::process(long socket, HttpScope &httpScope)
+void    Server::process(long socket, HttpScope& http)
 {
-    (void)httpScope;
     Response response;
+    HttpScope selectedServer;
+    HttpScope selectedLocation;
+    std::string hostname;
+    
+
 
     //chunked request ayrı bir fonksiyonda işlem görecek.
     if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos && _requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
@@ -80,11 +84,11 @@ void    Server::process(long socket, HttpScope &httpScope)
     if (_requests[socket] != "")
     {
         Request request(_requests[socket]); // aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
-
-
-        //ServerRequestSet = httpScope'tan aşağıdaki veriler set edilip bu classta tutulacak.
-        //requestConf = conf.getConfigForRequest(this->_listen,  request.getPath(), request.getHeaders().at("Host"), request.getMethod(), request);
-        response.call(request, ServerRequestSet);
+        hostname = request.getHeaders().at("Host");
+        hostname = hostname.substr(0, hostname.find_last_of(':'));
+        selectedServer = this->getServerForRequest(this->_listen, hostname, http);
+        selectedLocation = this->getLocationForRequest(selectedServer, request.getPath());
+        response.call(request, selectedServer, selectedLocation)
 
         // socket,request olan map yapısının requestini siliyoruz
         _requests.erase(socket);
@@ -229,14 +233,19 @@ int Server::send(long socket)
     }
 }
 
-long Server::get_fd(void)
+long Server::get_fd(void) const
 {
     return (fd);
 }
 
-t_listen   Server::get_listen()
+t_listen   Server::get_listen() const
 {
     return (_listen);
+}
+
+std::string    Server::get_hostname() const
+{
+    return (_hostname);
 }
 
 void Server::close(int socket)
@@ -252,3 +261,79 @@ void Server::clean()
         ::close(fd);
     fd = -1;
 }
+
+
+
+/****************************************************************/
+
+
+HttpScope		Server::getServerForRequest(t_listen& address, std::string& hostname, HttpScope& http)
+{
+
+    std::vector<std::string> serverNames;
+	for (std::vector<ServerScope *>::const_iterator it = http.getServers().begin() ; it != http.getServers().end(); it++)
+    {
+        std::vector<t_listen> listens = it->getListen();
+		for (std::vector<t_listen>::iterator listenIter = listens.begin(); listenIter != listens.end(); listenIter++) 
+        {
+			if (address.host == (*listenIter).host && address.port == (*listenIter).port)
+				this->matchingServers.push_back(*it);
+		}
+        for (size_t j = 0; http.getServers().at(i)->getServerName().size(); j++)
+        {
+            serverNames.push_back(http.getServers().at(i)->getServerName().at(j));
+        }
+	}
+	if (possibleServers.empty())
+    {
+		std::cerr << "there is no possible server" << std::endl;
+        return ;
+    }
+	// for (std::vector<ServerScope *>::iterator it = possibleServers.begin() ; it != possibleServers.end(); it++) 
+    // {
+	// 	std::vector<std::string>	serverNames;
+    //     serverNames.push_back(it->getServer().getName());
+	// 	for (std::vector<std::string>::iterator servNameIter = serverNames.begin() ; servNameIter != serverNames.end(); servNameIter++) 
+    //     {
+	// 		if (*servNameIter == hostname) {
+	// 			return *it;
+	// 		}
+	// 	}
+	// }
+	*it = possibleServers[0];
+	return *it;
+}
+
+bool Config::getServerForRequest(ConfigServer& ret, const t_listen& address, const std::string& hostName) const {
+    std::vector<ConfigServer> matchingServers;
+
+    // Find servers with matching listen address
+    for (std::vector<ConfigServer>::const_iterator serversIter = _servers.begin(); serversIter != _servers.end(); ++serversIter) {
+        std::vector<t_listen> listens = serversIter->getListen();
+        for (std::vector<t_listen>::const_iterator listenIter = listens.begin(); listenIter != listens.end(); ++listenIter) {
+            if (listenIter->host == address.host && listenIter->port == address.port) {
+                matchingServers.push_back(*serversIter);
+            }
+        }
+    }
+
+    if (matchingServers.empty()) {
+        return false;
+    }
+
+    // Find server with matching server name
+    for (std::vector<ConfigServer>::iterator serversIter = matchingServers.begin(); serversIter != matchingServers.end(); ++serversIter) {
+        std::vector<std::string> serverNames = serversIter->getServerName();
+        for (std::vector<std::string>::iterator servNameIter = serverNames.begin(); servNameIter != serverNames.end(); ++servNameIter) {
+            if (*servNameIter == hostName) {
+                ret = *serversIter;
+                return true;
+            }
+        }
+    }
+
+    // If no server name matches, return the first matching server
+    ret = matchingServers.front();
+    return true;
+}
+

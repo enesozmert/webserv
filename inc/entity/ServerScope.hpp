@@ -8,6 +8,8 @@
 #include "LocationScope.hpp"
 #include "IScope.hpp"
 #include "Variable.hpp"
+#include "Listen.hpp"//fatma ekledi
+#include "../utils/Utils.hpp"//fatma ekledi
 
 
 class ErrorPage;
@@ -15,6 +17,7 @@ class LocationScope;
 class ServerScope : public IScope
 {
     private:
+        t_listen listen;//fatma ekledi
         std::vector<LocationScope *> _locations;
         std::string _port;
         std::string _host;
@@ -41,6 +44,7 @@ class ServerScope : public IScope
         void setRoot(std::string root);
         void setIndex(std::string index);
         void setCgi_pass(std::string cgi_pass);
+        void setListen(std::string port, std::string host);//fatma ekledi
 
         void setLocation(LocationScope *location);
         void setIsServerNameNothing(bool isServerNameNothing);
@@ -63,6 +67,7 @@ class ServerScope : public IScope
         std::string getName() const;
         ServerScope* cloneNew() const;
         ServerScope* clone() const;
+        t_listen    getListen() const;//fatma ekledi
 
 };
 

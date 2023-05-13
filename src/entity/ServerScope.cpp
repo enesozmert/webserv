@@ -76,6 +76,17 @@ void ServerScope::setCgi_pass(std::string cgi_pass)
     this->_cgi_pass = cgi_pass;
 }
 
+void ServerScope::setListen(std::string port, std::string host)
+{
+    this->listen.port = atoi(this->getPort().c_str());
+    this->listen.host = strToIp(this->getHost());
+}
+
+t_listen    ServerScope::getListen() const
+{
+    return this->listen;
+}
+
 std::string ServerScope::getPort()
 {
     std::string tempPort;

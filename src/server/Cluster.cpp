@@ -21,7 +21,7 @@ int Cluster::setUpCluster()
 		long		fd;//server içinde oluşturulacak socket fd'si
 
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
-		if (server.setUpServer() != -1)
+		if (server.setUpSocket() != -1)
 		{
 			fd = server.get_fd();
 			FD_SET(fd, &fd_master);
@@ -104,8 +104,7 @@ void	Cluster::recv_section()
 			if (ret == 0)
 			{
 				//request ayrıştırılması, işlenmesi ve response oluşturulması için gerekli işlemler yapılır.
-                HttpScope httpScope;
-				it->second->process(client_fd, httpScope); //http class'ı ekelenecek
+				it->second->process(client_fd, this->HttpScope);
  				//client_fd ready map'ine eklenir. Daha sonra writing_set eklenmek ve response gönderilmek üzere.
 				ready.push_back(client_fd);
 			}

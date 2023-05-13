@@ -10,8 +10,8 @@
 
 #include "../entity/Listen.hpp"
 #include "../entity/HttpScope.hpp"
-#include "../entity/Request.hpp"
-# include "../entity/Response.hpp"
+#include "../request/Request.hpp"
+//#include "../response/Response.hpp"
 
 # define RECV_SIZE 65536
 
@@ -23,15 +23,22 @@ class Server {
     	long						fd;
     	struct sockaddr_in			addr;//host ve port ayarlanacak
 
+        std::string	                    _hostname;//http'den çek
+        std::vector<ServerScope *>       matchingServers;
+        std::vector<Server> 		    _servers;//http'den çek
+        std::string                     locationPath;
+        std::map<std::string, Server>   _location;//http'den çek
+
     public:
         Server();
         Server(const t_listen &listen);
         ~Server();
 
-        long	get_fd();
-        t_listen   get_listen();
+        long	    get_fd() const;
+        t_listen    get_listen() const;
+        std::string    get_hostname() const;
 
-        int     setUpServer();
+        int     setUpSocket();
         void    setAddr();
         void    clean();
         void    close(int socket);
@@ -41,4 +48,8 @@ class Server {
         void	processChunk(long socket);
         int		send(long socket);
         int		recv(long socket);
+
+        HttpScope  getConfigForRequest(Request &request);
+        Server		getServerForRequest();
+        Server		getLocationForRequest(std::string const path);
 };
