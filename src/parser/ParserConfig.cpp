@@ -206,9 +206,9 @@ void ParserConfig::parseHttp(std::vector<size_t> tempScopes)
         {
             this->httpPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        std::cout << "http ok : " << tempScopes[i] << std::endl;
+        // std::cout << "http ok : " << tempScopes[i] << std::endl;
     }
-    std::cout << "**********parseHttp" << std::endl;
+    // std::cout << "**********parseHttp" << std::endl;
 }
 
 void ParserConfig::parseServer(std::vector<size_t> tempScopes)
@@ -230,9 +230,9 @@ void ParserConfig::parseServer(std::vector<size_t> tempScopes)
         {
             this->serverPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        std::cout << "ServerScope ok : " << tempScopes[i] << std::endl;
+        // std::cout << "ServerScope ok : " << tempScopes[i] << std::endl;
     }
-    std::cout << "**********parseServer" << std::endl;
+    // std::cout << "**********parseServer" << std::endl;
 }
 
 void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
@@ -254,11 +254,11 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
         {
             this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        std::cout << "locaation ok : " << tempScopes[i] << std::endl;
+        // std::cout << "locaation ok : " << tempScopes[i] << std::endl;
     }
     _matchedClass.at(_matchedClassIndex) = this->locationPtr;
 
-    std::cout << "**********parseLocation" << std::endl;
+    // std::cout << "**********parseLocation" << std::endl;
 }
 
 size_t ParserConfig::findClosingScopeIndex(const std::vector<std::string> &lines, size_t startingIndex)
