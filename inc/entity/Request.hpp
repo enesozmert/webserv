@@ -10,6 +10,7 @@
 #include "Variable.hpp"
 #include "HttpMethod.hpp"
 
+class HttpMethod;
 class Request : public IRequest
 {
     private:
@@ -18,10 +19,11 @@ class Request : public IRequest
     	std::string _body;
     	std::string	_query;
         std::string _envForCgi;
-    	std::string _port;
         std::string	_acceptLanguages;
         std::string _raw;
         std::string _host;
+        std::string _ip;
+    	std::string _port;
         std::string _userAgent;
         std::string _accept;
         std::string _acceptEncoding;
@@ -31,7 +33,10 @@ class Request : public IRequest
         std::string _referer;
         std::string _contentType;
         std::string _contentLength;
-        int return_code;
+        std::string _httpMethodName;
+        int         return_code;
+
+        HttpMethod  _httpMethod;
 
         DataBase<Variable<std::string> > _keywordDatabase;
     public:
@@ -45,6 +50,7 @@ class Request : public IRequest
         std::string getQuery();
         std::string getEnvForCgi();
         int         getPort();
+        std::string getIp();
         std::vector<std::pair<std::string, float> > getAcceptLanguages();
         std::string getRaw();
         std::string getHost();
@@ -57,6 +63,7 @@ class Request : public IRequest
         std::string getReferer();
         std::string getContentType();
         int         getContentLength();
+        std::string getHttpMethodName();
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setVersion(std::string version);
@@ -68,6 +75,7 @@ class Request : public IRequest
         void setAcceptLanguage(std::string acceptLanguage);
         void setRaw(std::string raw);
         void setHost(std::string host);
+        void setIp(std::string ip);
         void setUserAgent(std::string userAgent);
         void setAccept(std::string accept);
         void setAcceptEncoding(std::string acceptEncoding);
@@ -77,6 +85,7 @@ class Request : public IRequest
         void setReferer(std::string referer);
         void setContentType(std::string contentType);
         void setContentLength(std::string contentLength);
+        void setHttpMethodName(std::string httpMethodName);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
         void keywordFill();

@@ -19,5 +19,8 @@ class HttpMethod
         HttpMethod(const HttpMethod &requestMethod);
 
         std::vector<std::string> get();
-        void set();
+        void set(std::string method);
+
+        void initMethods();
+        bool checkMethodName(std::string methodName);
 };

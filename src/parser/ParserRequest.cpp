@@ -8,11 +8,11 @@ ParserRequest::~ParserRequest()
 {
 }
 
-ParserRequest::ParserRequest(std::string text)
+ParserRequest::ParserRequest(std::string raw)
 {
-    this->_text = text;
+    this->_raw = raw;
 }
-void ParserRequest::parse(std::string text)
+void ParserRequest::parse(std::string raw)
 {
     std::string key;
 	std::string value;
@@ -21,22 +21,23 @@ void ParserRequest::parse(std::string text)
 	std::string delimiter = "\n";
 	size_t pos = 0;
 
-	if ((pos = text.find_first_of(delimiter)) != std::string::npos)
+	if ((pos = raw.find_first_of(delimiter)) != std::string::npos)
     {
-        line = text.substr(0, pos + 1);
-        text.erase(0, pos + 1);
+        line = raw.substr(0, pos + 1);
+        raw.erase(0, pos + 1);
         this->_firstLine = line;
         line.clear();
     }
 
-	while ((pos = text.find_first_of(delimiter)) != std::string::npos)
+	while ((pos = raw.find_first_of(delimiter)) != std::string::npos)
 	{
-		line = text.substr(0, pos + 1);
+		line = raw.substr(0, pos + 1);
         lineTrim = trim(line, "\n\r");
         std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
-		text.erase(0, pos + 1);
+		raw.erase(0, pos + 1);
         this->_lines.push_back(lineTrim);
 	}
+	this->parseFirstLine();
 	this->parseKeyValue();
 	this->parseBody();
 }
@@ -54,6 +55,8 @@ void ParserRequest::parseFirstLine()
 
 	this->request.setPath(path);
 	this->request.setVersion(version);
+	this->request.setHttpMethodName(method);
+	std::cout << "method :" << method << std::endl; 
 }
 
 void ParserRequest::parseKeyValue()
@@ -76,23 +79,16 @@ void ParserRequest::parseKeyValue()
 
 void ParserRequest::parseBody()
 {
-
+	this->parsedRequest = this->request.clone();
 }
 
 std::string ParserRequest::findKey(const std::string &line)
 {
 	std::string key;
-	size_t j = 0;
 	size_t i = line.find_first_of(':');
 
 	key.append(line, 0, i);
 	std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-	key[j] = std::toupper(key[j]);
-	while ((j = key.find_first_of('-', j + 1)) != std::string::npos)
-	{
-		if (j + 1 < key.size())
-			key[j + 1] = std::toupper(key[j + 1]);
-	}
 	return (trim(key, " \n\r\t\f\v"));
 }
 std::string ParserRequest::findValue(const std::string &line)
@@ -112,11 +108,11 @@ std::vector<std::string> ParserRequest::getLines()
 }
 std::string ParserRequest::getText()
 {
-    return (this->_text);
+    return (this->_raw);
 }
-void ParserRequest::setText(std::string text)
+void ParserRequest::setText(std::string raw)
 {
-    this->_text = text;
+    this->_raw = raw;
 }
 Request *ParserRequest::getRequest()
 {

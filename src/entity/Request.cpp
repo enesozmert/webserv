@@ -2,6 +2,7 @@
 
 Request::Request()
 {
+    this->keywordFill();
 }
 
 Request::~Request()
@@ -33,13 +34,53 @@ std::string Request::getEnvForCgi()
 }
 int Request::getPort()
 {
-    int numberOfPort = std::stoi(this->_port);
+    std::stringstream ss(this->_host);
+    std::string ip;
+    std::string portStr;
+    int numberOfPort;
+
+    if (this->_host.find(":") == std::string::npos)
+        return (80);
+    std::getline(ss, ip, ':');
+    std::getline(ss, portStr);
+    numberOfPort = std::stoi(portStr);
     return (numberOfPort);
+}
+std::string Request::getIp()
+{
+    std::stringstream ss(this->_host);
+    std::string ip;
+
+    if (this->_host.find(":") == std::string::npos)
+        return ("");
+    std::getline(ss, ip, ':');
+    return (ip);
 }
 std::vector<std::pair<std::string, float> > Request::getAcceptLanguages()
 {
-    std::vector<std::pair<std::string, float> > defaults;
-    return (defaults);
+    std::vector<std::pair<std::string, float> > _languages;
+    std::stringstream ss(this->_acceptLanguages);
+	std::string language;
+	while (std::getline(ss, language, ','))
+	{
+		std::istringstream iss(language);
+		std::string code;
+		float q = 1.0f;
+		if (std::getline(iss >> std::ws, code, ';'))
+		{
+			std::string qstr;
+			if (std::getline(iss >> std::ws, qstr, '='))
+			{
+				if (qstr == "q")
+				{
+					std::getline(iss >> std::ws, qstr);
+					q = std::atof(qstr.c_str());
+				}
+			}
+		}
+		_languages.push_back(std::make_pair(code, q));
+	}
+    return (_languages);
 }
 std::string Request::getRaw()
 {
@@ -87,6 +128,12 @@ int Request::getContentLength()
     return (numberOfContentLength);
 }
 
+std::string Request::getHttpMethodName()
+{
+    bool result = this->_httpMethod.checkMethodName(this->_httpMethodName);
+    return (result == true ? this->_httpMethodName : "");
+}
+
 DataBase<Variable<std::string> > Request::getKeywordDataBase()
 {
     return (this->_keywordDatabase);
@@ -113,7 +160,11 @@ void Request::setEnvForCgi(std::string envForCgi)
 }
 void Request::setPort(std::string port)
 {
-    this->_port = port;
+    this->_port = port;//değişebilir her an adress
+}
+void Request::setIp(std::string ip)
+{
+    this->_ip = ip;//değişebilir her an adress
 }
 void Request::setAcceptLanguage(std::string acceptLanguage)
 {
@@ -155,6 +206,12 @@ void Request::setReferer(std::string referer)
 void Request::setContentType(std::string contentType)
 {
     this->_contentType = contentType;
+}
+void Request::setHttpMethodName(std::string httpMethodName)
+{
+    bool result = _httpMethod.checkMethodName(httpMethodName);
+    if (result == true)
+        this->_httpMethodName = httpMethodName;
 }
 
 void Request::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)

@@ -17,15 +17,15 @@ class ParserRequest
     private:
         Request *parsedRequest;
         Request request;
-        std::string _text;
+        std::string _raw;
         std::vector<std::string> _lines;
         std::string _firstLine;
     public:
         ParserRequest();
         ~ParserRequest();
-        ParserRequest(std::string text);
+        ParserRequest(std::string raw);
 
-        void parse(std::string text);
+        void parse(std::string raw);
         void parseFirstLine();
         void parseKeyValue();
         void parseBody();
@@ -35,6 +35,6 @@ class ParserRequest
 
         std::vector<std::string> getLines();
         std::string getText();
-        void setText(std::string text);
+        void setText(std::string raw);
         Request *getRequest();
 };
