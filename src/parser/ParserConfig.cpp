@@ -46,7 +46,6 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
     size_t scopeOpenCount = 0;
     size_t scopeOpenIndex = 0;
     size_t scopeCloseIndex = 0;
-    std::vector<std::string> tempScopes;
 
     for (size_t i = 0; i < lines.size(); i++)
     {
@@ -147,7 +146,9 @@ void ParserConfig::parseScopeFill()
             }
             tempCloseIndex = _orderParseLineProps[i].getScopeCloseIndex();
         }
-        if (tempCloseIndex == _orderParseLineProps[i].getScopeCloseIndex() && _orderParseLineProps[i].getIsScopeOpen() == false && _orderParseLineProps[i].getIsScopeClose() == false)
+        if (tempCloseIndex == _orderParseLineProps[i].getScopeCloseIndex() && 
+            ((_orderParseLineProps[i].getIsScopeOpen() == false && _orderParseLineProps[i].getIsScopeClose() == false) || 
+            (_orderParseLineProps[i].getScopeName() == "location" && _orderParseLineProps[i].getIsScopeOpen() == true)))
         {
             tempLines.push_back(_orderParseLineProps[i].getIndex());
         }
