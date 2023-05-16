@@ -28,7 +28,7 @@ class LocationScope : public IScope
         bool longestMatch;//fatma ekledi
         //bunu true/false nasıl başlatacağımıza karar vermeliyiz
         //en uzun eşleşme açık olsun mu olmasın mı?
-        bool regex;
+        // bool regex;
         //regex olsun mu olamasın mı karar vermeliyiz?
 
     public:
@@ -42,8 +42,8 @@ class LocationScope : public IScope
         std::vector<std::string> getAllowMethods();
         ErrorPage getErrorPage();
         RedirectionUri getRedirectionUri();
-        DataBase<Variable<std::string> > getKeywordDataBase();
         std::string getPath();
+        DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setRoot(std::string root);
         void setIndex(std::string index);
@@ -55,7 +55,7 @@ class LocationScope : public IScope
         void setPath(std::string path);
 
         void keywordFill();
-        bool LocationScope::usesLongestMatch() const;//fatma
+        bool usesLongestMatch() const;//fatma
 
         std::string getName() const;
         LocationScope* clone() const;

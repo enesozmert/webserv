@@ -104,7 +104,7 @@ void	Cluster::recv_section()
 			if (ret == 0)
 			{
 				//request ayrıştırılması, işlenmesi ve response oluşturulması için gerekli işlemler yapılır.
-				it->second->process(client_fd, this->HttpScope);
+				it->second->process(client_fd, this->httpScope);
  				//client_fd ready map'ine eklenir. Daha sonra writing_set eklenmek ve response gönderilmek üzere.
 				ready.push_back(client_fd);
 			}
