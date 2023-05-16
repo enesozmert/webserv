@@ -76,7 +76,7 @@ void ServerScope::setCgi_pass(std::string cgi_pass)
     this->_cgi_pass = cgi_pass;
 }
 
-void ServerScope::setListen(std::string port, std::string host)
+void ServerScope::setListen()
 {
     this->listen.port = atoi(this->getPort().c_str());
     this->listen.host = strToIp(this->getHost());
@@ -179,11 +179,11 @@ ServerScope *ServerScope::clone() const { return new ServerScope(*this); }
 //fatma ekledi
 LocationScope* ServerScope::getDefaultLocation() const {
     // Eğer default location tanımlanmamışsa, null döndürür
-    if (defaultLocation == nullptr) {
-        return nullptr;
+    if (this->_defaultLocation == NULL) {
+        return (NULL);
     }
     // Eğer default location tanımlanmışsa, ilgili location döndürür
     else {
-        return defaultLocation;
+        return (this->_defaultLocation);
     }
 }

@@ -26,7 +26,7 @@ class ServerScope : public IScope
         std::string _index;
         std::string _cgi_pass;
         std::string _listen;
-        LocationScope* DefaultLocation;//fatma
+        LocationScope* _defaultLocation;//fatma
 
         bool _isServerNameNothing;
         ErrorPage _errorPage;
@@ -45,7 +45,7 @@ class ServerScope : public IScope
         void setRoot(std::string root);
         void setIndex(std::string index);
         void setCgi_pass(std::string cgi_pass);
-        void setListen(std::string port, std::string host);//fatma ekledi
+        void setListen();//fatma ekledi
 
         void setLocation(LocationScope *location);
         void setIsServerNameNothing(bool isServerNameNothing);
@@ -70,7 +70,7 @@ class ServerScope : public IScope
         ServerScope* clone() const;
         t_listen    getListen() const;//fatma ekledi
 
-        LocationScope* ServerScope::getDefaultLocation() const;//fatma
+        LocationScope* getDefaultLocation() const;//fatma
 
 };
 

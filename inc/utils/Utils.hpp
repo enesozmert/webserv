@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-unsigned int	strToIp(std::string strIp) 
+inline unsigned int	strToIp(std::string strIp) 
 {
 	size_t  sep = 0;
 	unsigned int   n;
