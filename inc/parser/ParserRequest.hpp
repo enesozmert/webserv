@@ -25,7 +25,7 @@ class ParserRequest
         ~ParserRequest();
         ParserRequest(std::string raw);
 
-        void parse(std::string raw);
+        void parse(std::string raw = "");
         void parseFirstLine();
         void parseKeyValue();
         void parseBody();

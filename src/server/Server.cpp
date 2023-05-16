@@ -63,12 +63,9 @@ long Server::accept(void)
 
 void    Server::process(long socket, HttpScope& http)
 {
-    Response response;
+    // Response response;
     ServerScope *matchedServer;
     LocationScope *matchedLocation;
-    std::string hostname;
-    
-
 
     //chunked request ayrı bir fonksiyonda işlem görecek.
     if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos && _requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
@@ -83,17 +80,25 @@ void    Server::process(long socket, HttpScope& http)
 
     if (_requests[socket] != "")
     {
-        Request request(_requests[socket]); // aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
-        hostname = request.getHeaders().at("Host");
-        hostname = hostname.substr(0, hostname.find_last_of(':'));
-        matchedServer = this->getServerForRequest(this->_listen, hostname, http);
-        matchedLocation = this->getLocationForRequest(matchedServer, request.getPath());
-        response.call(request, matchedServer, matchedLocation);
+        // Request request(_requests[socket]); // aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
+        Request *request;
+        ParserRequest parserRequest(_requests[socket]);
+
+        parserRequest.parse();
+        request = parserRequest.getRequest();
+        matchedServer = this->getServerForRequest(this->_listen, request->getIp(), http);
+        matchedLocation = this->getLocationForRequest(matchedServer, request->getPath());
+        // response.call(request, matchedServer, matchedLocation);
 
         // socket,request olan map yapısının requestini siliyoruz
         _requests.erase(socket);
         // requeste cevap oluşturup map içinde socket,response şeklinde tutuyoruz.
-        _requests.insert(std::make_pair(socket, response.getResponse()));
+        // _requests.insert(std::make_pair(socket, response.getResponse()));
+
+        //not:
+        //www.google.com:80
+        //192.282.23.2:
+        //192.80.808.1:8080
     }
 }
 
@@ -243,11 +248,6 @@ t_listen   Server::get_listen() const
     return (_listen);
 }
 
-std::string    Server::get_hostname() const
-{
-    return (_hostname);
-}
-
 void Server::close(int socket)
 {
     if (socket > 0)
@@ -267,26 +267,28 @@ void Server::clean()
 /****************************************************************/
 
 
-ServerScope*		Server::getServerForRequest(t_listen& address, std::string& hostname, HttpScope& http)
+ServerScope*        Server::getServerForRequest(t_listen& address, const std::string& hostname, HttpScope& http)
 {
-    std::vector<ServerScope *>       matchingServers;
+    std::vector<ServerScope *>  matchingServers;
+    std::vector<ServerScope *>  serverScope;
 
-	for (std::vector<ServerScope *>::const_iterator it = http.getServers().begin() ; it != http.getServers().end(); it++)
+    serverScope = http.getServers();
+    for (std::vector<ServerScope *>::const_iterator it = serverScope.begin() ; it != serverScope.end(); it++)
     {
-		if (address.host == (*it)->getListen().host && address.port == (*it)->getListen().port)
+        if (address.host == (*it)->getListen().host && address.port == (*it)->getListen().port)
         {
-			matchingServers.push_back(*it);
-            for(size_t i; i < (*it)->getServerName().size(); i++)
+            matchingServers.push_back(*it);
+            for(size_t i = 0; i < (*it)->getServerName().size(); i++)
             {
                 if((*it)->getServerName().at(i) == hostname)
                     return *it;
             }
         }
-	}
-	if (matchingServers.empty())
+    }
+    if (matchingServers.empty())
     {
-		std::cerr << "there is no possible server" << std::endl;
-        return ;
+        std::cerr << "there is no possible server" << std::endl;
+        return NULL;
     }
     // If no server name matches, return the first matching server
     return matchingServers.front();
@@ -294,58 +296,61 @@ ServerScope*		Server::getServerForRequest(t_listen& address, std::string& hostna
 
 
 //benim yazdığım daha basic olan
-LocationScope*  Server::getLocationForRequest(ServerScope *MatchedServer, std::string& const path) 
+LocationScope*  Server::getLocationForRequest(ServerScope *matchedServer, const std::string& path) 
 {
-    for(std::vector<LocationScope *>::iterator it = MatchedServer->getLocations().begin(); it != MatchedServer->getLocations().end(); it++)
+    std::vector<LocationScope *> locationScope;
+
+    locationScope = matchedServer->getLocations();
+    for(std::vector<LocationScope *>::iterator it = locationScope.begin(); it != locationScope.end(); it++)
     {
-        if(path == it->getPath())
+        if(path == (*it)->getPath())
             return (*it);
     }
-    return MatchedServer->getLocations().begin();
+    return (*(matchedServer->getLocations().begin()));
 }
-//chatgpt
-//yukarıdakinden daha gelişmiş bir formatta yazdı 
-LocationScope* Server::getLocationForRequest(ServerScope* matchedServer, const std::string& path)
-{
-    LocationScope* bestMatch = 0;  // En iyi eşleşme için LocationScope
+// //chatgpt
+// //yukarıdakinden daha gelişmiş bir formatta yazdı 
+// LocationScope* Server::getLocationForRequest(ServerScope* matchedServer, const std::string& path)
+// {
+//     LocationScope* bestMatch = 0;  // En iyi eşleşme için LocationScope
 
-    // Tüm location'lar üzerinde gezin ve en iyi eşleşmeyi bul
-    for (std::vector<LocationScope*>::iterator it = matchedServer->getLocations().begin(); it != matchedServer->getLocations().end(); ++it) 
-    {
-        LocationScope* location = *it;
+//     // Tüm location'lar üzerinde gezin ve en iyi eşleşmeyi bul
+//     for (std::vector<LocationScope*>::iterator it = matchedServer->getLocations().begin(); it != matchedServer->getLocations().end(); ++it) 
+//     {
+//         LocationScope* location = *it;
 
-        // Path'in location path'iyle eşleştiğini kontrol et
-        if (location->getPath() == path) {
-            bestMatch = location;
-            break;
-        }
+//         // Path'in location path'iyle eşleştiğini kontrol et
+//         if (location->getPath() == path) {
+//             bestMatch = location;
+//             break;
+//         }
 
-        // Eğer location regex kullanıyorsa, regex'e göre eşleşmeyi kontrol et
-        //çok abartı bu silebiliriz.
-        //Örneğin, "/user/[0-9]+" ifadesi, "/user/123", "/user/456", "/user/789", gibi "/user/" ile başlayan herhangi bir istek yolunu eşleştirebilir.
-        if (location->hasRegex()) {
-            if (std::regex_match(path, location->getRegex())) {
-                if (!bestMatch || bestMatch->getPath().length() < location->getPath().length()) {
-                    bestMatch = location;
-                }
-            }
-        }
+//         // Eğer location regex kullanıyorsa, regex'e göre eşleşmeyi kontrol et
+//         //çok abartı bu silebiliriz.
+//         //Örneğin, "/user/[0-9]+" ifadesi, "/user/123", "/user/456", "/user/789", gibi "/user/" ile başlayan herhangi bir istek yolunu eşleştirebilir.
+//         if (location->hasRegex()) {
+//             if (std::regex_match(path, location->getRegex())) {
+//                 if (!bestMatch || bestMatch->getPath().length() < location->getPath().length()) {
+//                     bestMatch = location;
+//                 }
+//             }
+//         }
 
-        // Eğer en uzun eşleşme prensibi kullanılıyorsa, path'in location path'iyle başladığından emin ol
-        //Örneğin, bir sunucuda /test ve /test/test2 isimli iki konum olsun. 
-        //Eğer gelen istek URL'si /test/test2/index.html ise, sunucu bu isteği işlerken /test/test2 konumunu seçer 
-        //çünkü bu, URL'nin en uzun eşleşmesidir.
-        if (location->usesLongestMatch() && path.find(location->getPath()) == 0) {
-            if (!bestMatch || bestMatch->getPath().length() < location->getPath().length()) {
-                bestMatch = location;
-            }
-        }
-    }
+//         // Eğer en uzun eşleşme prensibi kullanılıyorsa, path'in location path'iyle başladığından emin ol
+//         //Örneğin, bir sunucuda /test ve /test/test2 isimli iki konum olsun. 
+//         //Eğer gelen istek URL'si /test/test2/index.html ise, sunucu bu isteği işlerken /test/test2 konumunu seçer 
+//         //çünkü bu, URL'nin en uzun eşleşmesidir.
+//         if (location->usesLongestMatch() && path.find(location->getPath()) == 0) {
+//             if (!bestMatch || bestMatch->getPath().length() < location->getPath().length()) {
+//                 bestMatch = location;
+//             }
+//         }
+//     }
 
-    // Eğer hiçbir eşleşme bulunamazsa, default location kullanılır
-    if (!bestMatch) {
-        bestMatch = matchedServer->getDefaultLocation();
-    }
+//     // Eğer hiçbir eşleşme bulunamazsa, default location kullanılır
+//     if (!bestMatch) {
+//         bestMatch = matchedServer->getDefaultLocation();
+//     }
 
-    return bestMatch;
-}
+//     return bestMatch;
+// }

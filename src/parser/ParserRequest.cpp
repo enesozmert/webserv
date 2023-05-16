@@ -10,7 +10,7 @@ ParserRequest::~ParserRequest()
 
 ParserRequest::ParserRequest(std::string raw) : _raw(raw){}
 
-void ParserRequest::parse(std::string raw = "")
+void ParserRequest::parse(std::string raw)
 {
     std::string key;
 	std::string value;
