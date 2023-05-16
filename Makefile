@@ -28,7 +28,7 @@ FILE			=	File
 SERVER			=	Server Cluster
 REQUEST			=	Request
 RESPONSE		=
-CGI				=	
+CGI				=	Cgi
 
 SRC_MAIN		= 	main
 
