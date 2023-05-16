@@ -1,6 +1,6 @@
 # WEBSERV
 ### CYALNIZ
-### FOZTURK
+### FAOZTURK
 ### EOZMERT
 
 #### Write a HTTP server in C++ 98.
