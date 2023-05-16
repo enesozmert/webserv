@@ -86,8 +86,10 @@ void    Server::process(long socket, HttpScope& http)
 
         parserRequest.parse();
         request = parserRequest.getRequest();
+
         matchedServer = this->getServerForRequest(this->_listen, request->getIp(), http);
         matchedLocation = this->getLocationForRequest(matchedServer, request->getPath());
+
         response.createResponse(request, matchedServer, matchedLocation);
 
         // socket,request olan map yapısının requestini siliyoruz
@@ -354,3 +356,36 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServer, const 
 
 //     return bestMatch;
 // }
+
+
+
+/**********************************************************************************/
+
+void Server::noName(ServerScope *server, LocationScope *location, Request *request)
+{
+	std::vector<std::string> conf_index = server->getIndex();
+	for (std::vector<std::string>::const_iterator it = conf_index.begin(); it != conf_index.end(); it++) 
+    {
+		std::vector<std::string>::const_iterator it2 = _index.begin();
+		for (it2 = _index.begin(); it2 != _index.end(); it2++) 
+        {
+				if (*it == *it2)
+					break;
+		}
+		if (it2 == _index.end())
+			_index.push_back(*it);
+	}
+
+	this->_contentLocation = removeAdjacentSlashes(path);
+	this->_path = removeAdjacentSlashes(server->getRoot() + location.getPath());
+	std::string indexPath;
+	if (!pathIsFile(this->_path) && method == "GET") 
+    {
+		if ((indexPath = this->addIndex(request)) != "") {
+			config = config.getLocationForRequest(indexPath, locationName);
+			this->_cgi_pass = config.getCgiPass();
+			this->_cgi_param = config.getCgiParam();
+		}
+	}
+
+}

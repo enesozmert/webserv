@@ -28,7 +28,7 @@ std::string Request::getQuery()
 {
     return (this->_query);
 }
-std::string Request::getEnvForCgi()
+std::map<std::string, std::string> Request::getEnvForCgi()
 {
     return (this->_envForCgi);
 }
@@ -155,10 +155,14 @@ void Request::setQuery(std::string query)
 {
     this->_query = query;
 }
-void Request::setEnvForCgi(std::string envForCgi)
+/* void Request::setEnvForCgi(std::string envForCgi)
 {
     this->_envForCgi = envForCgi;
-}
+} */
+ void Request::setEnvForCgi(std::map<std::string, std::string> envForCgi)
+{
+    this->_envForCgi = envForCgi;
+} 
 void Request::setPort(std::string port)
 {
     this->_port = port;//değişebilir her an adress
