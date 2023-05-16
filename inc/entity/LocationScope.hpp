@@ -43,6 +43,7 @@ class LocationScope : public IScope
         ErrorPage getErrorPage();
         RedirectionUri getRedirectionUri();
         std::string getPath();
+        std::string getClientBodyBufferSize();
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setRoot(std::string root);

@@ -63,7 +63,7 @@ long Server::accept(void)
 
 void    Server::process(long socket, HttpScope& http)
 {
-    // Response response;
+    Response response;
     ServerScope *matchedServer;
     LocationScope *matchedLocation;
 
@@ -88,12 +88,12 @@ void    Server::process(long socket, HttpScope& http)
         request = parserRequest.getRequest();
         matchedServer = this->getServerForRequest(this->_listen, request->getIp(), http);
         matchedLocation = this->getLocationForRequest(matchedServer, request->getPath());
-        // response.call(request, matchedServer, matchedLocation);
+        response.createResponse(request, matchedServer, matchedLocation);
 
         // socket,request olan map yapısının requestini siliyoruz
         _requests.erase(socket);
         // requeste cevap oluşturup map içinde socket,response şeklinde tutuyoruz.
-        // _requests.insert(std::make_pair(socket, response.getResponse()));
+        _requests.insert(std::make_pair(socket, response.getResponse()));
 
         //not:
         //www.google.com:80

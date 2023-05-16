@@ -12,7 +12,7 @@
 #include "../entity/HttpScope.hpp"
 #include "../entity/Request.hpp"
 #include "../parser/ParserRequest.hpp"
-//#include "../response/Response.hpp"
+#include "../entity/Response.hpp"
 
 # define RECV_SIZE 65536
 

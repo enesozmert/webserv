@@ -33,7 +33,7 @@ class Request : public IRequest
         std::string _contentType;
         std::string _contentLength;
         std::string _httpMethodName;
-        int         return_code;
+        int         _returnCode;
 
         HttpMethod  _httpMethod;
 
@@ -62,6 +62,7 @@ class Request : public IRequest
         std::string getContentType();
         int         getContentLength();
         std::string getHttpMethodName();
+        int         getReturnCode();
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setVersion(std::string version);

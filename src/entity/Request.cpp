@@ -130,6 +130,11 @@ std::string Request::getHttpMethodName()
     return (result == true ? this->_httpMethodName : "");
 }
 
+int Request::getReturnCode()
+{
+    return (_returnCode);
+}
+
 DataBase<Variable<std::string> > Request::getKeywordDataBase()
 {
     return (this->_keywordDatabase);
