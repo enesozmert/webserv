@@ -26,7 +26,7 @@ ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope Request 
 PARSER			=	ParserConfig ParserRequest
 FILE			=	File
 SERVER			=	Server Cluster
-REQUEST			=	
+REQUEST			=	Request
 RESPONSE		=
 CGI				=	
 
