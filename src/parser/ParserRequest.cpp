@@ -8,11 +8,9 @@ ParserRequest::~ParserRequest()
 {
 }
 
-ParserRequest::ParserRequest(std::string raw)
-{
-    this->_raw = raw;
-}
-void ParserRequest::parse(std::string raw)
+ParserRequest::ParserRequest(std::string raw) : _raw(raw){}
+
+void ParserRequest::parse(std::string raw = "")
 {
     std::string key;
 	std::string value;
@@ -20,6 +18,9 @@ void ParserRequest::parse(std::string raw)
 	std::string lineTrim;
 	std::string delimiter = "\n";
 	size_t pos = 0;
+
+	if (raw == "")
+		raw = this->_raw;
 
 	if ((pos = raw.find_first_of(delimiter)) != std::string::npos)
     {
@@ -56,7 +57,6 @@ void ParserRequest::parseFirstLine()
 	this->request.setPath(path);
 	this->request.setVersion(version);
 	this->request.setHttpMethodName(method);
-	std::cout << "method :" << method << std::endl; 
 }
 
 void ParserRequest::parseKeyValue()
@@ -106,11 +106,11 @@ std::vector<std::string> ParserRequest::getLines()
 {
     return (this->_lines);
 }
-std::string ParserRequest::getText()
+std::string ParserRequest::getRaw()
 {
     return (this->_raw);
 }
-void ParserRequest::setText(std::string raw)
+void ParserRequest::setRaw(std::string raw)
 {
     this->_raw = raw;
 }

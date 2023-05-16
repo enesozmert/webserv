@@ -20,7 +20,6 @@ class Request : public IRequest
     	std::string	_query;
         std::string _envForCgi;
         std::string	_acceptLanguages;
-        std::string _raw;
         std::string _host;
         std::string _ip;
     	std::string _port;
@@ -52,7 +51,6 @@ class Request : public IRequest
         int         getPort();
         std::string getIp();
         std::vector<std::pair<std::string, float> > getAcceptLanguages();
-        std::string getRaw();
         std::string getHost();
         std::string getUserAgent();
         std::string getAccept();
@@ -73,7 +71,6 @@ class Request : public IRequest
         void setEnvForCgi(std::string envForCgi);
         void setPort(std::string port);
         void setAcceptLanguage(std::string acceptLanguage);
-        void setRaw(std::string raw);
         void setHost(std::string host);
         void setIp(std::string ip);
         void setUserAgent(std::string userAgent);

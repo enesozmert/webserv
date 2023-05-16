@@ -82,10 +82,6 @@ std::vector<std::pair<std::string, float> > Request::getAcceptLanguages()
 	}
     return (_languages);
 }
-std::string Request::getRaw()
-{
-    return (this->_raw);
-}
 std::string Request::getHost()
 {
     return (this->_host);
@@ -170,10 +166,6 @@ void Request::setAcceptLanguage(std::string acceptLanguage)
 {
     (void)acceptLanguage;
     //none
-}
-void Request::setRaw(std::string raw)
-{
-    this->_raw = raw;
 }
 void Request::setHost(std::string host)
 {

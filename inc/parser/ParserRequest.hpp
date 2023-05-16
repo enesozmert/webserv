@@ -34,7 +34,7 @@ class ParserRequest
         std::string  findValue(const std::string &line);
 
         std::vector<std::string> getLines();
-        std::string getText();
-        void setText(std::string raw);
+        std::string getRaw();
+        void setRaw(std::string raw);
         Request *getRequest();
 };

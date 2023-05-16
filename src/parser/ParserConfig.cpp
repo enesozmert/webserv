@@ -2,7 +2,7 @@
 
 typedef void (ParserConfig::*method_function)(std::vector<size_t>);
 
-ParserConfig::ParserConfig(/* args */) : _matchedClassIndex(0)
+ParserConfig::ParserConfig() : _matchedClassIndex(0)
 {
 }
 
