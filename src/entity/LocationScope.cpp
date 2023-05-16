@@ -121,3 +121,8 @@ std::string LocationScope::getName() const
 
 LocationScope* LocationScope::cloneNew() const { return new LocationScope(); }
 LocationScope* LocationScope::clone() const { return new LocationScope(*this); }
+
+//fatma ekledi
+bool LocationScope::usesLongestMatch() const {
+    return longestMatch;
+}

@@ -10,6 +10,8 @@
 
 #include "../entity/Listen.hpp"
 #include "../entity/HttpScope.hpp"
+#include "../request/Request.hpp"
+//#include "../response/Response.hpp"
 
 # define RECV_SIZE 65536
 
@@ -26,9 +28,11 @@ class Server {
         Server(const t_listen &listen);
         ~Server();
 
-        long	get_fd();
+        long	    get_fd() const;
+        t_listen    get_listen() const;
+        std::string    get_hostname() const;
 
-        int     setUpServer();
+        int     setUpSocket();
         void    setAddr();
         void    clean();
         void    close(int socket);
@@ -38,4 +42,8 @@ class Server {
         void	processChunk(long socket);
         int		send(long socket);
         int		recv(long socket);
+
+        ServerScope*    getServerForRequest(t_listen& address, std::string& hostname, HttpScope& http);
+        Server		getServerForRequest();
+        LocationScope*  getLocationForRequest(std::string& const path); 
 };

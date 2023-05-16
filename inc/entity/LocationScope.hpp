@@ -25,6 +25,11 @@ class LocationScope : public IScope
         ErrorPage _errorPage;
         RedirectionUri _redirectionUri;
         DataBase<Variable<std::string> > _keywordDatabase;
+        bool longestMatch;//fatma ekledi
+        //bunu true/false nasıl başlatacağımıza karar vermeliyiz
+        //en uzun eşleşme açık olsun mu olmasın mı?
+        bool regex;
+        //regex olsun mu olamasın mı karar vermeliyiz?
 
     public:
         LocationScope(/* args */);
@@ -50,6 +55,7 @@ class LocationScope : public IScope
         void setPath(std::string path);
 
         void keywordFill();
+        bool LocationScope::usesLongestMatch() const;//fatma
 
         std::string getName() const;
         LocationScope* clone() const;
