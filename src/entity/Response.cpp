@@ -429,8 +429,8 @@ std::string		Response::getHeader(size_t size, const std::string& path, int code,
 
 std::string		Response::getStatusMessage(int code)
 {
-	if (_errors.find(code) != _errors.end())
-		return _errors[code];
+	if (_errorMap.find(code) != _errorMap.end())
+		return _errorMap[code];
 	return ("Unknown Code");
 }
 
