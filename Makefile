@@ -21,11 +21,11 @@ SRC_UTILS		=	utils/
 SRC_ERROR		=	error/
 
 #Files
-ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope Request HttpMethod
+ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope Request HttpMethod Response
 PARSER			=	ParserConfig ParserRequest
 FILE			=	File
 SERVER			=	Server Cluster
-CGI				=	
+CGI				=	Cgi
 ERROR			=	ConfigException HandleException
 
 SRC_MAIN		= 	main
