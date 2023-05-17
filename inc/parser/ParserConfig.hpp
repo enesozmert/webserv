@@ -52,7 +52,7 @@ class ParserConfig
         ParserConfig();
         ~ParserConfig();
 
-        File getFile(std::string &fileName);
+        std::string getCheckFileExtension(File &file, std::string &fileName);
 
         void parse(std::string &fileName);
 

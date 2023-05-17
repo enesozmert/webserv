@@ -36,8 +36,8 @@ File	&File::operator=(const File &file)
 std::string File::readToString()
 {
     std::string fileContents((std::istreambuf_iterator<char>(_file)), std::istreambuf_iterator<char>());
-    if (fileContents.empty())
-        this->_configException.run(102);
+    // if (fileContents.empty())
+    //     this->_configException.run(102);
     return fileContents;
 }
 
