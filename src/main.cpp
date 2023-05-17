@@ -1,4 +1,5 @@
 #include "../inc/parser/ParserConfig.hpp"
+#include "../inc/error/ConfigException.hpp"
 #include "../inc/parser/ParserRequest.hpp"
 
 #include <iostream>
@@ -6,16 +7,17 @@
 
 void myTerminationHandler() {
     std::cerr << "Unhandled exception, program will terminate.\n";
-    abort();
+    // abort();
 }
 
 int main(int ac, char **av)
 {
-    std::set_terminate(myTerminationHandler);
+    ConfigException configException;
+    // std::set_terminate(myTerminationHandler);
 
     if (ac != 2)
     {
-        std::cerr << "Hata" << std::endl;
+        configException.run(106);
         return (-1);
     }
     std::string av1;

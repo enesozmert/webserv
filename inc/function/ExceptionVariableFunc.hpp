@@ -4,7 +4,7 @@
 
 struct IsExceptionVariableErrorCodeEqual : public std::unary_function<ExceptionVariable<int, std::string>, bool>
 {
-    IsExceptionVariableErrorCodeEqual(const int &errorCode) : _errorCode(errorCode) {}
+    IsExceptionVariableErrorCodeEqual(const int errorCode) : _errorCode(errorCode) {}
 
     bool operator()(const ExceptionVariable<int, std::string> &exceptionVariable) const
     {

@@ -7,27 +7,22 @@
 class HandleException
 {
 public:
-    static std::string HandleExMessage;
-
     template <typename T>
-    static std::string Error(void (T::*func)())
+    static void Error(T& obj, void (T::*func)())
     {
         try
         {
-            T obj;
             (obj.*func)();
         }
         catch (const IException &ex)
         {
-            HandleExMessage = ex.what();
+            std::cerr << ex.what() << std::endl;
+            exit(-1);
         }
         catch (...)
         {
-            HandleExMessage = "Unknown exception caught";
+            std::cerr << "Unknown exception caught" << std::endl;
+            exit(-1);
         }
-
-        return HandleExMessage;
     }
 };
-
-std::string HandleException::HandleExMessage = "";

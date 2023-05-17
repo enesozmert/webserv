@@ -26,7 +26,7 @@ PARSER			=	ParserConfig ParserRequest
 FILE			=	File
 SERVER			=	Server Cluster
 CGI				=	
-ERROR			=	ConfigException
+ERROR			=	ConfigException HandleException
 
 SRC_MAIN		= 	main
 

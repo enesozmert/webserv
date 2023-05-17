@@ -10,17 +10,26 @@ ParserConfig::~ParserConfig()
 {
 }
 
-void ParserConfig::parse(std::string &fileName)
+File ParserConfig::getFile(std::string &fileName)
 {
     File file(fileName);
+    if (!file.checkFileExtension(fileName, "config"))
+        this->_configException.run(104);
+    return (file);
+}
+
+void ParserConfig::parse(std::string &fileName)
+{
+    File file;  
     size_t pos = 0;
-    std::string fileContents = file.readToString();
-    std::string fileCleanContents = cleanString(fileContents);
+    std::string fileContents;
+    std::string fileCleanContents;
     std::vector<std::string> lines;
     std::string delimiter = "{};#";
 
-    if (fileName.empty())
-        configException.run(103);
+    file = getFile(fileName);
+    fileContents = file.readToString();
+    fileCleanContents = cleanString(fileContents);
     while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);

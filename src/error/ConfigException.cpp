@@ -2,6 +2,7 @@
 
 ConfigException::ConfigException(/* args */)
 {
+    errorFill();
 }
 
 ConfigException::~ConfigException()
@@ -15,6 +16,7 @@ ConfigException::ConfigException(const ConfigException &configException)
 
 ConfigException::ConfigException(int errorCode)
 {
+    errorFill();
     this->_errorCode = errorCode;
 }
 
@@ -33,13 +35,14 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(102, "Config file is empty"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(103, "Config file name is empty"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(104, "Invalid file extension."));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(105, "Invalid argument."));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(106, "Please provide a config file."));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(107, "Parenthesis is unbalanced."));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(108, "Expected 'server'"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(109, "Expected 'location'"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(110, "Location must be end with ';'"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(111, "Convert Exception"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(105, "Not Found file extension."));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(106, "Invalid argument."));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(107, "Please provide a config file."));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(108, "Parenthesis is unbalanced."));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(109, "Expected 'server'"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(110, "Expected 'location'"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(111, "Location must be end with ';'"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(112, "Convert Exception"));
 }
 
 void ConfigException::exceptionHandler()
@@ -54,8 +57,6 @@ void ConfigException::run(int errorCode)
     if (this->getErrorDataBase().isHere<int, IsExceptionVariableErrorCodeEqual>(errorCode))
     {
         this->_exception = this->getErrorDataBase().getByNameData<int, IsExceptionVariableErrorCodeEqual>(errorCode);
-        std::cerr << this->_exception.getErrorCode() << std::endl;
-        HandleException::Error(&ConfigException::exceptionHandler);
-        abort();
+        HandleException::Error(*this, &ConfigException::exceptionHandler);
     }
 }

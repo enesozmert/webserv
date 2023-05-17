@@ -47,10 +47,12 @@ class ParserConfig
         size_t _matchedClassIndex;
 
         //exception
-        ConfigException configException;
+        ConfigException _configException;
     public:
         ParserConfig();
         ~ParserConfig();
+
+        File getFile(std::string &fileName);
 
         void parse(std::string &fileName);
 
