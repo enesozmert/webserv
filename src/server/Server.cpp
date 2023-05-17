@@ -80,9 +80,8 @@ void    Server::process(long socket, HttpScope& http)
 
     if (_requests[socket] != "")
     {
-        // Request request(_requests[socket]); // aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
         Request *request;
-        ParserRequest parserRequest(_requests[socket]);
+        ParserRequest parserRequest(_requests[socket]);// aldığımız isteği parçalamak üzere Request class'a gönderiyoruz.
 
         parserRequest.parse();
         request = parserRequest.getRequest();
@@ -356,36 +355,3 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServer, const 
 
 //     return bestMatch;
 // }
-
-
-
-/**********************************************************************************/
-
-void Server::noName(ServerScope *server, LocationScope *location, Request *request)
-{
-	std::vector<std::string> conf_index = server->getIndex();
-	for (std::vector<std::string>::const_iterator it = conf_index.begin(); it != conf_index.end(); it++) 
-    {
-		std::vector<std::string>::const_iterator it2 = _index.begin();
-		for (it2 = _index.begin(); it2 != _index.end(); it2++) 
-        {
-				if (*it == *it2)
-					break;
-		}
-		if (it2 == _index.end())
-			_index.push_back(*it);
-	}
-
-	this->_contentLocation = removeAdjacentSlashes(path);
-	this->_path = removeAdjacentSlashes(server->getRoot() + location.getPath());
-	std::string indexPath;
-	if (!pathIsFile(this->_path) && method == "GET") 
-    {
-		if ((indexPath = this->addIndex(request)) != "") {
-			config = config.getLocationForRequest(indexPath, locationName);
-			this->_cgi_pass = config.getCgiPass();
-			this->_cgi_param = config.getCgiParam();
-		}
-	}
-
-}

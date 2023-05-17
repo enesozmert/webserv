@@ -1,9 +1,10 @@
 #include "../inc/cgi/Cgi.hpp"
 
-Cgi::Cgi(Request &request, HttpScope &httpScope): _body(request.getBody())
+Cgi::Cgi(Request *request, ServerScope* scope, LocationScope* location): _body(request.getBody())
 {
     (void)request;
-    (void)httpScope;
+    (void)scope;
+	(void)location;
 	//request headerının olduğu map'i çektik
 	// std::map<std::string, std::string>	headers = request.getHeaders();
 
