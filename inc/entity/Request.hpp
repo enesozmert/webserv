@@ -35,13 +35,9 @@ class Request : public IRequest
         std::string _contentType;
         std::string _contentLength;
         std::string _httpMethodName;
-<<<<<<< HEAD
         int         _returnCode;
-=======
         std::string _authScheme;
         std::string _authorization;
-        int         return_code;
->>>>>>> master
 
         HttpMethod  _httpMethod;
 

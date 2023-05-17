@@ -30,9 +30,8 @@ class Server {
         Server(const t_listen &listen);
         ~Server();
 
-        long	    get_fd() const;
+        long        get_fd() const;
         t_listen    get_listen() const;
-        std::string    get_hostname() const;
 
         int     setUpSocket();
         void    setAddr();
