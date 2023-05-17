@@ -26,7 +26,6 @@ class ServerScope : public IScope
         std::string _index;
         std::string _cgi_pass;
         std::string _listen;
-        LocationScope* _defaultLocation;//fatma
 
         bool _isServerNameNothing;
         ErrorPage _errorPage;
@@ -64,13 +63,13 @@ class ServerScope : public IScope
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void keywordFill();
+
+        t_listen    getListen() const;//fatma ekledi
         
         std::string getName() const;
         ServerScope* cloneNew() const;
         ServerScope* clone() const;
-        t_listen    getListen() const;//fatma ekledi
 
-        LocationScope* getDefaultLocation() const;//fatma
 
 };
 

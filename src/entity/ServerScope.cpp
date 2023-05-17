@@ -176,14 +176,3 @@ std::string ServerScope::getName() const
 ServerScope *ServerScope::cloneNew() const { return new ServerScope(); }
 ServerScope *ServerScope::clone() const { return new ServerScope(*this); }
 
-//fatma ekledi
-LocationScope* ServerScope::getDefaultLocation() const {
-    // Eğer default location tanımlanmamışsa, null döndürür
-    if (this->_defaultLocation == NULL) {
-        return (NULL);
-    }
-    // Eğer default location tanımlanmışsa, ilgili location döndürür
-    else {
-        return (this->_defaultLocation);
-    }
-}

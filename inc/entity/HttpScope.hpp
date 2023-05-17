@@ -36,7 +36,6 @@ class HttpScope : public IScope
         void setErrorPage(ErrorPage errorPage);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
-
         void keywordFill();
 
         std::string getName() const;

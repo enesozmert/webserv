@@ -133,6 +133,14 @@ std::string Request::getHttpMethodName()
 int Request::getReturnCode()
 {
     return (_returnCode);
+std::string Request::getAuthScheme()
+{
+    return (this->_authScheme);
+}
+
+std::string Request::getAuthorization()
+{
+    return (this->_authorization);
 }
 
 DataBase<Variable<std::string> > Request::getKeywordDataBase()
@@ -215,6 +223,16 @@ void Request::setHttpMethodName(std::string httpMethodName)
         this->_httpMethodName = httpMethodName;
 }
 
+void Request::setAuthScheme(std::string authScheme)
+{
+    this->_authScheme = authScheme;
+}
+
+void Request::setAuthorization(std::string authorization)
+{
+    this->_authorization = authorization;
+}
+
 void Request::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 {
     this->_keywordDatabase = keywordDatabase;
@@ -232,6 +250,8 @@ void Request::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("referer", &this->_referer));
     _keywordDatabase.insertData(Variable<std::string>("content-type", &this->_contentLength));
     _keywordDatabase.insertData(Variable<std::string>("content-length", &this->_contentLength));
+    _keywordDatabase.insertData(Variable<std::string>("auth-scheme", &this->_authScheme));
+    _keywordDatabase.insertData(Variable<std::string>("authorization", &this->_authorization));
 }
 std::string Request::getName() const
 {

@@ -13,6 +13,8 @@
 #include "../entity/Request.hpp"
 #include "../parser/ParserRequest.hpp"
 #include "../entity/Response.hpp"
+#include "../function/ServerFunc.hpp"
+
 
 # define RECV_SIZE 65536
 
@@ -44,5 +46,5 @@ class Server {
         int		recv(long socket);
 
         ServerScope*    getServerForRequest(t_listen& address, const std::string& hostname, HttpScope& http);
-        LocationScope*  getLocationForRequest(ServerScope *MatchedServer, const std::string& path); 
+        LocationScope*  getLocationForRequest(ServerScope *matchedServerScope, const std::string& path); 
 };

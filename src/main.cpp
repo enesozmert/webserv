@@ -1,15 +1,24 @@
 #include "../inc/parser/ParserConfig.hpp"
+#include "../inc/error/ConfigException.hpp"
 #include "../inc/parser/ParserRequest.hpp"
 #include "../inc/server/Cluster.hpp"
 
 #include <iostream>
 #include <string>
 
+void myTerminationHandler() {
+    std::cerr << "Unhandled exception, program will terminate.\n";
+    // abort();
+}
+
 int main(int ac, char **av)
 {
+    ConfigException configException;
+    // std::set_terminate(myTerminationHandler);
+
     if (ac != 2)
     {
-        std::cerr << "Hata" << std::endl;
+        configException.run(106);
         return (-1);
     }
     std::string av1;
@@ -20,9 +29,10 @@ int main(int ac, char **av)
     parser->parse(av1);
     http = parser->getHttp();
 
-    std::cout << "result1 : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
-    std::cout << "result2 : " << http->getServers().at(0)->getHost() << std::endl;
-    std::cout << "result3 : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
+    std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
+    std::cout << "getPath() : " << http->getServers().at(0)->getLocations().at(1)->getPath() << std::endl;
+    std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
+    std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
     std::string httpRequest = "POST /processsampleform.php HTTP/1.1\r\n"
                               "Host: www.tutorialspoint.com\r\n"
                               "User-Agent: Mozilla/5.0 (windows; U; Windows NT 6.0; en-Us; rv:1.9.0.19) Gecko/2010031422 Firefox/3.0.19 (.NET CLR 3.5.30729)\r\n"

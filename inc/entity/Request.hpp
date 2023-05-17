@@ -35,7 +35,13 @@ class Request : public IRequest
         std::string _contentType;
         std::string _contentLength;
         std::string _httpMethodName;
+<<<<<<< HEAD
         int         _returnCode;
+=======
+        std::string _authScheme;
+        std::string _authorization;
+        int         return_code;
+>>>>>>> master
 
         HttpMethod  _httpMethod;
 
@@ -66,6 +72,8 @@ class Request : public IRequest
         int         getContentLength();
         std::string getHttpMethodName();
         int         getReturnCode();
+        std::string getAuthScheme();
+        std::string getAuthorization();
         DataBase<Variable<std::string> > getKeywordDataBase();
 
         void setVersion(std::string version);
@@ -88,6 +96,8 @@ class Request : public IRequest
         void setContentType(std::string contentType);
         void setContentLength(std::string contentLength);
         void setHttpMethodName(std::string httpMethodName);
+        void setAuthScheme(std::string authScheme);
+        void setAuthorization(std::string authorization);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
         void keywordFill();

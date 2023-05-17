@@ -10,14 +10,25 @@ ParserConfig::~ParserConfig()
 {
 }
 
+std::string ParserConfig::getCheckFileExtension(File &file, std::string &fileName)
+{
+    if (!file.checkFileExtension(fileName, "config"))
+        this->_configException.run(104);
+    return (file.readToString());
+}
+
 void ParserConfig::parse(std::string &fileName)
 {
     File file(fileName);
     size_t pos = 0;
-    std::string fileContents = file.readToString();
-    std::string fileCleanContents = cleanString(fileContents);
+    std::string fileContents;
+    std::string fileCleanContents;
     std::vector<std::string> lines;
     std::string delimiter = "{};#";
+
+    fileContents = getCheckFileExtension(file, fileName);
+    fileCleanContents = cleanString(fileContents);
+    std::cout << fileCleanContents << std::endl;
     while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
@@ -46,7 +57,6 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
     size_t scopeOpenCount = 0;
     size_t scopeOpenIndex = 0;
     size_t scopeCloseIndex = 0;
-    std::vector<std::string> tempScopes;
 
     for (size_t i = 0; i < lines.size(); i++)
     {
@@ -147,7 +157,9 @@ void ParserConfig::parseScopeFill()
             }
             tempCloseIndex = _orderParseLineProps[i].getScopeCloseIndex();
         }
-        if (tempCloseIndex == _orderParseLineProps[i].getScopeCloseIndex() && _orderParseLineProps[i].getIsScopeOpen() == false && _orderParseLineProps[i].getIsScopeClose() == false)
+        if (tempCloseIndex == _orderParseLineProps[i].getScopeCloseIndex() && 
+            ((_orderParseLineProps[i].getIsScopeOpen() == false && _orderParseLineProps[i].getIsScopeClose() == false) || 
+            (_orderParseLineProps[i].getScopeName() == "location" && _orderParseLineProps[i].getIsScopeOpen() == true)))
         {
             tempLines.push_back(_orderParseLineProps[i].getIndex());
         }
@@ -202,7 +214,7 @@ void ParserConfig::parseHttp(std::vector<size_t> tempScopes)
         std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
-        if (this->httpPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
+        if (this->httpPtr->getKeywordDataBase().isHere<std::string, IsVariableNameEqual>(tempVariableName))
         {
             this->httpPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
@@ -226,7 +238,7 @@ void ParserConfig::parseServer(std::vector<size_t> tempScopes)
         std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
-        if (this->serverPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
+        if (this->serverPtr->getKeywordDataBase().isHere<std::string, IsVariableNameEqual>(tempVariableName))
         {
             this->serverPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
@@ -250,7 +262,7 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
         std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
-        if (this->locationPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
+        if (this->locationPtr->getKeywordDataBase().isHere<std::string, IsVariableNameEqual>(tempVariableName))
         {
             this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
