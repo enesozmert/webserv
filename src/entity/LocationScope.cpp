@@ -70,6 +70,10 @@ std::string LocationScope::getPath()
     return (this->_path);
 }
 
+std::string LocationScope::getClientBodyBufferSize()
+{
+    return (this->_clientBodyBufferSize);
+}
 void LocationScope::setRoot(std::string root)
 {
     this->_root = root;

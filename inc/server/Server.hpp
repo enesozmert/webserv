@@ -12,12 +12,12 @@
 #include "../entity/HttpScope.hpp"
 #include "../entity/Request.hpp"
 #include "../parser/ParserRequest.hpp"
+#include "../entity/Response.hpp"
 #include "../function/ServerFunc.hpp"
-//#include "../response/Response.hpp"
+
 
 # define RECV_SIZE 65536
 
-class HttpScope;
 class Server {
     private:
         std::map<long, std::string>	_requests;

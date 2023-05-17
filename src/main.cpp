@@ -1,6 +1,7 @@
 #include "../inc/parser/ParserConfig.hpp"
 #include "../inc/error/ConfigException.hpp"
 #include "../inc/parser/ParserRequest.hpp"
+#include "../inc/server/Cluster.hpp"
 
 #include <iostream>
 #include <string>
@@ -57,5 +58,8 @@ int main(int ac, char **av)
     std::cout << "request->getPath() : " << request->getPath() << std::endl;
     std::cout << "request->getVersion() : " << request->getVersion() << std::endl;
     std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
+
+    Cluster cluster;
+    cluster.run();
     return (0);
 }

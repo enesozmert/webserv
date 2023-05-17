@@ -12,9 +12,9 @@
 #include <sys/wait.h>
 
 #include "../entity/HttpScope.hpp"
-#include "../request/Request.hpp"
-
-class HttpScope;
+#include "../entity/Request.hpp"
+#include "../utils/Utils.hpp"
+;
 class Request;
 class Cgi
 {
@@ -24,7 +24,7 @@ class Cgi
     
     public:
         Cgi();
-    	Cgi(Request &request, HttpScope &httpScope); // sets up env according to the request
+    	Cgi(Request *request, ServerScope* server, std::string& _path); // sets up env according to the request
         ~Cgi();
     
     	std::string		executeCgi(const std::string &scriptName);	// executes cgi and returns body

@@ -1,41 +1,37 @@
 #include "../inc/cgi/Cgi.hpp"
 
-Cgi::Cgi(Request &request, HttpScope &httpScope): _body(request.getBody())
+Cgi::Cgi(Request *request, ServerScope* server, std::string& _path): _body(request->getBody())
 {
-    (void)request;
-    (void)httpScope;
-	//request headerının olduğu map'i çektik
-	// std::map<std::string, std::string>	headers = request.getHeaders();
 
-	// if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
-	// 	this->_env.insert(std::make_pair("AUTH_TYPE", headers["Authorization"]));
+	//if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
+	//	this->_env.insert(std::make_pair("AUTH_TYPE", headers["Authorization"]));
 
-	// this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
-	// this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
-	// this->_env.insert(std::make_pair("SCRIPT_NAME",config.getPath()));
-	// this->_env.insert(std::make_pair("SCRIPT_FILENAME", config.getPath()));
-	// this->_env.insert(std::make_pair("REQUEST_METHOD", request.getMethod()));
-	// this->_env.insert(std::make_pair("CONTENT_LENGTH", to_string(this->_body.length())));
-	// this->_env.insert(std::make_pair("CONTENT_TYPE", headers["Content-Type"]));
-	// this->_env.insert(std::make_pair("PATH_INFO", request.getPath())); //might need some change, using config path/contentLocation
-	// this->_env.insert(std::make_pair("PATH_TRANSLATED", request.getPath())); //might need some change, using config path/contentLocation
-	// this->_env.insert(std::make_pair("QUERY_STRING", request.getQuery()));
-	// this->_env.insert(std::make_pair("REMOTEaddr", to_string(config.getHostPort().host)));
-	// this->_env.insert(std::make_pair("REMOTE_IDENT", headers["Authorization"]));
-	// this->_env.insert(std::make_pair("REMOTE_USER", headers["Authorization"]));
-	// this->_env.insert(std::make_pair("REQUEST_URI", request.getPath() + request.getQuery()));
+	this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
+	this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
+	this->_env.insert(std::make_pair("SCRIPT_NAME", _path));
+	this->_env.insert(std::make_pair("SCRIPT_FILENAME", _path));
+	this->_env.insert(std::make_pair("REQUEST_METHOD", request->getHttpMethodName()));
+	this->_env.insert(std::make_pair("CONTENT_LENGTH", to_string(this->_body.length())));
+	this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
+	this->_env.insert(std::make_pair("PATH_INFO", request->getPath())); //might need some change, using config path/contentLocation
+	this->_env.insert(std::make_pair("PATH_TRANSLATED", request->getPath())); //might need some change, using config path/contentLocation
+	this->_env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
+	this->_env.insert(std::make_pair("REMOTEaddr", server->getHost()));
+	//this->_env.insert(std::make_pair("REMOTE_IDENT", request->getAuthorization()));
+	//this->_env.insert(std::make_pair("REMOTE_USER", request->getAuthorization()));
+	this->_env.insert(std::make_pair("REQUEST_URI", request->getPath() + request->getQuery()));
 	
-	// if (headers.find("Hostname") != headers.end())
-	// 	this->_env.insert(std::make_pair("SERVER_NAME", headers["Hostname"]));
-	// else
-	// 	this->_env.insert(std::make_pair("SERVER_NAME", this->_env["REMOTEaddr"]));
+	/* if (headers.find("Hostname") != headers.end())
+		this->_env.insert(std::make_pair("SERVER_NAME", headers["Hostname"]));
+	else
+		this->_env.insert(std::make_pair("SERVER_NAME", this->_env["REMOTEaddr"])); */
 
-    // this->_env.insert(std::make_pair("SERVER_PORT", to_string(config.getHostPort().port)));
-	// this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
-	// //this->_env.insert(std::make_pair("SERVER_SOFTWARE", "php-cgi/1.1"));
-	// this->_env.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));//burayı değiştir
-	// //config dosyasındaki cgi_param'ların tutulduğu map'i ekliyoruz. Birden fazla olabildiği için map içinde
-	// this->_env.insert(config.getCgiParam().begin(), config.getCgiParam().end());
+    this->_env.insert(std::make_pair("SERVER_PORT", server->getPort()));
+	this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
+	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "php-cgi/1.1"));
+	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));//burayı değiştir
+	//config dosyasındaki cgi_param'ların tutulduğu map'i ekliyoruz. Birden fazla olabildiği için map içinde
+	this->_env.insert(request->getEnvForCgi().begin(), request->getEnvForCgi().end());
 
 }
 
@@ -132,3 +128,4 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	return (newBody);
 }
 
+Cgi::~Cgi(){}
