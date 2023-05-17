@@ -55,8 +55,8 @@ class DataBase
             }
         }
 
-        template <typename K>
-        T getByNameData(std::string name)
+        template <typename V, typename K>
+        T getByNameData(V name)
         {
             T classe;
             typename std::vector<T>::iterator it = std::find_if(this->_data.begin(), this->_data.end(), K(name));
@@ -68,10 +68,10 @@ class DataBase
             return classe;
         }
 
-        template <typename K>
-        bool isHere(std::string name)
+        template <typename V,typename F>
+        bool isHere(V name)
         {
-            return (std::find_if(_data.begin(), _data.end(), K(name)) != this->_data.end());
+            return (std::find_if(_data.begin(), _data.end(), F(name)) != this->_data.end());
         }
 
         int size()

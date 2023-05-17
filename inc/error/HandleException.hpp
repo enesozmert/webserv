@@ -10,11 +10,12 @@ public:
     static std::string HandleExMessage;
 
     template <typename T>
-    static std::string Error(T action)
+    static std::string Error(void (T::*func)())
     {
         try
         {
-            action();
+            T obj;
+            (obj.*func)();
         }
         catch (const IException &ex)
         {

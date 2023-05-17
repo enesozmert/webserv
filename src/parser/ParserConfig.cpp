@@ -18,6 +18,9 @@ void ParserConfig::parse(std::string &fileName)
     std::string fileCleanContents = cleanString(fileContents);
     std::vector<std::string> lines;
     std::string delimiter = "{};#";
+
+    if (fileName.empty())
+        configException.run(103);
     while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
@@ -203,7 +206,7 @@ void ParserConfig::parseHttp(std::vector<size_t> tempScopes)
         std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
-        if (this->httpPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
+        if (this->httpPtr->getKeywordDataBase().isHere<std::string, IsVariableNameEqual>(tempVariableName))
         {
             this->httpPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
@@ -227,7 +230,7 @@ void ParserConfig::parseServer(std::vector<size_t> tempScopes)
         std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
-        if (this->serverPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
+        if (this->serverPtr->getKeywordDataBase().isHere<std::string, IsVariableNameEqual>(tempVariableName))
         {
             this->serverPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
@@ -251,7 +254,7 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
         std::istringstream s(trim(this->_parseLineProps.at(tempScopes[i]).getLine(), ";"));
         s >> tempVariableName;
         std::getline(s >> std::ws, tempVariableValue);
-        if (this->locationPtr->getKeywordDataBase().isHere<IsVariableNameEqual>(tempVariableName))
+        if (this->locationPtr->getKeywordDataBase().isHere<std::string, IsVariableNameEqual>(tempVariableName))
         {
             this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }

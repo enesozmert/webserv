@@ -15,7 +15,7 @@ class ExceptionVariable
         ExceptionVariable(T errorCode, K errorMessage) {_variable = std::make_pair(errorCode, errorMessage);}
         ~ExceptionVariable() {}
         T getErrorCode() const {return (_variable.first);}
-        K getErrorMessage() const {return (_variable.second);}
+        K getErrorMessage() {return (_variable.second);}
         void setErrorCode(T errorCode){_variable.first = errorCode;}
         void setErrorMessage(K errorMessage){_variable.second = errorMessage;}
 };

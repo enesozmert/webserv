@@ -70,7 +70,7 @@ void ParserRequest::parseKeyValue()
 		line = this->_lines[i];
 		key = findKey(line);
 		value = findValue(line);
-		if (this->request.getKeywordDataBase().isHere<IsVariableNameEqual>(key))
+		if (this->request.getKeywordDataBase().isHere<std::string, IsVariableNameEqual>(key))
 		{
 			this->request.getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(key, value);
 		}
