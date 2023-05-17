@@ -296,61 +296,13 @@ ServerScope*        Server::getServerForRequest(t_listen& address, const std::st
 
 
 //benim yazdığım daha basic olan
-LocationScope*  Server::getLocationForRequest(ServerScope *matchedServer, const std::string& path) 
+LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::string& path) 
 {
-    std::vector<LocationScope *> locationScope;
+    size_t locationScopeIndex;
 
-    locationScope = matchedServer->getLocations();
-    for(std::vector<LocationScope *>::iterator it = locationScope.begin(); it != locationScope.end(); it++)
-    {
-        if(path == (*it)->getPath())
-            return (*it);
-    }
-    return (*(matchedServer->getLocations().begin()));
+    locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
+    locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
+    locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
+
+    return (matchedServerScope->getLocations().at(locationScopeIndex));
 }
-// //chatgpt
-// //yukarıdakinden daha gelişmiş bir formatta yazdı 
-// LocationScope* Server::getLocationForRequest(ServerScope* matchedServer, const std::string& path)
-// {
-//     LocationScope* bestMatch = 0;  // En iyi eşleşme için LocationScope
-
-//     // Tüm location'lar üzerinde gezin ve en iyi eşleşmeyi bul
-//     for (std::vector<LocationScope*>::iterator it = matchedServer->getLocations().begin(); it != matchedServer->getLocations().end(); ++it) 
-//     {
-//         LocationScope* location = *it;
-
-//         // Path'in location path'iyle eşleştiğini kontrol et
-//         if (location->getPath() == path) {
-//             bestMatch = location;
-//             break;
-//         }
-
-//         // Eğer location regex kullanıyorsa, regex'e göre eşleşmeyi kontrol et
-//         //çok abartı bu silebiliriz.
-//         //Örneğin, "/user/[0-9]+" ifadesi, "/user/123", "/user/456", "/user/789", gibi "/user/" ile başlayan herhangi bir istek yolunu eşleştirebilir.
-//         if (location->hasRegex()) {
-//             if (std::regex_match(path, location->getRegex())) {
-//                 if (!bestMatch || bestMatch->getPath().length() < location->getPath().length()) {
-//                     bestMatch = location;
-//                 }
-//             }
-//         }
-
-//         // Eğer en uzun eşleşme prensibi kullanılıyorsa, path'in location path'iyle başladığından emin ol
-//         //Örneğin, bir sunucuda /test ve /test/test2 isimli iki konum olsun. 
-//         //Eğer gelen istek URL'si /test/test2/index.html ise, sunucu bu isteği işlerken /test/test2 konumunu seçer 
-//         //çünkü bu, URL'nin en uzun eşleşmesidir.
-//         if (location->usesLongestMatch() && path.find(location->getPath()) == 0) {
-//             if (!bestMatch || bestMatch->getPath().length() < location->getPath().length()) {
-//                 bestMatch = location;
-//             }
-//         }
-//     }
-
-//     // Eğer hiçbir eşleşme bulunamazsa, default location kullanılır
-//     if (!bestMatch) {
-//         bestMatch = matchedServer->getDefaultLocation();
-//     }
-
-//     return bestMatch;
-// }

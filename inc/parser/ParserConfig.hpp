@@ -18,12 +18,14 @@
 #include "../function/ParseLinePropFunc.hpp"
 #include "../function/VariableFunc.hpp"
 #include "../utils/Utils.hpp"
+#include "../error/ConfigException.hpp"
 
 class File;
 class HttpScope;
 class ServerScope;
 class LocationScope;
 class ParseLineProp;
+class ConfigException;
 class ParserConfig
 {
     private:
@@ -43,9 +45,14 @@ class ParserConfig
         std::map<size_t, IScope *> _matchedClass;
 
         size_t _matchedClassIndex;
+
+        //exception
+        ConfigException _configException;
     public:
         ParserConfig();
         ~ParserConfig();
+
+        std::string getCheckFileExtension(File &file, std::string &fileName);
 
         void parse(std::string &fileName);
 
