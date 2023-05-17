@@ -24,7 +24,6 @@ private:
 
     std::vector<std::string>			_index;//bunu araştır???
     std::string							_path;// local path for request
-    std::map<std::string, std::string>	_cgi_param;
 	std::string							_cgi_pass;
 
 
@@ -78,7 +77,7 @@ public:
     std::string     getPage(const char *path, std::string const &host, int port);
     std::string     getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port);
 
-    void    GETmethod(Request* request, ServerScope* scope, LocationScope* location);
-    void	DELETEmethod(Request* request, ServerScope* scope, LocationScope* location);
-    void	POSTmethod(Request* request, ServerScope* scope, LocationScope* location);
+    void    GETmethod(Request* request, ServerScope* server);
+    void	DELETEmethod();
+    void	POSTmethod(Request* request, ServerScope* server);
 };

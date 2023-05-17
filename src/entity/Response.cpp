@@ -128,7 +128,6 @@ void			Response::setWwwAuthenticate(int code)
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
     //_errorMap = request->getErrorPage();
-    this->_cgi_param = request->getEnvForCgi();
 	this->statusCode = request->getReturnCode();
     //addIndex(request);
  /*    std::vector<std::string> conf_index = server->getIndex();
@@ -155,7 +154,7 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
 
     if (std::find(location->getAllowMethods().begin(), location->getAllowMethods().end(), request->getHttpMethodName()) == location->getAllowMethods().end())
 		this->statusCode = 405;
-	else if (atoi(location->getClientBodyBufferSize().c_str()) < request->getBody().size())
+	else if (atoi(location->getClientBodyBufferSize().c_str()) < static_cast<int>(request->getBody().size()))
 		this->statusCode = 413;
 
     if (this->statusCode == 405 || this->statusCode == 413)
@@ -167,11 +166,11 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
     if (this->statusCode == 200)
     {
         if (request->getHttpMethodName() == "GET")
-            GETmethod(request, server, location);
+            GETmethod(request, server);
         else if (request->getHttpMethodName() == "POST")
-            POSTmethod(request, server, location);
+            POSTmethod(request, server);
         else if (request->getHttpMethodName() == "POST")
-            DELETEmethod(request, server, location);
+            DELETEmethod();
         else
             std::cerr << "buraya ne eklememiz lazım bilemedim" << std::endl;   
     }
@@ -271,11 +270,11 @@ std::string		Response::notAllowed(std::vector<std::string> methods, const std::s
 	return (header);
 }
 
-void			Response::GETmethod(Request* request, ServerScope* server, LocationScope* location)
+void			Response::GETmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, location);
+		Cgi	cgi(request, server, this->_path);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
@@ -305,10 +304,8 @@ void			Response::GETmethod(Request* request, ServerScope* server, LocationScope*
 	_response = getHeader(_response.size(), _path, this->statusCode, _type, this->_contentLocation, this->_contentLanguage) + "\r\n" + _response;
 }
 
-void			Response::DELETEmethod(Request* request, ServerScope* scope, LocationScope* location)
+void			Response::DELETEmethod()
 {
-	(void)request;
-
 	_response = "";
 	if (pathIsFile(_path))
 	{
@@ -324,11 +321,11 @@ void			Response::DELETEmethod(Request* request, ServerScope* scope, LocationScop
 	_response = getHeader(_response.size(), _path, this->statusCode, _type, this->_contentLocation, this->_contentLanguage) + "\r\n" + _response;
 }
 
-void			Response::POSTmethod(Request* request, ServerScope* scope, LocationScope* location)
+void			Response::POSTmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, scope, location);
+		Cgi	cgi(request, server, this->_path);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 

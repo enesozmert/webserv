@@ -22,13 +22,13 @@ SRC_CGI			=	cgi/
 SRC_UTILS		=	utils/
 
 #Files
-ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope Request HttpMethod
+ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope Request HttpMethod Response
 PARSER			=	ParserConfig ParserRequest
 FILE			=	File
 SERVER			=	Server Cluster
 REQUEST			=	
 RESPONSE		=
-CGI				=	
+CGI				=	Cgi
 
 SRC_MAIN		= 	main
 

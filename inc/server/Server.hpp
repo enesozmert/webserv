@@ -16,7 +16,6 @@
 
 # define RECV_SIZE 65536
 
-class HttpScope;
 class Server {
     private:
         std::map<long, std::string>	_requests;
