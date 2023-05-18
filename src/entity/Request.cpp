@@ -133,7 +133,7 @@ std::string Request::getHttpMethodName()
 int Request::getReturnCode()
 {
     return (_returnCode);
-
+}
 std::string Request::getAuthScheme()
 {
     return (this->_authScheme);
