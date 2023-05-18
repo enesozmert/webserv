@@ -3,8 +3,58 @@
 Response::Response(){}
 
 Response::~Response(){}
+//GETTERS
+
+std::string		Response::getResponse()
+{
+    return (this->_response);
+}
+
+int	Response::getStatusCode()
+{
+    return (this->statusCode);
+}
+std::map<int, std::string>  Response::getErrorMap()
+{
+    return (this->_errorMap);
+}
+
+
+void			Response::resetValues(void)
+{
+	_allow = "";
+	_contentLanguage = "";
+	_contentLength = "";
+	_contentLocation = "";
+	_contentType = "";
+	_date = "";
+	_lastModified = "";
+	_location = "";
+	_retryAfter = "";
+	_server = "";
+	_transferEncoding = "";
+	_wwwAuthenticate = "";
+}
+
 
 //Setters
+
+void    Response::setErrorMap()
+{
+	this->_errorMap.clear();
+	this->_errorMap[100] = "Continue";
+	this->_errorMap[200] = "OK";
+	this->_errorMap[201] = "Created";
+	this->_errorMap[204] = "No Content";
+	this->_errorMap[400] = "Bad Request";
+	this->_errorMap[403] = "Forbidden";
+	this->_errorMap[404] = "Not Found";
+	this->_errorMap[405] = "Method Not Allowed";
+	this->_errorMap[413] = "Payload Too Large";
+	this->_errorMap[500] = "Internal Server Error";
+}
+
+
 void			Response::setAllow(std::vector<std::string> methods)
 {
 	std::vector<std::string>::iterator it = methods.begin();
@@ -123,24 +173,34 @@ void			Response::setWwwAuthenticate(int code)
 		_wwwAuthenticate = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
 	}
 }
+void    Response::setIndex()
+{
 
+}
+
+void			Response::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
+{
+	setAllow();
+	setErrorMap();
+	setContentLanguage(lang);
+	setContentLength(size);
+	setContentLocation(contentLocation, code);
+	setContentType(type, path);
+	setDate();
+	setLastModified(path);
+	setLocation(code, path);
+	setRetryAfter(code, 3);
+	setServer();
+	setTransferEncoding();
+	setWwwAuthenticate(code);
+	//setIndex();
+}
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
 	this->statusCode = request->getReturnCode();
-	this->_index = request->getIndex();
- /*    std::vector<std::string> conf_index = server->getIndex();
-	for (std::vector<std::string>::const_iterator it = conf_index.begin(); it != conf_index.end(); it++)
-	{
-		std::vector<std::string>::const_iterator it2 = _index.begin();
-		for (it2 = _index.begin(); it2 != _index.end(); it2++)
-		{
-				if (*it == *it2)
-					break;
-		}
-		if (it2 == _index.end())
-			_index.push_back(*it);
-	} */
+	this->_cgi_pass = location->getCgiPass();
+	this->_index.push_back(location->getIndex());//server içindeki indexleri de eklemek gerekir mi?
 
     this->_contentLocation = removeAdjacentSlashes(request->getPath());
 	this->_path = removeAdjacentSlashes(server->getRoot() + location->getPath());
@@ -173,68 +233,6 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
         else
             std::cerr << "buraya ne eklememiz lazım bilemedim" << std::endl;   
     }
-}
-
-std::string		Response::getResponse()
-{
-    return (this->_response);
-}
-
-int	Response::getStatusCode()
-{
-    return (this->statusCode);
-}
-std::map<int, std::string>  Response::getErrorMap()
-{
-    return (this->_errorMap);
-}
-
-void			Response::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
-{
-	setAllow();
-	setErrorMap();
-	setContentLanguage(lang);
-	setContentLength(size);
-	setContentLocation(contentLocation, code);
-	setContentType(type, path);
-	setDate();
-	setLastModified(path);
-	setLocation(code, path);
-	setRetryAfter(code, 3);
-	setServer();
-	setTransferEncoding();
-	setWwwAuthenticate(code);
-}
-
-void    Response::setErrorMap()
-{
-	this->_errorMap.clear();
-	this->_errorMap[100] = "Continue";
-	this->_errorMap[200] = "OK";
-	this->_errorMap[201] = "Created";
-	this->_errorMap[204] = "No Content";
-	this->_errorMap[400] = "Bad Request";
-	this->_errorMap[403] = "Forbidden";
-	this->_errorMap[404] = "Not Found";
-	this->_errorMap[405] = "Method Not Allowed";
-	this->_errorMap[413] = "Payload Too Large";
-	this->_errorMap[500] = "Internal Server Error";
-}
-
-void			Response::resetValues(void)
-{
-	_allow = "";
-	_contentLanguage = "";
-	_contentLength = "";
-	_contentLocation = "";
-	_contentType = "";
-	_date = "";
-	_lastModified = "";
-	_location = "";
-	_retryAfter = "";
-	_server = "";
-	_transferEncoding = "";
-	_wwwAuthenticate = "";
 }
 
 std::string		Response::writeHeader(void)
@@ -319,7 +317,7 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 	if (this->statusCode == 500)
 		_response = this->readHtml(_errorMap[this->statusCode]);
 
-	_response = getHeader(_response.size(), _path, this->statusCode, _type, request->getContentLocation(), this->_contentLanguage) + "\r\n" + _response;
+	_response = getHeader(_response.size(), _path, this->statusCode, _type, this->_contentLocation, this->_contentLanguage) + "\r\n" + _response;
 }
 
 void			Response::DELETEmethod()
