@@ -36,20 +36,17 @@ void SyntaxConfig::setParseLineProps(std::map<size_t, ParseLineProp> parseLinePr
 
 void SyntaxConfig::analizer()
 {
-    size_t i;
-    size_t j;
     int result;
 
-    i = 0;
-    j = 0;
+    result = -1;
     method_function p[2] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets};
     for (size_t i = 0; i < this->_parseLineProps.size(); i++)
     {
-        for (size_t j = 0; j < 2; j++)
-        {
-            result = (this->*p[j])(i);
-            _configException.run(result);
-        }
+        result = (this->*p[0])(i);
+        _configException.run(result);
+
+        // result = (this->*p[1])(i);
+        // _configException.run(result);
     }
 }
 
@@ -59,13 +56,12 @@ int SyntaxConfig::checkSemicolon(const int &index)
     std::string lineEndOf;
 
     line = this->_parseLineProps[index].getLine();
-    if (!this->_parseLineProps[index].getIsScopeOpen() || !this->_parseLineProps[index].getIsScopeClose())
+    if (line.find("{") == std::string::npos && line.find("}") == std::string::npos)
     {
+        std::cout << "line : " << line << std::endl;
         lineEndOf = line.substr(line.size() - 1, 1);
-        std::cout << "lineEndOf : " << lineEndOf << std::endl;
         if (lineEndOf != ";")
         {
-            std::cout << "line : " << line << std::endl;
             return (111);
         }
     }
@@ -74,12 +70,15 @@ int SyntaxConfig::checkSemicolon(const int &index)
 int SyntaxConfig::checkBrackets(const int &index)
 {
     size_t scopeCloseIndex = 0;
-    if (this->_parseLineProps[index].getLine().find("{") != std::string::npos)
+    if (!this->_parseLineProps[index].getIsScopeOpen() && !this->_parseLineProps[index].getIsScopeOpen())
+        return (-1);
+    if (this->_parseLineProps[index].getIsScopeOpen())
     {
         scopeCloseIndex = this->_parseLineProps[index].getScopeCloseIndex();
     }
-    if (this->_parseLineProps[scopeCloseIndex].getLine().find("}") == std::string::npos)
+    if (this->_parseLineProps[scopeCloseIndex].getLine() != "}")
     {
+        std::cout << "this->_parseLineProps[scopeCloseIndex].getLine()" << this->_parseLineProps[scopeCloseIndex].getLine() << std::endl;
         return (108);
     }
     return (-1);

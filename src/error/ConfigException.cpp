@@ -41,7 +41,7 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(108, "Bracket is unbalanced."));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(109, "Expected 'server'"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(110, "Expected 'location'"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(111, "Location must be end with ';'"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(111, "Semicolon not found ';'"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(112, "Convert Exception"));
 }
 
