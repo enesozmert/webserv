@@ -47,6 +47,7 @@ public:
     //Getters
     std::string getResponse();
     int         getStatusCode();
+    std::map<int, std::string>  getErrorMap();
 
     //Setters
     void    setAllow(std::vector<std::string> methods);
@@ -62,6 +63,7 @@ public:
     void	setServer(void);
     void	setTransferEncoding(void);
     void	setWwwAuthenticate(int code);
+    void    setErrorMap();
     void    setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
 
     void    resetValues(void);
@@ -73,6 +75,7 @@ public:
     int			readContent(ServerScope *server);
     std::string	getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
     std::string	getStatusMessage(int code);
+    std::map<int, std::string>  getErrorPage();
     std::string getPage(const char *path, std::string const &host, int port);
     std::string getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port);
 

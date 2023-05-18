@@ -33,9 +33,9 @@ void			Response::setContentLength(size_t size)
 	_contentLength = to_string(size);
 }
 
-void			Response::setContentLocation(const std::string& path, int code)
+void	Response::setContentLocation(const std::string& path, int code)
 {
-	(void)code;
+    (void)code;
 	// if (code != 404)
 		_contentLocation = path;
 }
@@ -127,9 +127,8 @@ void			Response::setWwwAuthenticate(int code)
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-    //_errorMap = request->getErrorPage();
 	this->statusCode = request->getReturnCode();
-    //addIndex(request);
+	this->_index = request->getIndex();
  /*    std::vector<std::string> conf_index = server->getIndex();
 	for (std::vector<std::string>::const_iterator it = conf_index.begin(); it != conf_index.end(); it++)
 	{
@@ -185,10 +184,15 @@ int	Response::getStatusCode()
 {
     return (this->statusCode);
 }
+std::map<int, std::string>  Response::getErrorMap()
+{
+    return (this->_errorMap);
+}
 
 void			Response::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
 {
 	setAllow();
+	setErrorMap();
 	setContentLanguage(lang);
 	setContentLength(size);
 	setContentLocation(contentLocation, code);
@@ -200,6 +204,21 @@ void			Response::setValues(size_t size, const std::string& path, int code, std::
 	setServer();
 	setTransferEncoding();
 	setWwwAuthenticate(code);
+}
+
+void    Response::setErrorMap()
+{
+	this->_errorMap.clear();
+	this->_errorMap[100] = "Continue";
+	this->_errorMap[200] = "OK";
+	this->_errorMap[201] = "Created";
+	this->_errorMap[204] = "No Content";
+	this->_errorMap[400] = "Bad Request";
+	this->_errorMap[403] = "Forbidden";
+	this->_errorMap[404] = "Not Found";
+	this->_errorMap[405] = "Method Not Allowed";
+	this->_errorMap[413] = "Payload Too Large";
+	this->_errorMap[500] = "Internal Server Error";
 }
 
 void			Response::resetValues(void)
@@ -216,7 +235,6 @@ void			Response::resetValues(void)
 	_server = "";
 	_transferEncoding = "";
 	_wwwAuthenticate = "";
-	//initErrorMap();
 }
 
 std::string		Response::writeHeader(void)
@@ -301,7 +319,7 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 	if (this->statusCode == 500)
 		_response = this->readHtml(_errorMap[this->statusCode]);
 
-	_response = getHeader(_response.size(), _path, this->statusCode, _type, this->_contentLocation, this->_contentLanguage) + "\r\n" + _response;
+	_response = getHeader(_response.size(), _path, this->statusCode, _type, request->getContentLocation(), this->_contentLanguage) + "\r\n" + _response;
 }
 
 void			Response::DELETEmethod()
