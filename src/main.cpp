@@ -2,6 +2,7 @@
 #include "../inc/error/ConfigException.hpp"
 #include "../inc/parser/ParserRequest.hpp"
 #include "../inc/server/Cluster.hpp"
+#include "../inc/syntax/SyntaxConfig.hpp"
 
 #include <iostream>
 #include <string>
@@ -13,6 +14,10 @@ void myTerminationHandler() {
 
 int main(int ac, char **av)
 {
+    std::string av1;
+    HttpScope *http;
+    ParserConfig *parser = new ParserConfig();
+    SyntaxConfig syntaxConfig;
     ConfigException configException;
     // std::set_terminate(myTerminationHandler);
 
@@ -21,11 +26,15 @@ int main(int ac, char **av)
         configException.run(106);
         return (-1);
     }
-    std::string av1;
-    ParserConfig *parser = new ParserConfig();
-    HttpScope *http;
-
+    //get-filename
     av1 = av[1];
+
+    //parseSyntaxForSyntaxAnalizer
+    parser->parseSyntax(av1);
+    syntaxConfig.setParseLineProps(parser->getParseLineProps());
+    syntaxConfig.analizer();
+
+
     parser->parse(av1);
     http = parser->getHttp();
 
@@ -59,7 +68,7 @@ int main(int ac, char **av)
     std::cout << "request->getVersion() : " << request->getVersion() << std::endl;
     std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
-    Cluster cluster;
-    cluster.run();
+    // Cluster cluster;
+    // cluster.run();
     return (0);
 }

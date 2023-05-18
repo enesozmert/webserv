@@ -19,11 +19,29 @@ std::string ParserConfig::getCheckFileExtension(File &file, std::string &fileNam
 
 void ParserConfig::parse(std::string &fileName)
 {
+    parseFile(fileName);
+    setScopeNames(this->_lines);
+    parseScope(this->_lines);
+    setOrderParseLineProps();
+    setOrderScopeNames();
+    parseMatchClass();
+    parseScopeFill();
+    parseMatchedClassFill();
+}
+
+void ParserConfig::parseSyntax(std::string &fileName)
+{
+    parseFile(fileName);
+    setScopeNames(this->_lines);
+    parseScope(this->_lines);
+}
+
+void ParserConfig::parseFile(std::string &fileName)
+{
     File file(fileName);
     size_t pos = 0;
     std::string fileContents;
     std::string fileCleanContents;
-    std::vector<std::string> lines;
     std::string delimiter = "{};#";
 
     fileContents = getCheckFileExtension(file, fileName);
@@ -33,19 +51,10 @@ void ParserConfig::parse(std::string &fileName)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
         std::string lineTrim = trim(line, " \r\t");
-        lines.push_back(lineTrim);
+        this->_lines.push_back(lineTrim);
         fileCleanContents.erase(0, pos + 1);
     }
     file.close();
-    setScopeNames(lines);
-    parseScope(lines);
-    // this->locationPtr = dynamic_cast<LocationScope *>(_matchedClass.at(0));
-    // std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
-    // std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
-
-    // this->serverPtr = dynamic_cast<ServerScope *>(_matchedClass.at(2));
-    // std::cout << "this->_matchedClass.at(0)1 : " << *this->serverPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("server_name").getValue() << std::endl;
-    // std::cout << "this->_matchedClass.at(0)2 : " << this->serverPtr->getServerName().at(1) << std::endl;
 }
 
 void ParserConfig::parseScope(const std::vector<std::string> &lines)
@@ -98,11 +107,6 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         _parseLineProps.insert(std::pair<size_t, ParseLineProp>((parseLineProp)->getIndex(), *parseLineProp));
         delete parseLineProp;
     }
-    setOrderParseLineProps();
-    setOrderScopeNames();
-    parseMatchClass();
-    parseScopeFill();
-    parseMatchedClassFill();
 }
 
 void ParserConfig::parseMatchClass()
@@ -131,17 +135,17 @@ void ParserConfig::parseScopeFill()
     method_function p[3] = {&ParserConfig::parseHttp, &ParserConfig::parseServer, &ParserConfig::parseLocation};
 
     tempCloseIndex = _orderParseLineProps[0].getScopeCloseIndex();
-    // for (size_t i = 0; i < _orderParseLineProps.size(); i++)
-    // {
-    //     std::cout << "parseLineProps[i].getIndex() : " << _orderParseLineProps[i].getIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getLine() : " << _orderParseLineProps[i].getLine() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _orderParseLineProps[i].getScopeOpenIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeName() : " << _orderParseLineProps[i].getScopeName() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _orderParseLineProps[i].getScopeCloseIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeOpen() : " << _orderParseLineProps[i].getIsScopeOpen() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeClose() : " << _orderParseLineProps[i].getIsScopeClose() << std::endl;
-    //     std::cout << "****************************" << std::endl;
-    // }
+    for (size_t i = 0; i < _orderParseLineProps.size(); i++)
+    {
+        std::cout << "parseLineProps[i].getIndex() : " << _orderParseLineProps[i].getIndex() << std::endl;
+        std::cout << "parseLineProps[i].getLine() : " << _orderParseLineProps[i].getLine() << std::endl;
+        std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _orderParseLineProps[i].getScopeOpenIndex() << std::endl;
+        std::cout << "parseLineProps[i].getScopeName() : " << _orderParseLineProps[i].getScopeName() << std::endl;
+        std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _orderParseLineProps[i].getScopeCloseIndex() << std::endl;
+        std::cout << "parseLineProps[i].getIsScopeOpen() : " << _orderParseLineProps[i].getIsScopeOpen() << std::endl;
+        std::cout << "parseLineProps[i].getIsScopeClose() : " << _orderParseLineProps[i].getIsScopeClose() << std::endl;
+        std::cout << "****************************" << std::endl;
+    }
     for (size_t i = 0; i < _orderParseLineProps.size() + 1; i++)
     {
         if (tempCloseIndex != _orderParseLineProps[i].getScopeCloseIndex())
