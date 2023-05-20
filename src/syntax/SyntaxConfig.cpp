@@ -45,22 +45,22 @@ void SyntaxConfig::analizer()
         result = (this->*p[0])(i);
         _configException.run(result);
 
-        // result = (this->*p[1])(i);
-        // _configException.run(result);
+        result = (this->*p[1])(i);
+        _configException.run(result);
     }
 }
 
 int SyntaxConfig::checkSemicolon(const int &index)
 {
     std::string line;
-    std::string lineEndOf;
 
     line = this->_parseLineProps[index].getLine();
     if (line.find("{") == std::string::npos && line.find("}") == std::string::npos)
     {
-        std::cout << "line : " << line << std::endl;
-        lineEndOf = line.substr(line.size() - 1, 1);
-        if (lineEndOf != ";")
+        size_t newlinePos = line.find('\n');
+        std::string newLineSubString = line.substr(0, newlinePos);
+        size_t semicolonPos = newLineSubString.find(';');
+        if (semicolonPos == std::string::npos)
         {
             return (111);
         }
@@ -78,7 +78,7 @@ int SyntaxConfig::checkBrackets(const int &index)
     }
     if (this->_parseLineProps[scopeCloseIndex].getLine() != "}")
     {
-        std::cout << "this->_parseLineProps[scopeCloseIndex].getLine()" << this->_parseLineProps[scopeCloseIndex].getLine() << std::endl;
+        std::cout << "this->_parseLineProps[scopeCloseIndex].getLine()" << this->_parseLineProps[index].getLine() << std::endl;
         return (108);
     }
     return (-1);
