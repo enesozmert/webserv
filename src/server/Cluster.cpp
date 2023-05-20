@@ -55,9 +55,12 @@ void	Cluster::select_section()
 	//ready içindeki (yani reading sette olup processe gidecek socketler) writing sete ekliyoruz.
 	//socket send için hazır demektir
 	std::cout << "\rWaiting on a connection\n" << std::flush;
+	std::cout << "\rsize_of reading_set " << sizeof(reading_set) << std::endl << std::flush;
+	std::cout << "\rsize_of fd_master " << sizeof(fd_master) << std::endl << std::flush;
 	//select işlevi kullanılarak takip edilen soketler için okuma ve yazma işlemleri için hazırlık yapılır. 
 	//Bu döngüde, select işlevi sonucu select_return_value değişkenine değer atanana kadar çalışmaya devam eder.
 	//timeout olursa sıfır döner. select_return_value'e değer atanana kadar while döner.
+	std::cout << "\rselect_return_value = " << select_return_value << std::endl << std::flush;
 	this->select_return_value = select(max_fd + 1, &reading_set, &writing_set, NULL, &timeout);
 }
 

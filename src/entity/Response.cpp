@@ -173,10 +173,6 @@ void			Response::setWwwAuthenticate(int code)
 		_wwwAuthenticate = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
 	}
 }
-void    Response::setIndex()
-{
-
-}
 
 void			Response::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
 {
@@ -193,14 +189,22 @@ void			Response::setValues(size_t size, const std::string& path, int code, std::
 	setServer();
 	setTransferEncoding();
 	setWwwAuthenticate(code);
-	//setIndex();
 }
+
+void	Response::setIndex(std::string _locationIndex, std::string _serverIndex)
+{
+	this->_index.push_back(_locationIndex);
+	this->_index.push_back(_serverIndex);
+}
+
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
 	this->statusCode = request->getReturnCode();
-	this->_cgi_pass = location->getCgiPass();
-	this->_index.push_back(location->getIndex());//server içindeki indexleri de eklemek gerekir mi?
+    setIndex(location->getIndex(), server->getIndex());
+	//burada indexlerin string olarak değil de vector olarak gelme durumuna göre güncelleme yap
+	this->_cgi_pass = server->getCgi_pass();
+	//cgi_pass location altında da olabilir? hangisini almalıyız?
 
     this->_contentLocation = removeAdjacentSlashes(request->getPath());
 	this->_path = removeAdjacentSlashes(server->getRoot() + location->getPath());

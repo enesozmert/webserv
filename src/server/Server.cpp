@@ -48,6 +48,7 @@ int Server::setUpSocket()
 
 long Server::accept(void)
 {
+    std::cout << "Accepting..." << std::endl;
     long client_fd;
 
     client_fd = ::accept(fd, NULL, NULL); // client_fd üzerinden iletişim kurulabilir.
@@ -63,6 +64,7 @@ long Server::accept(void)
 
 void    Server::process(long socket, HttpScope& http)
 {
+    std::cout << "Server::process girdi " << std::endl;
     Response response;
     ServerScope *matchedServer;
     LocationScope *matchedLocation;
@@ -72,11 +74,9 @@ void    Server::process(long socket, HttpScope& http)
         this->processChunk(socket);
 
     if (_requests[socket].size() < 1000)
-        std::cout << "\nRequest :" << std::endl
-                  << "[" << _requests[socket] << "]" << std::endl;
+        std::cout << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << std::endl;
     else
-        std::cout << "\nRequest :" << std::endl
-                  << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << std::endl;
+        std::cout << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << std::endl;
 
     if (_requests[socket] != "")
     {
@@ -301,6 +301,7 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, c
 {
     size_t locationScopeIndex;
 
+    //hangi index kullanılacak?
     locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
     locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
     locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);

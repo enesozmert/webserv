@@ -69,15 +69,15 @@ public:
     void	                    setTransferEncoding(void);
     void	                    setWwwAuthenticate(int code);
     void                        setErrorMap();
-    //void                      setIndex();
+    void	                    setIndex(std::string _locationIndex, std::string _serverIndex);
     void                        setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
 
-    void    resetValues(void);
-    void        createResponse(Request *request, ServerScope *server, LocationScope *location);
-    std::string notAllowed(std::vector<std::string> methods, const std::string& path, int code, const std::string& lang);
-    std::string	writeHeader(void);
-    std::string	readHtml(const std::string& path);
-    int			readContent(ServerScope *server);
+    void                        resetValues(void);
+    void                        createResponse(Request *request, ServerScope *server, LocationScope *location);
+    std::string                 notAllowed(std::vector<std::string> methods, const std::string& path, int code, const std::string& lang);
+    std::string                 writeHeader(void);
+    std::string                 readHtml(const std::string& path);
+    int                         readContent(ServerScope *server);
 
     void    GETmethod(Request* request, ServerScope* server);
     void	DELETEmethod();
