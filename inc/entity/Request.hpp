@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <cstring>
 #include "../database/DataBase.hpp"
 #include "IRequest.hpp"
 #include "Variable.hpp"

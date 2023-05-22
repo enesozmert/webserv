@@ -22,7 +22,9 @@ SRC_ERROR		=	error/
 SRC_SYNTAX		=	syntax/
 
 #Files
-ENTITY			=	ErrorPage HttpScope LocationScope RedirectionUri ServerScope Request HttpMethod Response
+ENTITY			=	ErrorPage HttpScope LocationScope\
+					RedirectionUri ServerScope Request\
+					HttpMethod Response
 PARSER			=	ParserConfig ParserRequest
 FILE			=	File
 SERVER			=	Server Cluster

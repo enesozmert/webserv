@@ -4,8 +4,9 @@
 #include <map>
 #include <sstream>
 #include <string>
-# include <sys/stat.h>
-
+#include <limits>
+#include <sys/stat.h>
+#include <cstring>
 inline std::string	removeAdjacentSlashes(const std::string &str)
 {
 	std::string	ret;
@@ -50,7 +51,7 @@ inline unsigned int	strToIp(std::string strIp)
 	size_t  start = 0;
 	if (strIp == "localhost")
 		strIp = "127.0.0.1";
-	for (unsigned int i = 3 ; i != std::numeric_limits<uint32_t>::max(); i--) {
+	for (unsigned int i = 3 ; i != std::numeric_limits<u_int32_t>::max(); i--) {
 		sep = strIp.find_first_of('.', sep);
 		std::string str = strIp.substr(start, sep);
 		n = atoi(str.c_str());
@@ -109,4 +110,40 @@ inline std::string cleanString(std::string str)
         }
     }
     return cleanedStr;
+}
+
+inline unsigned long stoul_cxx98(const std::string& str, size_t* idx = 0, int base = 10)
+{
+    std::istringstream iss(str);
+    unsigned long result = 0;
+    iss >> result;
+
+    if (base != 10)
+    {
+        // İkinci parametrede belirtilen tabana göre dönüşüm yapma
+        unsigned long multiplier = 1;
+        unsigned long temp = result;
+
+        result = 0;
+
+        while (temp > 0)
+        {
+            unsigned long digit = temp % base;
+            result += digit * multiplier;
+            multiplier *= base;
+            temp /= base;
+        }
+    }
+
+    if (idx != 0)
+    {
+        *idx = iss.tellg();
+        if (*idx == static_cast<size_t>(-1))
+        {
+            // Dönüşüm başarısız oldu
+            *idx = 0;
+        }
+    }
+
+    return result;
 }
