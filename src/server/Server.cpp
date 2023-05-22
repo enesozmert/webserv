@@ -149,7 +149,7 @@ void Server::processChunk(long socket)
     while (std::getline(body_stream, chunk_str), !chunk_str.empty()) {
         // Chunk boyutunu hex değerinden decimal değere çevirir.
         const std::string::size_type pos = chunk_str.find(';');
-        const int chunk_size = std::stoul(pos != std::string::npos ? chunk_str.substr(0, pos) : chunk_str, nullptr, 16);
+        const int chunk_size = stoul_cxx98(pos != std::string::npos ? chunk_str.substr(0, pos) : chunk_str, NULL, 16);
 
         // Chunk boyutu kadar veriyi body'ye ekler.
         body.append(chunk_str.substr(chunk_str.find('\n') + 1, chunk_size));

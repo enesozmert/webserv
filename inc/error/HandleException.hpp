@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <exception>
+#include <cstdlib>
 #include "IException.hpp"
 
 class HandleException
