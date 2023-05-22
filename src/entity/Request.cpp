@@ -267,7 +267,7 @@ Request* Request::clone() const
     return (new Request(*this));
 }
 
-std::string								Request::setIndex()
+/* std::string								Request::setIndex()
 {
 	std::vector<std::string>::iterator							it;
 	std::list<std::pair<std::string, float> >::const_iterator	lang;
@@ -315,4 +315,4 @@ std::string								Request::setIndex()
 		it++;
 	}
 	return "";
-}
+} */

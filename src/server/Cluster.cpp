@@ -2,13 +2,15 @@
 
 Cluster::Cluster()
 {
-    this->setUpCluster();
+    //this->setUpCluster();
 }
 
-int Cluster::setUpCluster()
+int Cluster::setUpCluster(HttpScope* http)
 {
+	this->httpScope = http;
     //serverların hepsini vector olarak tutuyorduk. Onları çektik.
-	std::vector<t_listen>	listens;//http class gelecek=> http class listen çekilecek
+	std::vector<t_listen>	listens;
+	listens = this->httpScope->getListens();
 
 	//olası hataları önlemek için bütün fd'ler 0'a eşitlenir.
 	FD_ZERO(&fd_master);
@@ -21,7 +23,7 @@ int Cluster::setUpCluster()
 		long		fd;//server içinde oluşturulacak socket fd'si
 
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
-		if (server.setUpSocket() != -1)
+		if (server.getSetRet() == 0)
 		{
 			fd = server.get_fd();
 			FD_SET(fd, &fd_master);
@@ -55,12 +57,9 @@ void	Cluster::select_section()
 	//ready içindeki (yani reading sette olup processe gidecek socketler) writing sete ekliyoruz.
 	//socket send için hazır demektir
 	std::cout << "\rWaiting on a connection\n" << std::flush;
-	std::cout << "\rsize_of reading_set " << sizeof(reading_set) << std::endl << std::flush;
-	std::cout << "\rsize_of fd_master " << sizeof(fd_master) << std::endl << std::flush;
 	//select işlevi kullanılarak takip edilen soketler için okuma ve yazma işlemleri için hazırlık yapılır. 
 	//Bu döngüde, select işlevi sonucu select_return_value değişkenine değer atanana kadar çalışmaya devam eder.
 	//timeout olursa sıfır döner. select_return_value'e değer atanana kadar while döner.
-	std::cout << "\rselect_return_value = " << select_return_value << std::endl << std::flush;
 	this->select_return_value = select(max_fd + 1, &reading_set, &writing_set, NULL, &timeout);
 }
 

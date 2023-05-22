@@ -1,6 +1,6 @@
 #include "../inc/entity/HttpScope.hpp"
 
-HttpScope::HttpScope(/* args */)
+HttpScope::HttpScope()
 {
     this->keywordFill();
 
@@ -47,6 +47,7 @@ void HttpScope::setClientMaxBodySize(std::string clientMaxBodySize)
 void HttpScope::setServer(ServerScope *server)
 {
     this->_servers.push_back(server);
+    this->setListens(_servers);
 }
 void HttpScope::setErrorPage(ErrorPage errorPage)
 {
@@ -57,15 +58,40 @@ void HttpScope::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatab
     this->_keywordDatabase = keywordDatabase;
 }
 
+void HttpScope::setListens(std::vector<ServerScope *> _servers)
+{
+    for(std::vector<ServerScope *>::iterator it = _servers.begin(); it != _servers.end(); it++)
+        this->_listens.push_back((*it)->getListen());
+
+/*         this->getServers().at(0)->getHost();
+        this->getServers().at(0)->getPort(); */
+}
+
 void HttpScope::keywordFill()
 {
     _keywordDatabase.insertData(Variable<std::string>("client_max_body_size", &this->_clientMaxBodySize));
+}
+
+std::vector<t_listen> HttpScope::getListens() const
+{
+    return _listens;
 }
 
 std::string HttpScope::getName() const
 {
     return (this->name);
 }
+
+void HttpScope::writeListens(std::vector<t_listen> _listens)
+{
+    for(size_t i = 0; i < _listens.size(); i++)
+    {
+        std::cout << "listen host : " << _listens[i].host << std::endl;
+        std::cout << "listen port : " << _listens[i].port << std::endl;
+    }
+
+}
+
 
 HttpScope* HttpScope::cloneNew() const { return new HttpScope(); }
 HttpScope* HttpScope::clone() const { return new HttpScope(*this); }

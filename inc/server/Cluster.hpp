@@ -13,7 +13,7 @@ class HttpScope;
 class Cluster
 {
     private:
-        HttpScope					httpScope;//http class gelecek
+        HttpScope					*httpScope;//http class gelecek
         std::map<long, Server>      servers;
         std::map<long, Server *>    sockets;//her server üzerinden kurulan socketleri tutacak
         std::vector<int>            ready;//veri gönderimine hazır socketler(writing_set'e eklenmiş)
@@ -29,7 +29,7 @@ class Cluster
         ~Cluster();
     
         //setUp-->run-->select-->accept-->recv-->send
-        int		setUpCluster();
+        int		setUpCluster(HttpScope* http);
     	void	run();
         void	select_section();//havuzdan fd seçimi yapılır
         void 	accept_section();//client'a hizmet için hazır bir socket oluşturulur

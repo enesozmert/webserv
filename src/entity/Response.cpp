@@ -200,6 +200,7 @@ void	Response::setIndex(std::string _locationIndex, std::string _serverIndex)
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
+	//statusCode 0 atıyor. Düzelt???
 	this->statusCode = request->getReturnCode();
     setIndex(location->getIndex(), server->getIndex());
 	//burada indexlerin string olarak değil de vector olarak gelme durumuna göre güncelleme yap
