@@ -38,7 +38,7 @@ class LocationScope : public IScope
         LocationScope &operator=(const LocationScope &location);
         std::string getRoot();
         std::string getAutoindex();
-        std::string getIndex();
+        std::vector<std::string> getIndex();
         std::vector<std::string> getAllowMethods();
         ErrorPage getErrorPage();
         RedirectionUri getRedirectionUri();

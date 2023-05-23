@@ -38,11 +38,13 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(105, "Not Found file extension."));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(106, "Invalid argument."));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(107, "Please provide a config file."));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(108, "Parenthesis is unbalanced."));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(108, "Bracket is unbalanced."));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(109, "Expected 'server'"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(110, "Expected 'location'"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(111, "Location must be end with ';'"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(111, "Semicolon not found ';'"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(112, "Convert Exception"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(113, "Http scope count not equal to one"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(114, "Server scope count zero"));
 }
 
 void ConfigException::exceptionHandler()

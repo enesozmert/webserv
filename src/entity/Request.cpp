@@ -44,7 +44,9 @@ int Request::getPort()
         return (80);
     std::getline(ss, ip, ':');
     std::getline(ss, portStr);
-    numberOfPort = std::stoi(portStr);
+
+    std::istringstream portStream(portStr);
+    portStream >> numberOfPort;
     return (numberOfPort);
 }
 std::string Request::getIp()
@@ -121,7 +123,9 @@ std::string Request::getContentType()
 }
 int Request::getContentLength()
 {
-    int numberOfContentLength = std::stoi(this->_contentLength);
+    int numberOfContentLength = 0;
+    std::istringstream portStream(this->_contentLength);
+    portStream >> numberOfContentLength;
     return (numberOfContentLength);
 }
 

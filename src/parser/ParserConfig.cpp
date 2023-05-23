@@ -19,33 +19,42 @@ std::string ParserConfig::getCheckFileExtension(File &file, std::string &fileNam
 
 void ParserConfig::parse(std::string &fileName)
 {
+    parseFile(fileName);
+    setScopeNames(this->_lines);
+    parseScope(this->_lines);
+    setOrderParseLineProps();
+    setOrderScopeNames();
+    parseMatchClass();
+    parseScopeFill();
+    parseMatchedClassFill();
+}
+
+void ParserConfig::parseSyntax(std::string &fileName)
+{
+    parseFile(fileName);
+    setScopeNames(this->_lines);
+    parseScope(this->_lines);
+}
+
+void ParserConfig::parseFile(std::string &fileName)
+{
     File file(fileName);
     size_t pos = 0;
     std::string fileContents;
     std::string fileCleanContents;
-    std::vector<std::string> lines;
     std::string delimiter = "{};#";
 
     fileContents = getCheckFileExtension(file, fileName);
     fileCleanContents = cleanString(fileContents);
-    std::cout << fileCleanContents << std::endl;
     while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
         std::string lineTrim = trim(line, " \r\t");
-        lines.push_back(lineTrim);
+        std::cout << "lineTrim : " << lineTrim << std::endl;
+        this->_lines.push_back(lineTrim);
         fileCleanContents.erase(0, pos + 1);
     }
     file.close();
-    setScopeNames(lines);
-    parseScope(lines);
-    // this->locationPtr = dynamic_cast<LocationScope *>(_matchedClass.at(0));
-    // std::cout << "this->_matchedClass.at(0)1 : " << *this->locationPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("auto_index").getValue() << std::endl;
-    // std::cout << "this->_matchedClass.at(0)2 : " << this->locationPtr->getAutoindex() << std::endl;
-
-    // this->serverPtr = dynamic_cast<ServerScope *>(_matchedClass.at(2));
-    // std::cout << "this->_matchedClass.at(0)1 : " << *this->serverPtr->getKeywordDataBase().getByNameData<IsVariableNameEqual>("server_name").getValue() << std::endl;
-    // std::cout << "this->_matchedClass.at(0)2 : " << this->serverPtr->getServerName().at(1) << std::endl;
 }
 
 void ParserConfig::parseScope(const std::vector<std::string> &lines)
@@ -58,6 +67,8 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
     size_t scopeOpenIndex = 0;
     size_t scopeCloseIndex = 0;
 
+    _parseLineProps.clear();
+    _parseLineProps.erase(0);
     for (size_t i = 0; i < lines.size(); i++)
     {
         ParseLineProp *parseLineProp = new ParseLineProp();
@@ -98,11 +109,17 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         _parseLineProps.insert(std::pair<size_t, ParseLineProp>((parseLineProp)->getIndex(), *parseLineProp));
         delete parseLineProp;
     }
-    setOrderParseLineProps();
-    setOrderScopeNames();
-    parseMatchClass();
-    parseScopeFill();
-    parseMatchedClassFill();
+    for (size_t i = 0; i < _parseLineProps.size(); i++)
+    {
+        std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i].getIndex() << std::endl;
+        std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i].getLine() << std::endl;
+        std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i].getScopeOpenIndex() << std::endl;
+        std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i].getScopeName() << std::endl;
+        std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i].getScopeCloseIndex() << std::endl;
+        std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i].getIsScopeOpen() << std::endl;
+        std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i].getIsScopeClose() << std::endl;
+        std::cout << "****************************" << std::endl;
+    }
 }
 
 void ParserConfig::parseMatchClass()

@@ -20,6 +20,7 @@ class ServerScope : public IScope
         t_listen listen;//fatma ekledi
         std::vector<LocationScope *> _locations;
         std::string _port;
+        std::string _ip;
         std::string _host;
         std::string _serverNames;
         std::string _root;
@@ -38,6 +39,7 @@ class ServerScope : public IScope
         ServerScope	&operator=(const ServerScope &server);
 
         void setPort(std::string port);
+        void setIp(std::string ip);
         void setHost(std::string host);
         void setErrorPage(ErrorPage errorPage);
         void setServerName(std::string serverName);
@@ -51,6 +53,7 @@ class ServerScope : public IScope
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
 
         std::string getPort();
+        std::string getIp();
         std::string getHost();
         ErrorPage getErrorPage();
         std::vector<std::string> getServerName();

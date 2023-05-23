@@ -38,6 +38,7 @@ class ParserConfig
         ServerScope *serverPtr;
         LocationScope *locationPtr;
 
+        std::vector<std::string> _lines;
         std::map<size_t, ParseLineProp> _parseLineProps;
         std::vector<ParseLineProp> _orderParseLineProps;
         std::vector<std::string> _scopeNames;
@@ -55,7 +56,9 @@ class ParserConfig
         std::string getCheckFileExtension(File &file, std::string &fileName);
 
         void parse(std::string &fileName);
-
+        void parseSyntax(std::string &fileName);
+    private:
+        void parseFile(std::string &fileName);
         void parseScope(const std::vector<std::string> &lines);
         void parseMatchClass();
         void parseScopeFill();
@@ -67,7 +70,7 @@ class ParserConfig
 
         size_t findClosingScopeIndex(const std::vector<std::string> &lines, size_t startingIndex);
         size_t findOpeningScopeIndex(const std::vector<std::string> &lines, size_t closingIndex);
-
+    public:
         void setScopeNames(const std::vector<std::string> &lines);
         std::vector<std::string> getScopeNames();
 
