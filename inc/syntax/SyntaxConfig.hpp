@@ -14,6 +14,8 @@ class SyntaxConfig
     private:
         ConfigException _configException;
         std::map<size_t, ParseLineProp> _parseLineProps;
+        size_t _httpScopeCount;
+        size_t _serverScopeCount;
     public:
         SyntaxConfig();
         ~SyntaxConfig();
@@ -28,5 +30,5 @@ class SyntaxConfig
         int checkBrackets(const int &index);
         int checkVariableSpace(const int &index);
         int checkHttpCountGreaterThanZero(const int &index);
-        int checkServerCountGreaterThanZero(const int &index);
+        int checkServerCountEqualZero(const int &index);
 };

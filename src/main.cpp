@@ -40,6 +40,10 @@ int main(int ac, char **av)
     http = parser->getHttp();
 
     std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
+    std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getIndex().at(1) << std::endl;
+    std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
+    std::cout << "http->getServers().at(0)->getIp() : " << http->getServers().at(0)->getIp() << std::endl;
+    std::cout << "http->getServers().at(0)->getPort() : " << http->getServers().at(0)->getPort() << std::endl;
     std::cout << "getPath() : " << http->getServers().at(0)->getLocations().at(1)->getPath() << std::endl;
     std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
     std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;

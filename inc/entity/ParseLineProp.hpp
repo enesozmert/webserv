@@ -18,12 +18,25 @@ private:
 
 public:
     ParseLineProp(/* args */) : _index(0) ,_scopeOpenIndex(0), _scopeCloseIndex(0), _isScopeOpen(false), _isScopeClose(false) {}
+    ~ParseLineProp() {}
     ParseLineProp(const ParseLineProp &other) : _index(other._index),
                                                 _scopeOpenIndex(other._scopeOpenIndex), _scopeCloseIndex(other._scopeCloseIndex),
                                                 _scopeName(other._scopeName), _line(other._line), _isScopeOpen(other._isScopeOpen), _isScopeClose(other._isScopeClose)
     {
     }
-    ~ParseLineProp() {}
+    ParseLineProp &operator=(const ParseLineProp &parseLineProp)
+    {
+        if (this == &parseLineProp)
+            return (*this);
+        this->_index = parseLineProp._index;
+        this->_scopeOpenIndex = parseLineProp._scopeOpenIndex;
+        this->_scopeCloseIndex = parseLineProp._scopeCloseIndex;
+        this->_scopeName = parseLineProp._scopeName;
+        this->_line = parseLineProp._line;
+        this->_isScopeOpen = parseLineProp._isScopeOpen;
+        this->_isScopeClose = parseLineProp._isScopeClose;
+        return (*this);
+    }
     size_t getIndex() const { return _index; }
     size_t getScopeOpenIndex() const
     {

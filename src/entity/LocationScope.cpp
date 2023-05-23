@@ -35,9 +35,17 @@ std::string LocationScope::getAutoindex()
 {
     return (this->_autoindex);
 }
-std::string LocationScope::getIndex()
+std::vector<std::string> LocationScope::getIndex()
 {
-    return (this->_index);
+    std::vector<std::string> indexs;
+    std::string tempIndexs;
+    std::stringstream sp(this->_index);
+
+    while (sp >> std::ws >> tempIndexs)
+    {
+        indexs.push_back(tempIndexs);
+    }
+    return (indexs);
 }
 std::vector<std::string> LocationScope::getAllowMethods()
 {
