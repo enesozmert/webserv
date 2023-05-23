@@ -67,7 +67,7 @@ class ServerScope : public IScope
 
         void keywordFill();
 
-        t_listen    getListen() const;//fatma ekledi
+        t_listen    getListen();//fatma ekledi
         
         std::string getName() const;
         ServerScope* cloneNew() const;

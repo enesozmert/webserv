@@ -2,6 +2,7 @@
 
 Request::Request()
 {
+    this->_returnCode = 200;
     this->keywordFill();
 }
 
@@ -147,7 +148,6 @@ std::string Request::getAuthorization()
 {
     return (this->_authorization);
 }
-
 DataBase<Variable<std::string> > Request::getKeywordDataBase()
 {
     return (this->_keywordDatabase);
@@ -242,6 +242,7 @@ void Request::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabas
 {
     this->_keywordDatabase = keywordDatabase;
 }
+
 void Request::keywordFill()
 {
     _keywordDatabase.insertData(Variable<std::string>("host", &this->_host));
@@ -270,3 +271,53 @@ Request* Request::clone() const
 {
     return (new Request(*this));
 }
+
+/* std::string								Request::setIndex()
+{
+	std::vector<std::string>::iterator							it;
+	std::list<std::pair<std::string, float> >::const_iterator	lang;
+	std::string													path;
+
+	it = this->_index.begin();
+	while(it != this->_index.end()) // Check with language prefs
+	{
+		for (lang = this->_acceptLanguages().begin(); lang != this->_acceptLanguages().end(); lang++)
+		{
+			path = this->_path;
+			if (path[path.size() - 1] != '/')
+				path += "/";
+			if ((*it).find('.') != (*it).npos)
+				path += (*it).substr(0, (*it).find_last_of('.') + 1) + lang->first + (*it).substr((*it).find_last_of('.'));
+			if (pathIsFile(path))
+			{
+				this->_path = path;
+				if (this->_contentLocation.size() && this->_contentLocation[this->_contentLocation.size() - 1] != '/')
+					this->_contentLocation += "/";
+				// NOT PROTECTED AGAINST INDEXES WITHOUT EXTENSION
+				if ((*it).find('.') != (*it).npos)
+					this->_contentLocation += (*it).substr(0, (*it).find_last_of('.') + 1) + lang->first + (*it).substr((*it).find_last_of('.'));
+				return this->_path;
+			}
+		}
+		it++;
+	}
+
+	it = this->_index.begin();
+	while(it != this->_index.end()) // check with index file only
+	{
+		path = this->_path;
+		if (path[path.size() - 1] != '/')
+			path += "/";
+		path += *it;
+		if (pathIsFile(path))
+		{
+			this->_path = path;
+			if (this->_contentLocation[this->_contentLocation.size() - 1] != '/')
+				this->_contentLocation += "/";
+			this->_contentLocation += *it;
+			return this->_path;
+		}
+		it++;
+	}
+	return "";
+} */

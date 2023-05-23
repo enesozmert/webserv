@@ -11,43 +11,53 @@ Server::~Server()
 
 Server::Server(const t_listen &_listen)
 {
+    this->setRet = 0;
     this->_listen = _listen;
     fd = -1;
-    this->setAddr();
     this->setUpSocket();
+}
+
+int Server::getSetRet() const
+{
+    return setRet;
 }
 
 void Server::setAddr(void)
 {
     memset((char *)&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(_listen.host);
+    addr.sin_addr.s_addr = htonl(_listen.host);//127.0.0.1--->2130706433
     addr.sin_port = htons(_listen.port);
 }
 
-int Server::setUpSocket()
+void Server::setUpSocket()
 {
     fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
     if (fd == -1)
     {
         std::cerr << "Could not create server." << std::endl; //hatalar ortak bir yerden yönetilecek
-        return (-1);
+        setRet = -1;
+        return ;
     }
+    this->setAddr();
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
     {
         std::cerr << "Could not bind port " << _listen.port << "." << std::endl;
-        return (-1);
+        setRet = -1;
+        return ;
     }
     if (listen(fd, 10) == -1) // aynı anda max 10 bağlantı kabul etmeye hazır
     {
         std::cerr << "Could not listen." << std::endl;
-        return (-1);
+        setRet = -1;
+        return ;
     }
-    return (0);
+    setRet = 0;
 }
 
 long Server::accept(void)
 {
+    std::cout << "Accepting..." << std::endl;
     long client_fd;
 
     client_fd = ::accept(fd, NULL, NULL); // client_fd üzerinden iletişim kurulabilir.
@@ -61,7 +71,7 @@ long Server::accept(void)
     return (client_fd);
 }
 
-void    Server::process(long socket, HttpScope& http)
+void    Server::process(long socket, HttpScope* http)
 {
     Response response;
     ServerScope *matchedServer;
@@ -72,11 +82,9 @@ void    Server::process(long socket, HttpScope& http)
         this->processChunk(socket);
 
     if (_requests[socket].size() < 1000)
-        std::cout << "\nRequest :" << std::endl
-                  << "[" << _requests[socket] << "]" << std::endl;
+        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << RESET << std::endl;
     else
-        std::cout << "\nRequest :" << std::endl
-                  << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << std::endl;
+        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << RESET << std::endl;
 
     if (_requests[socket] != "")
     {
@@ -215,6 +223,14 @@ int Server::send(long socket)
 
     if (sent.find(socket) == sent.end()) // gönderilecek mesaj kalmadıysa, socket içi boşsa
         sent[socket] = 0;
+    
+    if (1 && sent[socket] == 0)
+	{
+		if (_requests[socket].size() < 1000)
+			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
+		else
+			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
+	}
 
     std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);
     int ret = ::send(socket, str.c_str(), str.size(), 0);
@@ -268,12 +284,12 @@ void Server::clean()
 /****************************************************************/
 
 
-ServerScope*        Server::getServerForRequest(t_listen& address, const std::string& hostname, HttpScope& http)
+ServerScope*        Server::getServerForRequest(t_listen& address, const std::string& hostname, HttpScope* http)
 {
     std::vector<ServerScope *>  matchingServers;
     std::vector<ServerScope *>  serverScope;
 
-    serverScope = http.getServers();
+    serverScope = http->getServers();
     for (std::vector<ServerScope *>::const_iterator it = serverScope.begin() ; it != serverScope.end(); it++)
     {
         if (address.host == (*it)->getListen().host && address.port == (*it)->getListen().port)
@@ -301,9 +317,10 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, c
 {
     size_t locationScopeIndex;
 
+    //hangi index kullanılacak?
     locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-    locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
-    locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
-
+    //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
+    //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
+    //locationScopeIndex 2 dönüyor ve out_of_range hatası fırlatıyor????
     return (matchedServerScope->getLocations().at(locationScopeIndex));
 }

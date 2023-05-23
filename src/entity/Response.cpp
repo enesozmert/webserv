@@ -3,8 +3,58 @@
 Response::Response(){}
 
 Response::~Response(){}
+//GETTERS
+
+std::string		Response::getResponse()
+{
+    return (this->_response);
+}
+
+int	Response::getStatusCode()
+{
+    return (this->statusCode);
+}
+std::map<int, std::string>  Response::getErrorMap()
+{
+    return (this->_errorMap);
+}
+
+
+void			Response::resetValues(void)
+{
+	_allow = "";
+	_contentLanguage = "";
+	_contentLength = "";
+	_contentLocation = "";
+	_contentType = "";
+	_date = "";
+	_lastModified = "";
+	_location = "";
+	_retryAfter = "";
+	_server = "";
+	_transferEncoding = "";
+	_wwwAuthenticate = "";
+}
+
 
 //Setters
+
+void    Response::setErrorMap()
+{
+	this->_errorMap.clear();
+	this->_errorMap[100] = "Continue";
+	this->_errorMap[200] = "OK";
+	this->_errorMap[201] = "Created";
+	this->_errorMap[204] = "No Content";
+	this->_errorMap[400] = "Bad Request";
+	this->_errorMap[403] = "Forbidden";
+	this->_errorMap[404] = "Not Found";
+	this->_errorMap[405] = "Method Not Allowed";
+	this->_errorMap[413] = "Payload Too Large";
+	this->_errorMap[500] = "Internal Server Error";
+}
+
+
 void			Response::setAllow(std::vector<std::string> methods)
 {
 	std::vector<std::string>::iterator it = methods.begin();
@@ -33,9 +83,9 @@ void			Response::setContentLength(size_t size)
 	_contentLength = to_string(size);
 }
 
-void			Response::setContentLocation(const std::string& path, int code)
+void	Response::setContentLocation(const std::string& path, int code)
 {
-	(void)code;
+    (void)code;
 	// if (code != 404)
 		_contentLocation = path;
 }
@@ -124,27 +174,47 @@ void			Response::setWwwAuthenticate(int code)
 	}
 }
 
+void			Response::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
+{
+	setAllow();
+	setErrorMap();
+	setContentLanguage(lang);
+	setContentLength(size);
+	setContentLocation(contentLocation, code);
+	setContentType(type, path);
+	setDate();
+	setLastModified(path);
+	setLocation(code, path);
+	setRetryAfter(code, 3);
+	setServer();
+	setTransferEncoding();
+	setWwwAuthenticate(code);
+}
+
+void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex)
+{
+	//_locationIndex ve _serverIndex ayrı ayrı vector olarak al
+	for (std::vector<std::string>::iterator it = _locationIndex.begin(); it != _locationIndex.end(); it++)
+		this->_indexs.push_back(*it);
+	for (std::vector<std::string>::iterator itt = _serverIndex.begin(); itt != _serverIndex.end(); itt++)
+		this->_indexs.push_back(*itt);
+}
+
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-    //_errorMap = request->getErrorPage();
+	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->statusCode = request->getReturnCode();
-    //addIndex(request);
- /*    std::vector<std::string> conf_index = server->getIndex();
-	for (std::vector<std::string>::const_iterator it = conf_index.begin(); it != conf_index.end(); it++)
-	{
-		std::vector<std::string>::const_iterator it2 = _index.begin();
-		for (it2 = _index.begin(); it2 != _index.end(); it2++)
-		{
-				if (*it == *it2)
-					break;
-		}
-		if (it2 == _index.end())
-			_index.push_back(*it);
-	} */
+    setIndexs(location->getIndex(), server->getIndex());
+	this->_cgi_pass = server->getCgi_pass();
+	//cgi_pass location altında da olabilir? hangisini almalıyız?
 
-    this->_contentLocation = removeAdjacentSlashes(request->getPath());
-	this->_path = removeAdjacentSlashes(server->getRoot() + location->getPath());
+    //this->_contentLocation = removeAdjacentSlashes(_index.at(0));
+	//this->_path = removeAdjacentSlashes(server->getRoot() + _index.at(0));
+	this->_contentLocation = "index.html";
+	this->_path = "./tests/test1/index.html";
+	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
+	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 
     if (location->getAutoindex() == "on")
         this->_isAutoIndex = true;
@@ -174,49 +244,6 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
         else
             std::cerr << "buraya ne eklememiz lazım bilemedim" << std::endl;   
     }
-}
-
-std::string		Response::getResponse()
-{
-    return (this->_response);
-}
-
-int	Response::getStatusCode()
-{
-    return (this->statusCode);
-}
-
-void			Response::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
-{
-	setAllow();
-	setContentLanguage(lang);
-	setContentLength(size);
-	setContentLocation(contentLocation, code);
-	setContentType(type, path);
-	setDate();
-	setLastModified(path);
-	setLocation(code, path);
-	setRetryAfter(code, 3);
-	setServer();
-	setTransferEncoding();
-	setWwwAuthenticate(code);
-}
-
-void			Response::resetValues(void)
-{
-	_allow = "";
-	_contentLanguage = "";
-	_contentLength = "";
-	_contentLocation = "";
-	_contentType = "";
-	_date = "";
-	_lastModified = "";
-	_location = "";
-	_retryAfter = "";
-	_server = "";
-	_transferEncoding = "";
-	_wwwAuthenticate = "";
-	//initErrorMap();
 }
 
 std::string		Response::writeHeader(void)

@@ -93,8 +93,9 @@ void ServerScope::setListen()
 {
 }*/
 
-t_listen    ServerScope::getListen() const
+t_listen    ServerScope::getListen()
 {
+    ServerScope::setListen();
     return this->listen;
 }
 

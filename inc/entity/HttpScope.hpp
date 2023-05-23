@@ -19,6 +19,7 @@ class HttpScope : public IScope
         std::vector<ServerScope *> _servers;
         ErrorPage _errorPage;
         DataBase<Variable<std::string> > _keywordDatabase;
+        std::vector<t_listen> _listens;
 
     public:
         HttpScope(/* args */);
@@ -35,8 +36,13 @@ class HttpScope : public IScope
         void setServer(ServerScope *server);
         void setErrorPage(ErrorPage errorPage);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
+        void setListens(std::vector<ServerScope *> _servers);
 
         void keywordFill();
+
+        std::vector<t_listen> getListens() const;
+
+        void writeListens(std::vector<t_listen> _listens);
 
         std::string getName() const;
         HttpScope* cloneNew() const;

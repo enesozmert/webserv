@@ -2,13 +2,15 @@
 
 Cluster::Cluster()
 {
-    this->setUpCluster();
+    //this->setUpCluster();
 }
 
-int Cluster::setUpCluster()
+int Cluster::setUpCluster(HttpScope* http)
 {
+	this->httpScope = http;
     //serverların hepsini vector olarak tutuyorduk. Onları çektik.
-	std::vector<t_listen>	listens;//http class gelecek=> http class listen çekilecek
+	std::vector<t_listen>	listens;
+	listens = this->httpScope->getListens();
 
 	//olası hataları önlemek için bütün fd'ler 0'a eşitlenir.
 	FD_ZERO(&fd_master);
@@ -21,7 +23,7 @@ int Cluster::setUpCluster()
 		long		fd;//server içinde oluşturulacak socket fd'si
 
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
-		if (server.setUpSocket() != -1)
+		if (server.getSetRet() == 0)
 		{
 			fd = server.get_fd();
 			FD_SET(fd, &fd_master);
