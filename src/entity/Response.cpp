@@ -209,9 +209,8 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
 	this->_cgi_pass = server->getCgi_pass();
 	//cgi_pass location altında da olabilir? hangisini almalıyız?
 
-    //this->_contentLocation = removeAdjacentSlashes(_index.at(0));
-	//this->_path = removeAdjacentSlashes(server->getRoot() + _index.at(0));
-	this->_contentLocation = "index.html";
+    this->_contentLocation = removeAdjacentSlashes(_indexs.at(0));
+	//this->_path = removeAdjacentSlashes(server->getRoot() + _indexs.at(0));
 	this->_path = "./tests/test1/index.html";
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
