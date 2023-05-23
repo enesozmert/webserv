@@ -2,6 +2,7 @@
 
 Request::Request()
 {
+    this->_returnCode = 200;
     this->keywordFill();
 }
 

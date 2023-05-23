@@ -22,7 +22,7 @@ private:
     std::string					_type;
     std::map<int, std::string>	_errorMap;
 
-    std::vector<std::string>	_index;//bunu araştır???
+    std::vector<std::string>	_indexs;//bunu araştır???
     std::string					_path;// local path for request
 	std::string					_cgi_pass;
 
@@ -69,7 +69,7 @@ public:
     void	                    setTransferEncoding(void);
     void	                    setWwwAuthenticate(int code);
     void                        setErrorMap();
-    void	                    setIndex(std::string _locationIndex, std::string _serverIndex);
+    void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
 
     void                        resetValues(void);

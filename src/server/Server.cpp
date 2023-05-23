@@ -82,9 +82,9 @@ void    Server::process(long socket, HttpScope* http)
         this->processChunk(socket);
 
     if (_requests[socket].size() < 1000)
-        std::cout << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << std::endl;
+        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << RESET << std::endl;
     else
-        std::cout << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << std::endl;
+        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << RESET << std::endl;
 
     if (_requests[socket] != "")
     {
@@ -223,6 +223,14 @@ int Server::send(long socket)
 
     if (sent.find(socket) == sent.end()) // gönderilecek mesaj kalmadıysa, socket içi boşsa
         sent[socket] = 0;
+    
+    if (1 && sent[socket] == 0)
+	{
+		if (_requests[socket].size() < 1000)
+			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
+		else
+			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
+	}
 
     std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);
     int ret = ::send(socket, str.c_str(), str.size(), 0);

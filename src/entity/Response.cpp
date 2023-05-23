@@ -191,24 +191,30 @@ void			Response::setValues(size_t size, const std::string& path, int code, std::
 	setWwwAuthenticate(code);
 }
 
-void	Response::setIndex(std::string _locationIndex, std::string _serverIndex)
+void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex)
 {
-	this->_index.push_back(_locationIndex);
-	this->_index.push_back(_serverIndex);
+	//_locationIndex ve _serverIndex ayrı ayrı vector olarak al
+	for (std::vector<std::string>::iterator it = _locationIndex.begin(); it != _locationIndex.end(); it++)
+		this->_indexs.push_back(*it);
+	for (std::vector<std::string>::iterator itt = _serverIndex.begin(); itt != _serverIndex.end(); itt++)
+		this->_indexs.push_back(*itt);
 }
 
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-	//statusCode 0 atıyor. Düzelt???
+	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->statusCode = request->getReturnCode();
-    setIndex(location->getIndex(), server->getIndex());
-	//burada indexlerin string olarak değil de vector olarak gelme durumuna göre güncelleme yap
+    setIndexs(location->getIndex(), server->getIndex());
 	this->_cgi_pass = server->getCgi_pass();
 	//cgi_pass location altında da olabilir? hangisini almalıyız?
 
-    this->_contentLocation = removeAdjacentSlashes(request->getPath());
-	this->_path = removeAdjacentSlashes(server->getRoot() + location->getPath());
+    //this->_contentLocation = removeAdjacentSlashes(_index.at(0));
+	//this->_path = removeAdjacentSlashes(server->getRoot() + _index.at(0));
+	this->_contentLocation = "index.html";
+	this->_path = "./tests/test1/index.html";
+	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
+	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 
     if (location->getAutoindex() == "on")
         this->_isAutoIndex = true;
