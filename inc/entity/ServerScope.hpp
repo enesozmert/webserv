@@ -58,7 +58,7 @@ class ServerScope : public IScope
         ErrorPage getErrorPage();
         std::vector<std::string> getServerName();
         std::string getRoot();
-        std::string getIndex();
+        std::vector<std::string> getIndex();
         std::string getCgi_pass();
 
         std::vector<LocationScope *> getLocations();
