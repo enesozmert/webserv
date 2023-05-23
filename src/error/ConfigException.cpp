@@ -43,6 +43,8 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(110, "Expected 'location'"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(111, "Semicolon not found ';'"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(112, "Convert Exception"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(113, "Http scope count not equal to one"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(114, "Server scope count zero"));
 }
 
 void ConfigException::exceptionHandler()
