@@ -153,9 +153,17 @@ std::string ServerScope::getRoot()
 {
     return (this->_root);
 }
-std::string ServerScope::getIndex()
+std::vector<std::string> ServerScope::getIndex()
 {
-    return (this->_index);
+    std::vector<std::string> indexs;
+    std::string tempIndexs;
+    std::stringstream sp(this->_index);
+
+    while (sp >> std::ws >> tempIndexs)
+    {
+        indexs.push_back(tempIndexs);
+    }
+    return (indexs);
 }
 std::string ServerScope::getCgi_pass()
 {
