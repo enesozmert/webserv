@@ -37,6 +37,11 @@ void ServerScope::setPort(std::string port)
     this->_port = port;
 }
 
+ void ServerScope::setIp(std::string ip)
+ {
+    this->_ip = ip;
+ }
+
 void ServerScope::setServerName(std::string serverName)
 {
     (void)serverName;
@@ -79,7 +84,7 @@ void ServerScope::setCgi_pass(std::string cgi_pass)
 void ServerScope::setListen()
 {
     this->listen.port = atoi(this->getPort().c_str());
-    this->listen.host = strToIp(this->getHost());
+    this->listen.host = strToIp(this->getIp());
 }
 
 //default location initialization yap
@@ -95,14 +100,6 @@ t_listen    ServerScope::getListen() const
 
 std::string ServerScope::getPort()
 {
-    std::string tempPort;
-    std::istringstream sp(this->_listen);
-
-    std::getline(sp, tempPort, ':');
-    return tempPort;
-}
-std::string ServerScope::getHost()
-{
     std::string tempHost;
     std::istringstream sp(this->_listen);
 
@@ -111,6 +108,18 @@ std::string ServerScope::getHost()
     std::getline(sp >> std::ws, tempHost, ':');
     std::getline(sp >> std::ws, tempHost);
     return tempHost;
+}
+std::string ServerScope::getIp()
+{
+    std::string tempPort;
+    std::istringstream sp(this->_listen);
+
+    std::getline(sp, tempPort, ':');
+    return tempPort;
+}
+std::string ServerScope::getHost()
+{
+    return (this->_listen);
 }
 ErrorPage ServerScope::getErrorPage()
 {
