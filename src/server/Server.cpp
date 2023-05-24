@@ -35,20 +35,20 @@ void Server::setUpSocket()
     fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
     if (fd == -1)
     {
-        std::cerr << "Could not create server." << std::endl; //hatalar ortak bir yerden yönetilecek
+        std::cerr << RED << "Could not create server." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
         setRet = -1;
         return ;
     }
     this->setAddr();
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
     {
-        std::cerr << "Could not bind port " << _listen.port << "." << std::endl;
+        std::cerr << RED << "Could not bind port " << _listen.port << "." << RESET << std::endl;
         setRet = -1;
         return ;
     }
     if (listen(fd, 10) == -1) // aynı anda max 10 bağlantı kabul etmeye hazır
     {
-        std::cerr << "Could not listen." << std::endl;
+        std::cerr << RED << "Could not listen." << RESET << std::endl;
         setRet = -1;
         return ;
     }
@@ -57,7 +57,7 @@ void Server::setUpSocket()
 
 long Server::accept(void)
 {
-    std::cout << "Accepting..." << std::endl;
+    std::cout << YELLOW << "\nAccepting..." << RESET << std::endl;
     long client_fd;
 
     client_fd = ::accept(fd, NULL, NULL); // client_fd üzerinden iletişim kurulabilir.
@@ -97,13 +97,13 @@ void    Server::process(long socket, HttpScope* http)
         matchedServer = this->getServerForRequest(this->_listen, request->getIp(), http);
         matchedLocation = this->getLocationForRequest(matchedServer, request->getPath());
 
-        std::cout << YELLOW << "matchedServer->getHost() = " << matchedServer->getHost() << RESET << std::endl;
+        /* std::cout << YELLOW << "matchedServer->getHost() = " << matchedServer->getHost() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getName() = " << matchedServer->getName() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getRoot() = " << matchedServer->getRoot() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getCgi_pass() = " << matchedServer->getCgi_pass() << RESET << std::endl;
-        //std::cout << YELLOW << "matchedServer->getIndex().front() = " << matchedServer->getIndex().front() << RESET << std::endl;
+        std::cout << YELLOW << "matchedServer->getIndex().front() = " << matchedServer->getIndex().front() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getErrorPage().getPageName() = " << matchedServer->getErrorPage().getPageName() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getServerName().front() = " << matchedServer->getServerName().front() << RESET << std::endl;
+        std::cout << YELLOW << "matchedServer->getServerName().front() = " << matchedServer->getServerName().front() << RESET << std::endl;*/
 
 
 
@@ -179,6 +179,7 @@ void Server::processChunk(long socket)
 
 int Server::recv(long socket)
 {
+    std::cout << YELLOW <<  "\nReceiving..." << RESET << std::endl;
     int ret;
     char buffer[RECV_SIZE] = {0};
 
@@ -229,6 +230,7 @@ int Server::recv(long socket)
 
 int Server::send(long socket)
 {
+    std::cout << YELLOW << "\nSending..." << RESET << std::endl;
     static std::map<long, size_t> sent;
 
     if (sent.find(socket) == sent.end()) // gönderilecek mesaj kalmadıysa, socket içi boşsa

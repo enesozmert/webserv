@@ -11,18 +11,24 @@ int Cluster::setUpCluster(HttpScope* http)
     //serverların hepsini vector olarak tutuyorduk. Onları çektik.
 	std::vector<t_listen>	listens;
 	listens = this->httpScope->getListens();
+	std::cout << "writeListens" << std::endl;
+	this->httpScope->writeListens(listens);
+	//buradan 3 server gelmesi gerekirken 6 geliyor???
 
 	//olası hataları önlemek için bütün fd'ler 0'a eşitlenir.
 	FD_ZERO(&fd_master);
 	max_fd = 0;
 
-	for ( std::vector<t_listen>::const_iterator it = listens.begin() ; it != listens.end() ; it++ )
+	for (std::vector<t_listen>::const_iterator it = listens.begin() ; it != listens.end() ; it++ )
 	{
+		std::cout << "listen host: " << it->host << std::endl;
+		std::cout << "listen port: "<< it->port << std::endl;
 		//her bir server için ayrı bir Server nesnesi oluşturulur.
-		Server		server(*it);
+		Server		server(*it);//setUpSocket de burada çalışacak
 		long		fd;//server içinde oluşturulacak socket fd'si
 
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
+		std::cout << GREEN << server.getSetRet() << RESET << std::endl;
 		if (server.getSetRet() == 0)
 		{
 			fd = server.get_fd();
@@ -56,7 +62,7 @@ void	Cluster::select_section()
 	//ready ilk başta boş, sonradan dolacak
 	//ready içindeki (yani reading sette olup processe gidecek socketler) writing sete ekliyoruz.
 	//socket send için hazır demektir
-	std::cout << "\rWaiting on a connection\n" << std::flush;
+	std::cout << YELLOW << "\rWaiting on a connection..." << RESET << std::flush;
 	//select işlevi kullanılarak takip edilen soketler için okuma ve yazma işlemleri için hazırlık yapılır. 
 	//Bu döngüde, select işlevi sonucu select_return_value değişkenine değer atanana kadar çalışmaya devam eder.
 	//timeout olursa sıfır döner. select_return_value'e değer atanana kadar while döner.
@@ -155,8 +161,7 @@ void 	Cluster::accept_section()
 }
 
 void	Cluster::run()
-{
-	
+{	
 	while (1)
 	{
 		this->select_return_value = 0;

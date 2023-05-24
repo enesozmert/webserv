@@ -40,7 +40,7 @@ class HttpScope : public IScope
 
         void keywordFill();
 
-        std::vector<t_listen> getListens() const;
+        std::vector<t_listen> getListens();
 
         void writeListens(std::vector<t_listen> _listens);
 
