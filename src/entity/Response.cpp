@@ -203,15 +203,14 @@ void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<st
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
+	//std::cout << YELLOW << "server->getName() : " << server->getKeywordDataBase().getByNameData(server) << RESET << std::endl;
 	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->statusCode = request->getReturnCode();
     setIndexs(location->getIndex(), server->getIndex());
-	this->_cgi_pass = server->getCgi_pass();
-	//cgi_pass location altında da olabilir? hangisini almalıyız?
-
-    this->_contentLocation = removeAdjacentSlashes(_indexs.at(0));
-	//this->_path = removeAdjacentSlashes(server->getRoot() + _indexs.at(0));
-	this->_path = "./tests/test1/index.html";
+	//this->_cgi_pass = location->getCgiPass();
+    this->_contentLocation = _indexs.at(0);
+	this->_path = location->getRoot() + _indexs.at(0);
+	//this->_path = "./tests/test1/index.html";
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 
