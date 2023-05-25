@@ -23,7 +23,6 @@ ServerScope	&ServerScope::operator=(const ServerScope &server)
     this->_root = server._root;
     this->_index = server._index;
     this->_serverNames = server._serverNames;
-    this->_cgi_pass = server._cgi_pass;
     this->_listen = server._listen;
     return (*this);
 }
@@ -76,22 +75,12 @@ void ServerScope::setIndex(std::string index)
 {
     this->_index = index;
 }
-void ServerScope::setCgi_pass(std::string cgi_pass)
-{
-    this->_cgi_pass = cgi_pass;
-}
 
 void ServerScope::setListen()
 {
     this->listen.port = atoi(this->getPort().c_str());
     this->listen.host = strToIp(this->getIp());
 }
-
-//default location initialization yap
-//en genel ayarlara sahip olanı seçebilirsin. Örneğin, tüm istekleri karşılamak için "/", "*/", ya da "/default" gibi bir path'e sahip olanı
-/*void ServerScope::setDefaultLocation()
-{
-}*/
 
 t_listen    ServerScope::getListen()
 {
@@ -165,9 +154,10 @@ std::vector<std::string> ServerScope::getIndex()
     }
     return (indexs);
 }
-std::string ServerScope::getCgi_pass()
+
+CgiScope ServerScope::getCgiScope()
 {
-    return (this->_cgi_pass);
+    return (this->_cgiScope);
 }
 
 DataBase<Variable<std::string> > ServerScope::getKeywordDataBase()
@@ -182,8 +172,9 @@ void ServerScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("server_name", &this->_serverNames));
     _keywordDatabase.insertData(Variable<std::string>("root", &this->_root));
     _keywordDatabase.insertData(Variable<std::string>("index", &this->_index));
-    _keywordDatabase.insertData(Variable<std::string>("cgi_pass", &this->_cgi_pass));
     _keywordDatabase.insertData(Variable<std::string>("listen", &this->_listen));
+    // _keywordDatabase.insertData(Variable<std::string>("cgi_pass", &this->_cgiScope._pass));
+    // _keywordDatabase.insertData(Variable<std::string>("cgi_param", &this->_cgiScope._param));
 }
 
 std::string ServerScope::getName() const

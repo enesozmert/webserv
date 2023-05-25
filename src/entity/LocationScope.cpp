@@ -9,7 +9,7 @@ LocationScope::~LocationScope()
 {
 }
 
-LocationScope::LocationScope(const LocationScope &location)
+LocationScope::LocationScope(const LocationScope &location) : CgiScope(location)
 {
     *this = location;
 }
@@ -119,6 +119,8 @@ void LocationScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("auto_index", &this->_autoindex));
     _keywordDatabase.insertData(Variable<std::string>("location", &this->_path));
     _keywordDatabase.insertData(Variable<std::string>("allow_methods", &this->_allowMethods));
+    _keywordDatabase.insertData(Variable<std::string>("cgi_pass", &this->_pass));
+    _keywordDatabase.insertData(Variable<std::string>("cgi_param", &this->_param));
 }
 
 void LocationScope::setPath(std::string path)

@@ -6,14 +6,14 @@
 #include <string>
 #include <sstream>
 #include "ErrorPage.hpp"
+#include "CgiScope.hpp"
 #include "RedirectionUri.hpp"
 #include "../database/DataBase.hpp"
 #include "IScope.hpp"
 #include "Variable.hpp"
-
 class ErrorPage;
 class RedirectionUri;
-class LocationScope : public IScope
+class LocationScope : public IScope, public CgiScope
 {
     private:
         std::string _path;
@@ -22,6 +22,7 @@ class LocationScope : public IScope
         std::string _index;
         std::string _allowMethods;
         std::string _clientBodyBufferSize;
+
         ErrorPage _errorPage;
         RedirectionUri _redirectionUri;
         DataBase<Variable<std::string> > _keywordDatabase;
