@@ -82,7 +82,7 @@ void ParserConfig::parseFile(std::string &fileName)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
         std::string lineTrim = trim(line, " \r\t");
-        std::cout << "lineTrim : " << lineTrim << std::endl;
+        std::cout << lineTrim;
         this->_lines.push_back(lineTrim);
         fileCleanContents.erase(0, pos + 1);
     }

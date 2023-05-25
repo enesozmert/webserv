@@ -46,7 +46,7 @@ void HttpScope::setClientMaxBodySize(std::string clientMaxBodySize)
 void HttpScope::setServer(ServerScope *server)
 {
     this->_servers.push_back(server);
-    //this->setListens(_servers);
+    this->setListens(server);
 }
 void HttpScope::setErrorPage(ErrorPage errorPage)
 {
@@ -57,12 +57,9 @@ void HttpScope::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatab
     this->_keywordDatabase = keywordDatabase;
 }
 
-void HttpScope::setListens(std::vector<ServerScope *> _servers)
+void HttpScope::setListens(ServerScope* server)
 {
-    for(std::vector<ServerScope *>::iterator it = _servers.begin(); it != _servers.end(); it++)
-        this->_listens.push_back((*it)->getListen());
-    //buraya server atarken aynı serverdan bir daha atmasın diye koşul eklemeli miyiz?
-    //neden aynı serverdan birkaç tane geliyor ki?
+    this->_listens.push_back(server->getListen());
 }
 
 void HttpScope::keywordFill()
@@ -72,7 +69,6 @@ void HttpScope::keywordFill()
 
 std::vector<t_listen> HttpScope::getListens()
 {
-    setListens(_servers);
     return _listens;
 }
 

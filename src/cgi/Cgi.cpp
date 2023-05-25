@@ -38,6 +38,7 @@ Cgi::Cgi(Request *request, ServerScope* server, std::string& _path): _body(reque
 
 std::string		Cgi::executeCgi(const std::string& scriptName) 
 {
+	std::cout << RED << "executeCgi girdi" << RESET << std::endl;
 	pid_t		pid;
 	int			saveStdin;
 	int			saveStdout;

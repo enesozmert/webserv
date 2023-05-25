@@ -14,11 +14,11 @@ void myTerminationHandler() {
 
 int main(int ac, char **av)
 {
-    (void)av;
-    (void)ac;
+/*     (void)av;
+    (void)ac; */
     
     std::string av1;
-    av1 = "configs/default.config";
+    //av1 = "configs/default.config";
     HttpScope *http;
     ParserConfig *parser = new ParserConfig();
     ParserConfig *parserSyntax = new ParserConfig();
@@ -26,13 +26,13 @@ int main(int ac, char **av)
     ConfigException configException;
     // std::set_terminate(myTerminationHandler);
 
-  /*   if (ac != 2)
+    if (ac != 2)
     {
         configException.run(106);
         return (-1);
     }
     //get-filename
-    av1 = av[1]; */
+    av1 = av[1];
 
     //parseSyntaxForSyntaxAnalizer
     parserSyntax->parseSyntax(av1);
@@ -42,7 +42,7 @@ int main(int ac, char **av)
 
     parser->parse(av1);
     http = parser->getHttp();
-    std::cout << "http->writeListens(http->getListens()) : " << std::endl;
+    /* std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
     http->writeListens(http->getListens());
     std::cout << "http->getServers().at(0)->getListen().host : " << http->getServers().at(0)->getListen().host << std::endl;
     std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
@@ -52,7 +52,7 @@ int main(int ac, char **av)
     std::cout << "http->getServers().at(0)->getPort() : " << http->getServers().at(0)->getPort() << std::endl;
     std::cout << "getPath() : " << http->getServers().at(0)->getLocations().at(1)->getPath() << std::endl;
     std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
-    std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
+    std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl; */
     // std::string httpRequest = "POST /processsampleform.php HTTP/1.1\r\n"
     //                           "Host: www.tutorialspoint.com\r\n"
     //                           "User-Agent: Mozilla/5.0 (windows; U; Windows NT 6.0; en-Us; rv:1.9.0.19) Gecko/2010031422 Firefox/3.0.19 (.NET CLR 3.5.30729)\r\n"

@@ -1,8 +1,11 @@
 #include "../inc/server/Cluster.hpp"
 
-Cluster::Cluster()
+Cluster::Cluster() {}
+
+Cluster::~Cluster()
 {
-    //this->setUpCluster();
+    for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
+		it->second.clean();
 }
 
 int Cluster::setUpCluster(HttpScope* http)
@@ -11,9 +14,6 @@ int Cluster::setUpCluster(HttpScope* http)
     //serverların hepsini vector olarak tutuyorduk. Onları çektik.
 	std::vector<t_listen>	listens;
 	listens = this->httpScope->getListens();
-	std::cout << "writeListens" << std::endl;
-	this->httpScope->writeListens(listens);
-	//buradan 3 server gelmesi gerekirken 6 geliyor???
 
 	//olası hataları önlemek için bütün fd'ler 0'a eşitlenir.
 	FD_ZERO(&fd_master);
@@ -21,22 +21,19 @@ int Cluster::setUpCluster(HttpScope* http)
 
 	for (std::vector<t_listen>::const_iterator it = listens.begin() ; it != listens.end() ; it++ )
 	{
-		std::cout << "listen host: " << it->host << std::endl;
-		std::cout << "listen port: "<< it->port << std::endl;
 		//her bir server için ayrı bir Server nesnesi oluşturulur.
 		Server		server(*it);//setUpSocket de burada çalışacak
 		long		fd;//server içinde oluşturulacak socket fd'si
 
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
-		std::cout << GREEN << server.getSetRet() << RESET << std::endl;
-		if (server.getSetRet() == 0)
+		if (server.getSocketConnected())
 		{
-			fd = server.get_fd();
+			fd = server.getFd();
 			FD_SET(fd, &fd_master);
 			servers.insert(std::make_pair(fd, server));
 			if (fd > max_fd)
 				max_fd = fd;
-			std::cout << "Setting up " << it->host << ":" << it->port << "..." << std::endl;
+			std::cout << GREEN << "Setting up " << it->host << ":" << it->port << "..." << RESET << std::endl;
 			//socket oluşturuldu host:port
 		}
 	}
@@ -192,8 +189,3 @@ void	Cluster::run()
 }
 
 
-Cluster::~Cluster()
-{
-    for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
-		it->second.clean();
-}
