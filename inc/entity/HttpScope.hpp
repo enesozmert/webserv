@@ -36,11 +36,11 @@ class HttpScope : public IScope
         void setServer(ServerScope *server);
         void setErrorPage(ErrorPage errorPage);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
-        void setListens(std::vector<ServerScope *> _servers);
+        void setListens(ServerScope* server);
 
         void keywordFill();
 
-        std::vector<t_listen> getListens() const;
+        std::vector<t_listen> getListens();
 
         void writeListens(std::vector<t_listen> _listens);
 

@@ -3,13 +3,12 @@
 Response::Response(){}
 
 Response::~Response(){}
-//GETTERS
 
+//GETTERS
 std::string		Response::getResponse()
 {
     return (this->_response);
 }
-
 int	Response::getStatusCode()
 {
     return (this->statusCode);
@@ -18,27 +17,7 @@ std::map<int, std::string>  Response::getErrorMap()
 {
     return (this->_errorMap);
 }
-
-
-void			Response::resetValues(void)
-{
-	_allow = "";
-	_contentLanguage = "";
-	_contentLength = "";
-	_contentLocation = "";
-	_contentType = "";
-	_date = "";
-	_lastModified = "";
-	_location = "";
-	_retryAfter = "";
-	_server = "";
-	_transferEncoding = "";
-	_wwwAuthenticate = "";
-}
-
-
-//Setters
-
+//SETTERS
 void    Response::setErrorMap()
 {
 	this->_errorMap.clear();
@@ -53,8 +32,6 @@ void    Response::setErrorMap()
 	this->_errorMap[413] = "Payload Too Large";
 	this->_errorMap[500] = "Internal Server Error";
 }
-
-
 void			Response::setAllow(std::vector<std::string> methods)
 {
 	std::vector<std::string>::iterator it = methods.begin();
@@ -203,17 +180,16 @@ void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<st
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
+	//std::cout << YELLOW << "server->getName() : " << server->getKeywordDataBase().getByNameData(server) << RESET << std::endl;
 	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->statusCode = request->getReturnCode();
-    setIndexs(location->getIndex(), server->getIndex());
-	// this->_cgi_pass = server->getCgi_pass();
-	//cgi_pass location altında da olabilir? hangisini almalıyız?
-
-    this->_contentLocation = removeAdjacentSlashes(_indexs.at(0));
-	//this->_path = removeAdjacentSlashes(server->getRoot() + _indexs.at(0));
-	this->_path = "./tests/test1/index.html";
+  setIndexs(location->getIndex(), server->getIndex());
+	//this->_cgi_pass = location->getCgiPass();
+  this->_contentLocation = _indexs.at(0);
+	this->_path = location->getRoot() + _indexs.at(0);//this->_path = "./tests/test1/index.html";
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
+
 
     if (location->getAutoindex() == "on")
         this->_isAutoIndex = true;
@@ -496,4 +472,20 @@ std::string         Response::getLink(std::string const &dirEntry, std::string c
     ss << "\t\t<p><a href=\"http://" + host + ":" <<\
         port << dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
     return ss.str();
+}
+
+void			Response::resetValues(void)
+{
+	_allow = "";
+	_contentLanguage = "";
+	_contentLength = "";
+	_contentLocation = "";
+	_contentType = "";
+	_date = "";
+	_lastModified = "";
+	_location = "";
+	_retryAfter = "";
+	_server = "";
+	_transferEncoding = "";
+	_wwwAuthenticate = "";
 }

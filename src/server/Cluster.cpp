@@ -1,8 +1,11 @@
 #include "../inc/server/Cluster.hpp"
 
-Cluster::Cluster()
+Cluster::Cluster() {}
+
+Cluster::~Cluster()
 {
-    //this->setUpCluster();
+    for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
+		it->second.clean();
 }
 
 int Cluster::setUpCluster(HttpScope* http)
@@ -16,21 +19,21 @@ int Cluster::setUpCluster(HttpScope* http)
 	FD_ZERO(&fd_master);
 	max_fd = 0;
 
-	for ( std::vector<t_listen>::const_iterator it = listens.begin() ; it != listens.end() ; it++ )
+	for (std::vector<t_listen>::const_iterator it = listens.begin() ; it != listens.end() ; it++ )
 	{
 		//her bir server için ayrı bir Server nesnesi oluşturulur.
-		Server		server(*it);
+		Server		server(*it);//setUpSocket de burada çalışacak
 		long		fd;//server içinde oluşturulacak socket fd'si
 
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
-		if (server.getSetRet() == 0)
+		if (server.getSocketConnected())
 		{
-			fd = server.get_fd();
+			fd = server.getFd();
 			FD_SET(fd, &fd_master);
 			servers.insert(std::make_pair(fd, server));
 			if (fd > max_fd)
 				max_fd = fd;
-			std::cout << "Setting up " << it->host << ":" << it->port << "..." << std::endl;
+			std::cout << GREEN << "Setting up " << it->host << ":" << it->port << "..." << RESET << std::endl;
 			//socket oluşturuldu host:port
 		}
 	}
@@ -56,7 +59,7 @@ void	Cluster::select_section()
 	//ready ilk başta boş, sonradan dolacak
 	//ready içindeki (yani reading sette olup processe gidecek socketler) writing sete ekliyoruz.
 	//socket send için hazır demektir
-	std::cout << "\rWaiting on a connection\n" << std::flush;
+	std::cout << YELLOW << "\rWaiting on a connection..." << RESET << std::flush;
 	//select işlevi kullanılarak takip edilen soketler için okuma ve yazma işlemleri için hazırlık yapılır. 
 	//Bu döngüde, select işlevi sonucu select_return_value değişkenine değer atanana kadar çalışmaya devam eder.
 	//timeout olursa sıfır döner. select_return_value'e değer atanana kadar while döner.
@@ -155,8 +158,7 @@ void 	Cluster::accept_section()
 }
 
 void	Cluster::run()
-{
-	
+{	
 	while (1)
 	{
 		this->select_return_value = 0;
@@ -187,8 +189,3 @@ void	Cluster::run()
 }
 
 
-Cluster::~Cluster()
-{
-    for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
-		it->second.clean();
-}

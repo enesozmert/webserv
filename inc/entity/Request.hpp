@@ -20,7 +20,6 @@ class Request : public IRequest
     	std::string _path;
     	std::string _body;
     	std::string	_query;
-        //std::string _envForCgi;
         std::map<std::string, std::string>			_envForCgi;
         std::string	_acceptLanguages;
         std::string _host;
@@ -52,7 +51,6 @@ class Request : public IRequest
         std::string getPath();
         std::string getBody();
         std::string getQuery();
-        //std::string getEnvForCgi();
         std::map<std::string, std::string> getEnvForCgi();
         int         getPort();
         std::string getIp();
@@ -77,7 +75,6 @@ class Request : public IRequest
         void setPath(std::string path);
         void setBody(std::string body);
         void setQuery(std::string query);
-        //void setEnvForCgi(std::string envForCgi);
         void setEnvForCgi(std::map<std::string, std::string> envForCgi);
         void setPort(std::string port);
         void setAcceptLanguage(std::string acceptLanguage);

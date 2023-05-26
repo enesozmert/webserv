@@ -1,25 +1,30 @@
 #include "../inc/server/Server.hpp"
 
-Server::Server()
-{
+Server::Server() {}
 
-}
-
-Server::~Server()
-{
-}
+Server::~Server() {}
 
 Server::Server(const t_listen &_listen)
 {
-    this->setRet = 0;
+    this->SocketConnected = false;
     this->_listen = _listen;
     fd = -1;
     this->setUpSocket();
 }
 
-int Server::getSetRet() const
+bool Server::getSocketConnected() const
 {
-    return setRet;
+    return SocketConnected;
+}
+
+long Server::getFd(void) const
+{
+    return (fd);
+}
+
+t_listen   Server::getListen() const
+{
+    return (_listen);
 }
 
 void Server::setAddr(void)
@@ -35,53 +40,47 @@ void Server::setUpSocket()
     fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
     if (fd == -1)
     {
-        std::cerr << "Could not create server." << std::endl; //hatalar ortak bir yerden yönetilecek
-        setRet = -1;
+        std::cerr << RED << "Could not create server." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
         return ;
     }
     this->setAddr();
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
     {
-        std::cerr << "Could not bind port " << _listen.port << "." << std::endl;
-        setRet = -1;
+        std::cerr << RED << "Could not bind port " << _listen.port << "." << RESET << std::endl;
         return ;
     }
     if (listen(fd, 10) == -1) // aynı anda max 10 bağlantı kabul etmeye hazır
     {
-        std::cerr << "Could not listen." << std::endl;
-        setRet = -1;
+        std::cerr << RED << "Could not listen." << RESET << std::endl;
         return ;
     }
-    setRet = 0;
+    SocketConnected = true;
 }
 
 long Server::accept(void)
 {
-    std::cout << "Accepting..." << std::endl;
+    std::cout << YELLOW << "\nAccepting..." << RESET << std::endl;
     long client_fd;
 
     client_fd = ::accept(fd, NULL, NULL); // client_fd üzerinden iletişim kurulabilir.
     if (client_fd == -1)
-        std::cerr << "Could not create socket. " << std::endl;
-    else
-    {
-        fcntl(client_fd, F_SETFL, O_NONBLOCK); // socket ayarlarını bloklanmamış olarak değiştiriyoruz.
-        _requests.insert(std::make_pair(client_fd, ""));
-    }
+        std::cerr << RED << "Could not create socket. " << RESET << std::endl;
+    fcntl(client_fd, F_SETFL, O_NONBLOCK); // socket ayarlarını bloklanmamış olarak değiştiriyoruz.
+    _requests.insert(std::make_pair(client_fd, ""));
     return (client_fd);
 }
 
 void    Server::process(long socket, HttpScope* http)
 {
-    Response response;
-    ServerScope *matchedServer;
-    LocationScope *matchedLocation;
+    Response        response;
+    ServerScope     *matchedServer;
+    LocationScope   *matchedLocation;
 
     //chunked request ayrı bir fonksiyonda işlem görecek.
     if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos && _requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
         this->processChunk(socket);
 
-    if (_requests[socket].size() < 1000)
+    if (_requests[socket].size() < 1000)//request ekrana basıyoruz
         std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << RESET << std::endl;
     else
         std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << RESET << std::endl;
@@ -147,6 +146,7 @@ void    Server::process(long socket, HttpScope* http)
 
     _requests[socket] = head + "\r\n\r\n" + body + "\r\n\r\n";
 } */
+
 //chatgpt
 void Server::processChunk(long socket)
 {
@@ -178,20 +178,19 @@ void Server::processChunk(long socket)
 
 int Server::recv(long socket)
 {
-    int ret;
+    std::cout << YELLOW <<  "\nReceiving..." << RESET << std::endl;
+    int Recieved;
     char buffer[RECV_SIZE] = {0};
 
-    ret = ::recv(socket, buffer, RECV_SIZE - 1, 0); // ret alınan veri boyutu
+    Recieved = ::recv(socket, buffer, RECV_SIZE - 1, 0); // Recieved alınan veri boyutu
 
-    if (ret == 0 || ret == -1)
+    if (Recieved == 0 || Recieved == -1)
     {
         this->close(socket);
-        if (!ret) // ret 0 olması durumu
-            std::cout << "\rConnection was closed by client.\n"
-                      << std::endl;
-        else
-            std::cout << "\rRead error, closing connection.\n"
-                      << std::endl; // ret -1 olması durumu
+        if (Recieved == 0)
+            std::cout << RED << "\rConnection was closed by client.\n" << RESET << std::endl;
+        else if(Recieved == -1)
+            std::cout << RED << "\rRead error, closing connection.\n" << RESET << std::endl;
         return (-1);
     }
 
@@ -228,6 +227,7 @@ int Server::recv(long socket)
 
 int Server::send(long socket)
 {
+    std::cout << YELLOW << "\nSending..." << RESET << std::endl;
     static std::map<long, size_t> sent;
 
     if (sent.find(socket) == sent.end()) // gönderilecek mesaj kalmadıysa, socket içi boşsa
@@ -242,36 +242,22 @@ int Server::send(long socket)
 	}
 
     std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);
-    int ret = ::send(socket, str.c_str(), str.size(), 0);
+    int SentData = ::send(socket, str.c_str(), str.size(), 0);//gönderilen veri boyutu döner
 
-    if (ret == -1)
+    if (SentData == -1)
     {
         this->close(socket);
         sent[socket] = 0;
         return (-1);
     }
-    else
+    sent[socket] += SentData; // ret gönderilmiş veri bunu sent[socket] eklediğimizde aşağıda karşılaştırma yapabiliriz
+    if (sent[socket] >= _requests[socket].size())
     {
-        sent[socket] += ret; // ret gönderilmiş veri bunu sent[socket] eklediğimizde aşağıda karşılaştırma yapabiliriz
-        if (sent[socket] >= _requests[socket].size())
-        {
-            _requests.erase(socket); // socketten gönderilen mesajı sileriz
-            sent[socket] = 0;
-            return (0);
-        }
-        else
-            return (1);
+        _requests.erase(socket); // socketten gönderilen mesajı sileriz
+        sent[socket] = 0;
+        return (0);
     }
-}
-
-long Server::get_fd(void) const
-{
-    return (fd);
-}
-
-t_listen   Server::get_listen() const
-{
-    return (_listen);
+    return (1);
 }
 
 void Server::close(int socket)
