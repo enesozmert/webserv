@@ -1,6 +1,6 @@
 #include "../inc/cgi/Cgi.hpp"
 
-Cgi::Cgi(Request *request, ServerScope* server, std::string& _path): _body(request->getBody())
+Cgi::Cgi(Request *request, ServerScope* server, std::string& _path, std::map<std::string, std::string> envParams): _body(request->getBody())
 {
 
 	//if (headers.find("Auth-Scheme") != headers.end() && headers["Auth-Scheme"] != "")
@@ -31,7 +31,7 @@ Cgi::Cgi(Request *request, ServerScope* server, std::string& _path): _body(reque
 	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "php-cgi/1.1"));
 	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "Weebserv/1.0"));//burayı değiştir
 	//config dosyasındaki cgi_param'ların tutulduğu map'i ekliyoruz. Birden fazla olabildiği için map içinde
-	this->_env.insert(request->getEnvForCgi().begin(), request->getEnvForCgi().end());
+	this->_env.insert(envParams.begin(), envParams.end());
 
 }
 

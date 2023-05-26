@@ -177,15 +177,29 @@ void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<st
 		this->_indexs.push_back(*itt);
 }
 
+void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue)
+{
+	int i = 0;
+	if (_paramValue.size() == _paramKeyword.size())
+	{
+		for (std::vector<std::string>::iterator it = _paramValue.begin(); it != _paramValue.end(); it++)
+		{
+			this->_cgi_params[_paramKeyword.at(i)] = *it;
+			i++;
+		}
+	}
+}
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
 	//std::cout << YELLOW << "server->getName() : " << server->getKeywordDataBase().getByNameData(server) << RESET << std::endl;
 	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->statusCode = request->getReturnCode();
-  setIndexs(location->getIndex(), server->getIndex());
-	//this->_cgi_pass = location->getCgiPass();
-  this->_contentLocation = _indexs.at(0);
+  	setIndexs(location->getIndex(), server->getIndex());
+	this->_cgi_pass = location->getPass();
+	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
+	setParams(location->getParamKeyword(), location->getParamValues());
+  	this->_contentLocation = _indexs.at(0);
 	this->_path = location->getRoot() + _indexs.at(0);//this->_path = "./tests/test1/index.html";
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
@@ -276,7 +290,7 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path);
+		Cgi	cgi(request, server, this->_path, this->_cgi_params);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
@@ -327,7 +341,7 @@ void			Response::POSTmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path);
+		Cgi	cgi(request, server, this->_path, _cgi_params);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 

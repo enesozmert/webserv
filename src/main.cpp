@@ -55,7 +55,9 @@ int main(int ac, char **av)
     std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
     std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
     std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getPass() << " end" << std::endl;
-    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getParam() << " end" << std::endl;
+    std::cout << "cgi param : " << http->getServers().at(0)->getLocations().at(0)->getParam() << " end" << std::endl;
+    std::cout << "cgi paramkeyword : " << http->getServers().at(0)->getLocations().at(0)->getParamKeyword() << " end" << std::endl;
+    std::cout << "cgi paramvalues : " << http->getServers().at(0)->getLocations().at(0)->getParamValues().at(0) << " end" << std::endl;
     std::cout << "errorPageCodes() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() << std::endl;
 
     // std::string httpRequest = "POST /processsampleform.php HTTP/1.1\r\n"

@@ -25,6 +25,7 @@ private:
     std::vector<std::string>	_indexs;//bunu araştır???
     std::string					_path;// local path for request
 	std::string					_cgi_pass;
+    std::map<std::string, std::string>	_cgi_params;
 
 
     std::string					_allow;
@@ -71,6 +72,7 @@ public:
     void                        setErrorMap();
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
+    void                        setParams(std::string _paramKeyword, std::vector<std::string> _paramValue);
 
     void                        resetValues(void);
     void                        createResponse(Request *request, ServerScope *server, LocationScope *location);
