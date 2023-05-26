@@ -31,6 +31,7 @@ int main(int ac, char **av)
         configException.run(106);
         return (-1);
     }
+    
     //get-filename
     av1 = av[1];
 
