@@ -34,38 +34,6 @@ void ParserConfig::parseSyntax(std::string &fileName)
     parseScope(this->_lines);
 }
 
-/* void ParserConfig::parseFile(std::string &fileName)
-{
-    File file(fileName);
-    size_t pos = 0;
-    std::string fileContents;
-    std::string fileCleanContents;
-    std::string delimiter = ";#{}";
-    int i = 0;
-    
-    fileContents = getCheckFileExtension(file, fileName);
-    fileCleanContents = cleanString(fileContents);
-    while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
-    {
-        std::string line = fileCleanContents.substr(0, pos + 1);
-        i = 0;
-        if(line.find("{") != std::string::npos && line.compare("{"))
-        {
-            i = 1;
-            line.clear();
-            line = fileCleanContents.substr(0, pos);
-        }
-        std::string lineTrim = trim(line, " \r\t");
-        std::cout << YELLOW << lineTrim << RESET << std::endl;
-        this->_lines.push_back(lineTrim);
-        if (i)
-            fileCleanContents.erase(0, pos);
-        else
-            fileCleanContents.erase(0, pos + 1);
-    }
-    file.close();
-} */
-
 void ParserConfig::parseFile(std::string &fileName)
 {
     File file(fileName);
@@ -80,7 +48,6 @@ void ParserConfig::parseFile(std::string &fileName)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
         std::string lineTrim = trim(line, " \r\t");
-        std::cout << lineTrim;
         this->_lines.push_back(lineTrim);
         fileCleanContents.erase(0, pos + 1);
     }
@@ -254,7 +221,8 @@ void ParserConfig::parseHttp(std::vector<size_t> tempScopes)
     this->httpPtr = dynamic_cast<HttpScope *>(_matchedClass.at(_matchedClassIndex));
     if (this->httpPtr == NULL)
     {
-        std::cout << "nulll" << _matchedClassIndex << std::endl;
+        this->_configException.run(115);
+        // std::cout << "nulll" << _matchedClassIndex << std::endl;
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
@@ -278,7 +246,8 @@ void ParserConfig::parseServer(std::vector<size_t> tempScopes)
     this->serverPtr = dynamic_cast<ServerScope *>(_matchedClass.at(_matchedClassIndex));
     if (this->serverPtr == NULL)
     {
-        std::cout << "nulll" << _matchedClassIndex << std::endl;
+        this->_configException.run(116);
+        // std::cout << "nulll" << _matchedClassIndex << std::endl;
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
@@ -302,7 +271,8 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
     this->locationPtr = dynamic_cast<LocationScope *>(_matchedClass.at(_matchedClassIndex));
     if (this->locationPtr == NULL)
     {
-        std::cout << "nulll" << _matchedClassIndex << std::endl;
+        this->_configException.run(117);
+        // std::cout << "nulll" << _matchedClassIndex << std::endl;
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {

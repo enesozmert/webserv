@@ -43,6 +43,9 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(112, "Convert Exception"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(113, "Http scope count not equal to one"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(114, "Server scope count zero"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(115, "Http Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(116, "Http Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(117, "Http Convert Error"));
 }
 
 void ConfigException::exceptionHandler()

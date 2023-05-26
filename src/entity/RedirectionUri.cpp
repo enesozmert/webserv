@@ -15,6 +15,7 @@ RedirectionUri &RedirectionUri::operator=(const RedirectionUri &redirectionUri)
         return (*this);
     this->_redirectionCode = redirectionUri._redirectionCode;
     this->_redirectionValue = redirectionUri._redirectionValue;
+    this->_redirectionUri = redirectionUri._redirectionUri;
     return (*this);
 }
 
@@ -29,8 +30,9 @@ std::string RedirectionUri::getRedirectionCode()
     std::stringstream sp(this->_redirectionUri);
 
     sp >> std::ws >> result;
-    bool isResult = this->_httpStatusCode.checkErrorCode(this->_redirectionCode);
-    result = isResult ? this->_redirectionCode : "none";
+    bool isResult = this->_httpStatusCode.checkErrorCode(result);
+    result = isResult ? result : "none";
+    this->_redirectionCode = result;
     return (result);
 }
 

@@ -31,6 +31,7 @@ int main(int ac, char **av)
         configException.run(106);
         return (-1);
     }
+    
     //get-filename
     av1 = av[1];
 
@@ -42,7 +43,7 @@ int main(int ac, char **av)
 
     parser->parse(av1);
     http = parser->getHttp();
-    /* std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
+    std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
     http->writeListens(http->getListens());
     std::cout << "http->getServers().at(0)->getListen().host : " << http->getServers().at(0)->getListen().host << std::endl;
     std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
@@ -54,12 +55,14 @@ int main(int ac, char **av)
     std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
     std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
     std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
-    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getPass() << " end" << std::endl;
-    std::cout << "cgi param : " << http->getServers().at(0)->getLocations().at(0)->getParam() << " end" << std::endl;
-    std::cout << "cgi paramkeyword : " << http->getServers().at(0)->getLocations().at(0)->getParamKeyword() << " end" << std::endl;
-    std::cout << "cgi paramvalues : " << http->getServers().at(0)->getLocations().at(0)->getParamValues().at(0) << " end" << std::endl;
-    std::cout << "errorPageCodes() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() << std::endl; */
-
+    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiPass() << " end" << std::endl;
+    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiParamKeyword() << " end" << std::endl;
+    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiParamValues().at(0) << " end" << std::endl;
+    std::cout << "http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() << std::endl;
+    std::cout << "http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() << std::endl;
+    std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) << std::endl;
+    std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() : " << http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() << std::endl;
+   
     // std::string httpRequest = "POST /processsampleform.php HTTP/1.1\r\n"
     //                           "Host: www.tutorialspoint.com\r\n"
     //                           "User-Agent: Mozilla/5.0 (windows; U; Windows NT 6.0; en-Us; rv:1.9.0.19) Gecko/2010031422 Firefox/3.0.19 (.NET CLR 3.5.30729)\r\n"

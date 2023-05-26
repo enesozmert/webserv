@@ -15,7 +15,6 @@ class RedirectionUri : public ISubScope
         std::string _redirectionUri;
         std::string _redirectionCode;
         std::string _redirectionValue;
-
         HttpStatusCode _httpStatusCode;
     public:
         RedirectionUri();
