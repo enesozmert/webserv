@@ -5,10 +5,11 @@
 #include <vector>
 #include <sstream>
 #include "ErrorPage.hpp"
-#include "IScope.hpp"
+#include "ISubScope.hpp"
 #include "Variable.hpp"
 #include "../utils/Utils.hpp"
-class CgiScope
+
+class CgiScope : public ISubScope
 {
     protected:
         std::string _pass;
@@ -20,17 +21,17 @@ class CgiScope
         ~CgiScope();
         CgiScope(const CgiScope &cgiScope);
         CgiScope &operator=(const CgiScope &cgiScope);
-    
+
         std::string getPass();
         std::string getParam();
         std::string getParamKeyword();
         std::vector<std::string> getParamValues();
-    
+
         void setPass(std::string pass);
         void setParam(std::string param);
         void setParamKeyword(std::string keyword);
         void setParamValues(std::vector<std::string> values);
-    
+
         // std::string getName() const;
         // CgiScope *cloneNew() const;
         // CgiScope *clone() const;

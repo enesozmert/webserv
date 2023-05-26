@@ -13,7 +13,7 @@
 #include "Variable.hpp"
 class ErrorPage;
 class RedirectionUri;
-class LocationScope : public IScope, public CgiScope
+class LocationScope : public IScope, public CgiScope, public ErrorPage, public RedirectionUri
 {
     private:
         std::string _path;
@@ -23,8 +23,6 @@ class LocationScope : public IScope, public CgiScope
         std::string _allowMethods;
         std::string _clientBodyBufferSize;
 
-        ErrorPage _errorPage;
-        RedirectionUri _redirectionUri;
         DataBase<Variable<std::string> > _keywordDatabase;
         bool longestMatch;//fatma ekledi
         //bunu true/false nasıl başlatacağımıza karar vermeliyiz
@@ -41,8 +39,6 @@ class LocationScope : public IScope, public CgiScope
         std::string getAutoindex();
         std::vector<std::string> getIndex();
         std::vector<std::string> getAllowMethods();
-        ErrorPage getErrorPage();
-        RedirectionUri getRedirectionUri();
         std::string getPath();
         std::string getClientBodyBufferSize();
         DataBase<Variable<std::string> > getKeywordDataBase();
@@ -51,8 +47,6 @@ class LocationScope : public IScope, public CgiScope
         void setIndex(std::string index);
         void setAutoindex(std::string autoIndex);
         void setAllowMethods(std::string allowMethods);
-        void setErrorPage(ErrorPage errorPage);
-        void setRedirectionUri(RedirectionUri redirectionUri);
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
         void setPath(std::string path);
 

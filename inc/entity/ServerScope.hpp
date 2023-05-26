@@ -15,8 +15,7 @@
 
 class ErrorPage;
 class LocationScope;
-class CgiScope;
-class ServerScope : public IScope
+class ServerScope : public IScope, public CgiScope
 {
     private:
         t_listen listen;//fatma ekledi
@@ -28,8 +27,6 @@ class ServerScope : public IScope
         std::string _root;
         std::string _index;
         std::string _listen;
-
-        CgiScope _cgiScope;
 
         bool _isServerNameNothing;
         ErrorPage _errorPage;
@@ -61,7 +58,6 @@ class ServerScope : public IScope
         std::vector<std::string> getServerName();
         std::string getRoot();
         std::vector<std::string> getIndex();
-        CgiScope getCgiScope();
 
         std::vector<LocationScope *> getLocations();
         bool getIsServerNameNothing();

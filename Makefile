@@ -25,7 +25,7 @@ SRC_SYNTAX		=	syntax/
 ENTITY			=	ErrorPage HttpScope LocationScope\
 					RedirectionUri ServerScope CgiScope\
 					Response Request\
-					HttpMethod
+					HttpMethod HttpStatusCode
 PARSER			=	ParserConfig ParserRequest
 FILE			=	File
 SERVER			=	Server Cluster

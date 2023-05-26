@@ -102,7 +102,7 @@ void    Server::process(long socket, HttpScope* http)
         std::cout << YELLOW << "matchedServer->getRoot() = " << matchedServer->getRoot() << RESET << std::endl;
         // std::cout << YELLOW << "matchedServer->getCgi_pass() = " << matchedServer->getCgi_pass() << RESET << std::endl;
         //std::cout << YELLOW << "matchedServer->getIndex().front() = " << matchedServer->getIndex().front() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getErrorPage().getPageName() = " << matchedServer->getErrorPage().getPageName() << RESET << std::endl;
+        std::cout << YELLOW << "matchedServer->getErrorPage().getPageName() = " << matchedServer->getErrorPage().getErrorPagePath() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getServerName().front() = " << matchedServer->getServerName().front() << RESET << std::endl;
 
 

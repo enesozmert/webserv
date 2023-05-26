@@ -9,7 +9,7 @@ ServerScope::~ServerScope()
 {
 }
 
-ServerScope::ServerScope(const ServerScope &server)
+ServerScope::ServerScope(const ServerScope &server) : CgiScope(server)
 {
     *this = server;
 }
@@ -155,11 +155,6 @@ std::vector<std::string> ServerScope::getIndex()
     return (indexs);
 }
 
-CgiScope ServerScope::getCgiScope()
-{
-    return (this->_cgiScope);
-}
-
 DataBase<Variable<std::string> > ServerScope::getKeywordDataBase()
 {
     return (this->_keywordDatabase);
@@ -173,8 +168,8 @@ void ServerScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("root", &this->_root));
     _keywordDatabase.insertData(Variable<std::string>("index", &this->_index));
     _keywordDatabase.insertData(Variable<std::string>("listen", &this->_listen));
-    // _keywordDatabase.insertData(Variable<std::string>("cgi_pass", &this->_cgiScope._pass));
-    // _keywordDatabase.insertData(Variable<std::string>("cgi_param", &this->_cgiScope._param));
+    _keywordDatabase.insertData(Variable<std::string>("cgi_pass", &this->_pass));
+    _keywordDatabase.insertData(Variable<std::string>("cgi_param", &this->_param));
 }
 
 std::string ServerScope::getName() const

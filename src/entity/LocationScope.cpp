@@ -9,7 +9,8 @@ LocationScope::~LocationScope()
 {
 }
 
-LocationScope::LocationScope(const LocationScope &location) : CgiScope(location)
+LocationScope::LocationScope(const LocationScope &location) : CgiScope(location),
+    ErrorPage(location), RedirectionUri(location)
 {
     *this = location;
 }
@@ -59,14 +60,6 @@ std::vector<std::string> LocationScope::getAllowMethods()
     }
     return (allowMethods);
 }
-ErrorPage LocationScope::getErrorPage()
-{
-    return (this->_errorPage);
-}
-RedirectionUri LocationScope::getRedirectionUri()
-{
-    return (this->_redirectionUri);
-}
 
 DataBase<Variable<std::string> > LocationScope::getKeywordDataBase()
 {
@@ -98,14 +91,6 @@ void LocationScope::setAllowMethods(std::string allowMethods)
 {
     (void)allowMethods;
 }
-void LocationScope::setErrorPage(ErrorPage errorPage)
-{
-    this->_errorPage = errorPage;
-}
-void LocationScope::setRedirectionUri(RedirectionUri redirectionUri)
-{
-    this->_redirectionUri = redirectionUri;
-}
 
 void LocationScope::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 {
@@ -121,6 +106,8 @@ void LocationScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("allow_methods", &this->_allowMethods));
     _keywordDatabase.insertData(Variable<std::string>("cgi_pass", &this->_pass));
     _keywordDatabase.insertData(Variable<std::string>("cgi_param", &this->_param));
+    _keywordDatabase.insertData(Variable<std::string>("error_page", &this->_errorPage));
+    _keywordDatabase.insertData(Variable<std::string>("return", &this->_redirectionUri));
 }
 
 void LocationScope::setPath(std::string path)

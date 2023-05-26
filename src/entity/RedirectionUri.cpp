@@ -13,66 +13,54 @@ RedirectionUri::RedirectionUri(const RedirectionUri &redirectionUri)
     *this = redirectionUri;
 }
 
-RedirectionUri	&RedirectionUri::operator=(const RedirectionUri &redirectionUri)
+RedirectionUri &RedirectionUri::operator=(const RedirectionUri &redirectionUri)
 {
     if (this == &redirectionUri)
         return (*this);
-    this->_codes = redirectionUri._codes;
-    this->_pageName = redirectionUri._pageName;
+    this->_redirectionCode = redirectionUri._redirectionCode;
+    this->_redirectionValue = redirectionUri._redirectionValue;
     return (*this);
 }
 
-std::vector<std::string> RedirectionUri::getCodes() const
+std::string RedirectionUri::getRedirectionUri()
 {
-    std::vector<std::string> codes;
-    std::string tempCodes;
-    std::stringstream sp(this->_codes);
-
-    while (sp << tempCodes)
-    {
-        codes.push_back(tempCodes);
-    }
-    return (codes);
+    return (this->_redirectionUri);
 }
 
-std::string RedirectionUri::getPageName() const
+std::string RedirectionUri::getRedirectionCode()
 {
-    return (this->_pageName);
+    std::string result;
+    std::stringstream sp(this->_redirectionUri);
+
+    sp >> std::ws >> result;
+    bool isResult = this->_httpStatusCode.checkErrorCode(this->_redirectionCode);
+    result = isResult ? this->_redirectionCode : "none";
+    return (result);
 }
 
-void RedirectionUri::setCodes(std::string code)
+std::string RedirectionUri::getRedirectionValue()
 {
-    (void)code;
-    // this->_codes.push_back(code);
+    std::string tempCode;
+    std::string value;
+    std::stringstream sp(this->_redirectionUri);
+
+    sp >> tempCode;
+    sp >> value;
+    this->_redirectionValue = value;
+    return (this->_redirectionValue);
 }
 
-void RedirectionUri::setPageName(std::string pageName)
+void RedirectionUri::setRedirectionUri(std::string redirectionUri)
 {
-    this->_pageName = pageName;
+    this->_redirectionUri = redirectionUri;
 }
 
-
-void RedirectionUri::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
+void RedirectionUri::setRedirectionCode(std::string code)
 {
-    this->_keywordDatabase = keywordDatabase;
+    this->_redirectionCode = code;
 }
 
-
-std::string RedirectionUri::getName() const
+void RedirectionUri::setRedirectionValue(std::string value)
 {
-    return (this->name);
+    this->_redirectionValue = value;
 }
-
-
-void RedirectionUri::keywordFill()
-{
-    // std::vector<Variable<std::string> >  datas;
-
-    _keywordDatabase.insertData(Variable<std::string>("codes", &this->_codes));
-    _keywordDatabase.insertData(Variable<std::string>("pageName", &this->_pageName));
-
-    // this->setKeywordDatabase(datas);
-}
-
-RedirectionUri* RedirectionUri::cloneNew() const { return new RedirectionUri(); }
-RedirectionUri* RedirectionUri::clone() const { return new RedirectionUri(*this); }
