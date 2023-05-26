@@ -23,15 +23,15 @@ CgiScope &CgiScope::operator=(const CgiScope &cgiScope)
     return (*this);
 }
 
-std::string CgiScope::getPass()
+std::string CgiScope::getCgiPass()
 {
     return (this->_pass);
 }
-std::string CgiScope::getParam()
+std::string CgiScope::getCgiParam()
 {
     return (this->_param);
 }
-std::string CgiScope::getParamKeyword()
+std::string CgiScope::getCgiParamKeyword()
 {
     std::istringstream iss(this->_param);
     std::string keyword;
@@ -39,7 +39,7 @@ std::string CgiScope::getParamKeyword()
     iss >> std::ws >> keyword;
     return (keyword);
 }
-std::vector<std::string> CgiScope::getParamValues()
+std::vector<std::string> CgiScope::getCgiParamValues()
 {
     std::istringstream iss(this->_param);
     std::vector<std::string> result;
@@ -53,19 +53,19 @@ std::vector<std::string> CgiScope::getParamValues()
     return result;
 }
 
-void CgiScope::setPass(std::string pass)
+void CgiScope::setCgiPass(std::string pass)
 {
     this->_pass = pass;
 }
-void CgiScope::setParam(std::string param)
+void CgiScope::setCgiParam(std::string param)
 {
     this->_param = param;
 }
-void CgiScope::setParamKeyword(std::string keyword)
+void CgiScope::setCgiParamKeyword(std::string keyword)
 {
     this->_paramKeyword = keyword;
 }
-void CgiScope::setParamValues(std::vector<std::string> values)
+void CgiScope::setCgiParamValues(std::vector<std::string> values)
 {
     this->_paramValues = values;
 }
