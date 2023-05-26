@@ -53,6 +53,10 @@ int main(int ac, char **av)
     std::cout << "getPath() : " << http->getServers().at(0)->getLocations().at(1)->getPath() << std::endl;
     std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
     std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
+    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getPass() << " end" << std::endl;
+    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getParam() << " end" << std::endl;
+    std::cout << "errorPageCodes() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() << std::endl;
+
     // std::string httpRequest = "POST /processsampleform.php HTTP/1.1\r\n"
     //                           "Host: www.tutorialspoint.com\r\n"
     //                           "User-Agent: Mozilla/5.0 (windows; U; Windows NT 6.0; en-Us; rv:1.9.0.19) Gecko/2010031422 Firefox/3.0.19 (.NET CLR 3.5.30729)\r\n"
@@ -79,9 +83,9 @@ int main(int ac, char **av)
     // std::cout << "request->getVersion() : " << request->getVersion() << std::endl;
     // std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
-    Cluster cluster;
-    cluster.setUpCluster(http);
-    cluster.run();
+    // Cluster cluster;
+    // cluster.setUpCluster(http);
+    // cluster.run();
 
     return (0);
 }

@@ -2,12 +2,10 @@
 
 #include <iostream>
 #include <vector>
-#include <iostream>
 #include <string>
 #include <sstream>
 #include "../database/DataBase.hpp"
 #include "IRequest.hpp"
-#include "Variable.hpp"
 
 class HttpMethod
 {
@@ -21,6 +19,7 @@ class HttpMethod
         std::vector<std::string> get();
         void set(std::string method);
 
-        void initMethods();
         bool checkMethodName(std::string methodName);
+    private:
+        void initMethods();
 };

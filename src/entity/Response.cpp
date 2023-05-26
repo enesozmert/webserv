@@ -206,7 +206,7 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
 	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->statusCode = request->getReturnCode();
     setIndexs(location->getIndex(), server->getIndex());
-	this->_cgi_pass = server->getCgi_pass();
+	// this->_cgi_pass = server->getCgi_pass();
 	//cgi_pass location altında da olabilir? hangisini almalıyız?
 
     this->_contentLocation = removeAdjacentSlashes(_indexs.at(0));

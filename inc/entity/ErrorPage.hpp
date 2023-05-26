@@ -5,36 +5,31 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "IScope.hpp"
+#include "ISubScope.hpp"
 #include "Variable.hpp"
 #include "../database/DataBase.hpp"
+#include "HttpStatusCode.hpp"
 
-
-class ErrorPage : public IScope
+class HttpStatusCode;
+class ErrorPage : public ISubScope
 {
-    private:
-        std::string _codes;
-        std::string _pageName;
-        DataBase<Variable<std::string> > _keywordDatabase;
+    protected:
+        std::string _errorPage;
+        std::vector<std::string> _errorPageCodes;
+        std::string _errorPagePath;
         
+        HttpStatusCode _httpStatusCode;
     public:
-        ErrorPage(/* args */);
+        ErrorPage();
         ~ErrorPage();
         ErrorPage(const ErrorPage &errorPage);
         ErrorPage &operator=(const ErrorPage &errorPage);
     
-        std::vector<std::string> getCodes();
-        std::string getPageName();
-        std::string getName() const;
-        DataBase<Variable<std::string> > getKeywordDataBase();
+        std::vector<std::string> getErrorPageCodes();
+        std::string getErrorPagePath();
+        std::string getErrorPage();
 
-
-        void setCodes(std::string code);
-        void setPageName(std::string pageName);
-        void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
-
-        void keywordFill();
-
-        ErrorPage* cloneNew() const;
-        ErrorPage* clone() const;
+        void setErrorPageCodes(std::string code);
+        void setErrorPagePath(std::string pagePath);
+        void setErrorPage(std::string errorPage);
 };
