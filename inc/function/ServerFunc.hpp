@@ -16,6 +16,10 @@ inline size_t getMatchLocationPathIndex(ServerScope *matchedServerScope, std::st
             defaultLocationScopeSize++;
             result++;
         }
+        else
+        {
+            return (0);
+        }
     }
 
     if (defaultLocationScopeSize != 1)
@@ -38,6 +42,10 @@ inline size_t getDefaultLocationPathIndex(ServerScope *matchedServerScope) {
         {
             defaultLocationScopeSize++;
             result++;
+        }
+        else
+        {
+            return (0);
         }
     }
 
@@ -62,6 +70,10 @@ inline size_t getLongestLocationPathIndex(ServerScope *matchedServerScope)
         {
             maxPathLength = (*it)->getPath().length();
             result++;
+        }
+        else
+        {
+            return (0);
         }
     }
     return (result);

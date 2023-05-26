@@ -183,10 +183,13 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
 	//std::cout << YELLOW << "server->getName() : " << server->getKeywordDataBase().getByNameData(server) << RESET << std::endl;
 	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->statusCode = request->getReturnCode();
-    setIndexs(location->getIndex(), server->getIndex());
+  setIndexs(location->getIndex(), server->getIndex());
 	//this->_cgi_pass = location->getCgiPass();
-    this->_contentLocation = _indexs.at(0);
+  this->_contentLocation = _indexs.at(0);
 	this->_path = location->getRoot() + _indexs.at(0);//this->_path = "./tests/test1/index.html";
+	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
+	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
+
 
     if (location->getAutoindex() == "on")
         this->_isAutoIndex = true;

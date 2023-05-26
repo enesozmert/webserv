@@ -5,39 +5,29 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "IScope.hpp"
-#include "../database/DataBase.hpp"
-#include "Variable.hpp"
+#include "ISubScope.hpp"
+#include "HttpStatusCode.hpp"
 
-
-
-class RedirectionUri : public IScope
+class HttpStatusCode;
+class RedirectionUri : public ISubScope
 {
-private:
-    std::string _codes;
-    std::string _pageName;
-    DataBase<Variable<std::string> > _keywordDatabase;
+    protected:
+        std::string _redirectionUri;
+        std::string _redirectionCode;
+        std::string _redirectionValue;
 
-public:
-    RedirectionUri(/* args */);
-    ~RedirectionUri();
-    RedirectionUri(const RedirectionUri &redirectionUri);
-    RedirectionUri	&operator=(const RedirectionUri &redirectionUri);
+        HttpStatusCode _httpStatusCode;
+    public:
+        RedirectionUri();
+        ~RedirectionUri();
+        RedirectionUri(const RedirectionUri &redirectionUri);
+        RedirectionUri	&operator=(const RedirectionUri &redirectionUri);
 
-    std::vector<std::string> getCodes() const;
-    void setCodes(std::string code);
-    void setPageName(std::string pageName);
-    void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
+        std::string getRedirectionCode();
+        std::string getRedirectionValue();
+        std::string getRedirectionUri();
 
-
-    std::string getName() const;
-    std::string getPageName() const;
-    DataBase<Variable<std::string> > getKeywordDataBase();
-
-    void keywordFill();
-
-
-    RedirectionUri* cloneNew() const;
-    RedirectionUri* clone() const;
-
+        void setRedirectionCode(std::string code);
+        void setRedirectionValue(std::string value);
+        void setRedirectionUri(std::string redirectionUri); 
 };
