@@ -15,22 +15,23 @@ class ErrorPage;
 class HttpScope : public IScope
 {
     private:
-        std::string _clientMaxBodySize;
-        std::vector<ServerScope *> _servers;
-        ErrorPage _errorPage;
-        DataBase<Variable<std::string> > _keywordDatabase;
-        std::vector<t_listen> _listens;
+        std::string                         _clientMaxBodySize;
+        std::vector<ServerScope *>          _servers;
+        std::vector<t_listen>               _listens;
+        ErrorPage                           _errorPage;
+        DataBase<Variable<std::string> >    _keywordDatabase;
 
     public:
-        HttpScope(/* args */);
+        HttpScope();
         ~HttpScope();
         HttpScope(const HttpScope &http);
         HttpScope &operator=(const HttpScope &http);
 
-        std::string getClientMaxBodySize();
-        std::vector<ServerScope *> getServers();
-        ErrorPage getErrorPage();
-        DataBase<Variable<std::string> > getKeywordDataBase();
+        std::string                         getClientMaxBodySize();
+        std::vector<ServerScope *>          getServers();
+        ErrorPage                           getErrorPage();
+        DataBase<Variable<std::string> >    getKeywordDataBase();
+        std::vector<t_listen>               getListens();
 
         void setClientMaxBodySize(std::string clientMaxBodySize);
         void setServer(ServerScope *server);
@@ -38,14 +39,10 @@ class HttpScope : public IScope
         void setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
         void setListens(ServerScope* server);
 
-        void keywordFill();
-
-        std::vector<t_listen> getListens();
-
-        void writeListens(std::vector<t_listen> _listens);
-
+        void        keywordFill();
+        void        writeListens(std::vector<t_listen> _listens);
+        HttpScope*  cloneNew() const;
+        HttpScope*  clone() const;
         std::string getName() const;
-        HttpScope* cloneNew() const;
-        HttpScope* clone() const;
 
 };

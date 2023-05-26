@@ -5,10 +5,7 @@ Request::Request()
     this->_returnCode = 200;
     this->keywordFill();
 }
-
-Request::~Request()
-{
-}
+Request::~Request() {}
 Request::Request(const Request& request)
 {
     (*this) = request;
@@ -28,10 +25,6 @@ std::string Request::getBody()
 std::string Request::getQuery()
 {
     return (this->_query);
-}
-std::map<std::string, std::string> Request::getEnvForCgi()
-{
-    return (this->_envForCgi);
 }
 int Request::getPort()
 {
@@ -168,14 +161,6 @@ void Request::setQuery(std::string query)
 {
     this->_query = query;
 }
-/* void Request::setEnvForCgi(std::string envForCgi)
-{
-    this->_envForCgi = envForCgi;
-} */
- void Request::setEnvForCgi(std::map<std::string, std::string> envForCgi)
-{
-    this->_envForCgi = envForCgi;
-} 
 void Request::setPort(std::string port)
 {
     this->_port = port;//değişebilir her an adress
@@ -259,10 +244,6 @@ void Request::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("auth-scheme", &this->_authScheme));
     _keywordDatabase.insertData(Variable<std::string>("authorization", &this->_authorization));
 }
-std::string Request::getName() const
-{
-    return (this->name);
-}
 Request* Request::cloneNew() const
 {
     return (new Request());
@@ -272,52 +253,7 @@ Request* Request::clone() const
     return (new Request(*this));
 }
 
-/* std::string								Request::setIndex()
+std::string Request::getName() const
 {
-	std::vector<std::string>::iterator							it;
-	std::list<std::pair<std::string, float> >::const_iterator	lang;
-	std::string													path;
-
-	it = this->_index.begin();
-	while(it != this->_index.end()) // Check with language prefs
-	{
-		for (lang = this->_acceptLanguages().begin(); lang != this->_acceptLanguages().end(); lang++)
-		{
-			path = this->_path;
-			if (path[path.size() - 1] != '/')
-				path += "/";
-			if ((*it).find('.') != (*it).npos)
-				path += (*it).substr(0, (*it).find_last_of('.') + 1) + lang->first + (*it).substr((*it).find_last_of('.'));
-			if (pathIsFile(path))
-			{
-				this->_path = path;
-				if (this->_contentLocation.size() && this->_contentLocation[this->_contentLocation.size() - 1] != '/')
-					this->_contentLocation += "/";
-				// NOT PROTECTED AGAINST INDEXES WITHOUT EXTENSION
-				if ((*it).find('.') != (*it).npos)
-					this->_contentLocation += (*it).substr(0, (*it).find_last_of('.') + 1) + lang->first + (*it).substr((*it).find_last_of('.'));
-				return this->_path;
-			}
-		}
-		it++;
-	}
-
-	it = this->_index.begin();
-	while(it != this->_index.end()) // check with index file only
-	{
-		path = this->_path;
-		if (path[path.size() - 1] != '/')
-			path += "/";
-		path += *it;
-		if (pathIsFile(path))
-		{
-			this->_path = path;
-			if (this->_contentLocation[this->_contentLocation.size() - 1] != '/')
-				this->_contentLocation += "/";
-			this->_contentLocation += *it;
-			return this->_path;
-		}
-		it++;
-	}
-	return "";
-} */
+    return (this->name);
+}

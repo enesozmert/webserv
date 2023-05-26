@@ -1,13 +1,11 @@
 #include "../inc/entity/ServerScope.hpp"
 
-ServerScope::ServerScope(/* args */)
+ServerScope::ServerScope()
 {
     this->keywordFill();
 }
 
-ServerScope::~ServerScope()
-{
-}
+ServerScope::~ServerScope() {}
 
 ServerScope::ServerScope(const ServerScope &server) : CgiScope(server)
 {
@@ -44,7 +42,6 @@ void ServerScope::setPort(std::string port)
 void ServerScope::setServerName(std::string serverName)
 {
     (void)serverName;
-    // this->_serverNames.push_back(serverName);
 }
 
 void ServerScope::setLocation(LocationScope *location)
@@ -172,11 +169,10 @@ void ServerScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("cgi_param", &this->_param));
 }
 
+ServerScope *ServerScope::cloneNew() const { return new ServerScope(); }
+ServerScope *ServerScope::clone() const { return new ServerScope(*this); }
 std::string ServerScope::getName() const
 {
     return (this->name);
 }
-
-ServerScope *ServerScope::cloneNew() const { return new ServerScope(); }
-ServerScope *ServerScope::clone() const { return new ServerScope(*this); }
 

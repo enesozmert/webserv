@@ -1,13 +1,8 @@
 #include "../inc/file/File.hpp"
 
-File::File()
-{
+File::File() {}
 
-}
-
-File::~File()
-{
-}
+File::~File() {}
 
 File::File(const File &file)
 {

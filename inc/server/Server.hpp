@@ -31,21 +31,18 @@ class Server {
         Server(const t_listen &listen);
         ~Server();
 
-        long        getFd() const;
-        t_listen    getListen() const;
-        bool        getSocketConnected() const;
-
-        void        setUpSocket();
-        void        setAddr();
-        void        clean();
-        void        close(int socket);
-
-        long        accept();
-        void        process(long socket, HttpScope *httpScope);
-        void        processChunk(long socket);
-        int         send(long socket);
-        int         recv(long socket);
-
+        long            getFd() const;
+        t_listen        getListen() const;
+        bool            getSocketConnected() const;
+        void            setUpSocket();
+        void            setAddr();
+        void            clean();
+        void            close(int socket);
+        long            accept();
+        void            process(long socket, HttpScope *httpScope);
+        void            processChunk(long socket);
+        int             send(long socket);
+        int             recv(long socket);
         ServerScope*    getServerForRequest(t_listen& address, const std::string& hostname, HttpScope* http);
         LocationScope*  getLocationForRequest(ServerScope *matchedServerScope, const std::string& path); 
 };

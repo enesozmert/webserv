@@ -12,10 +12,10 @@
 class CgiScope : public ISubScope
 {
     protected:
-        std::string _pass;
-        std::string _param;
-        std::string _paramKeyword;
-        std::vector<std::string> _paramValues;
+        std::string                 _pass;
+        std::string                 _param;
+        std::string                 _paramKeyword;
+        std::vector<std::string>    _paramValues;
     public:
         CgiScope();
         ~CgiScope();

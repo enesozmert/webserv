@@ -14,8 +14,9 @@ class Variable
         Variable(){}
         Variable(T name, T* value) {_variable = std::make_pair(name, value);}
         ~Variable() {}
-        T getName() const {return (_variable.first);}
-        T* getValue() const {return (_variable.second);}
-        void setName(T name){_variable.first = name;}
-        void setValue(T* value){_variable.second = value;}
+    
+        T       getName() const {return (_variable.first);}
+        T*      getValue() const {return (_variable.second);}
+        void    setName(T name){_variable.first = name;}
+        void    setValue(T* value){_variable.second = value;}
 };

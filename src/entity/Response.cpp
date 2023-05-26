@@ -4,20 +4,21 @@ Response::Response(){}
 
 Response::~Response(){}
 
-//GETTERS
 std::string		Response::getResponse()
 {
     return (this->_response);
 }
+
 int	Response::getStatusCode()
 {
     return (this->statusCode);
 }
+
 std::map<int, std::string>  Response::getErrorMap()
 {
     return (this->_errorMap);
 }
-//SETTERS
+
 void    Response::setErrorMap()
 {
 	this->_errorMap.clear();
@@ -32,6 +33,7 @@ void    Response::setErrorMap()
 	this->_errorMap[413] = "Payload Too Large";
 	this->_errorMap[500] = "Internal Server Error";
 }
+
 void			Response::setAllow(std::vector<std::string> methods)
 {
 	std::vector<std::string>::iterator it = methods.begin();
@@ -57,14 +59,12 @@ void			Response::setContentLanguage(const std::string& lang)
 
 void			Response::setContentLength(size_t size)
 {
-	_contentLength = to_string(size);
+	_contentLength = std::to_string(size);
 }
 
-void	Response::setContentLocation(const std::string& path, int code)
+void	Response::setContentLocation(const std::string& path)
 {
-    (void)code;
-	// if (code != 404)
-		_contentLocation = path;
+	_contentLocation = path;
 }
 
 void			Response::setContentType(std::string type, std::string path)
@@ -129,13 +129,13 @@ void			Response::setRetryAfter(int code, int sec)
 {
 	if (code == 503 || code == 429 || code == 301)
 	{
-		_retryAfter = to_string(sec);
+		_retryAfter = std::to_string(sec);
 	}
 }
 
 void			Response::setServer(void)
 {
-	_server = "Weebserv/1.0.0 (Unix)";
+	_server = "webserv";//buraya farklı isim verilebilir mi?
 }
 
 void			Response::setTransferEncoding(void)
@@ -157,7 +157,7 @@ void			Response::setValues(size_t size, const std::string& path, int code, std::
 	setErrorMap();
 	setContentLanguage(lang);
 	setContentLength(size);
-	setContentLocation(contentLocation, code);
+	setContentLocation(contentLocation);
 	setContentType(type, path);
 	setDate();
 	setLastModified(path);
@@ -177,16 +177,28 @@ void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<st
 		this->_indexs.push_back(*itt);
 }
 
+void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue)
+{
+	int i = 0;
+	if (_paramValue.size() == _paramKeyword.size())
+	{
+		for (std::vector<std::string>::iterator it = _paramValue.begin(); it != _paramValue.end(); it++)
+		{
+			this->_cgi_params[_paramKeyword.at(i)] = *it;
+			i++;
+		}
+	}
+}
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-	//std::cout << YELLOW << "server->getName() : " << server->getKeywordDataBase().getByNameData(server) << RESET << std::endl;
-	//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
-	this->statusCode = request->getReturnCode();
-  setIndexs(location->getIndex(), server->getIndex());
-	//this->_cgi_pass = location->getCgiPass();
-  this->_contentLocation = _indexs.at(0);
+	this->statusCode = request->getReturnCode();//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
+	//this->_cgi_pass = location->getPass();
+  	setIndexs(location->getIndex(), server->getIndex());
+	//setParams(location->getParamKeyword(), location->getParamValues());
+  	this->_contentLocation = _indexs.at(0);
 	this->_path = location->getRoot() + _indexs.at(0);//this->_path = "./tests/test1/index.html";
+	//std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 
@@ -214,7 +226,7 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
             GETmethod(request, server);
         else if (request->getHttpMethodName() == "POST")
             POSTmethod(request, server);
-        else if (request->getHttpMethodName() == "POST")
+        else if (request->getHttpMethodName() == "DELETE")
             DELETEmethod();
         else
             std::cerr << "buraya ne eklememiz lazım bilemedim" << std::endl;   
@@ -249,8 +261,7 @@ std::string		Response::writeHeader(void)
 		header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
 	if (_wwwAuthenticate != "")
 		header += "WWW-Authenticate: " + _wwwAuthenticate + "\r\n";
-	// header += "\r\n";
-
+	header += "\r\n";
 	return (header);
 }
 
@@ -276,12 +287,11 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path);
+		Cgi	cgi(request, server, this->_path, this->_cgi_params);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
 		_response = cgi.executeCgi(this->_cgi_pass);
-
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -293,13 +303,13 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 		}
 		while (_response.find("\r\n", j) == j)
 			j -= 2;
-
 		_response = _response.substr(i, j - i);
 	}
 	else if  (this->statusCode == 200)
 		this->statusCode = readContent(server);
 	else
 		_response = this->readHtml(_errorMap[this->statusCode]);
+	
 	if (this->statusCode == 500)
 		_response = this->readHtml(_errorMap[this->statusCode]);
 
@@ -327,12 +337,11 @@ void			Response::POSTmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path);
+		Cgi	cgi(request, server, this->_path, _cgi_params);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
 		_response = cgi.executeCgi(this->_cgi_pass);
-
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -422,11 +431,10 @@ std::string		Response::getHeader(size_t size, const std::string& path, int code,
 	resetValues();
 	setValues(size, path, code, type, contentLocation, lang);
 
-	header = "HTTP/1.1 " + to_string(code) + " " + getStatusMessage(code) + "\r\n";
+	header = "HTTP/1.1 " + std::to_string(code) + " " + getStatusMessage(code) + "\r\n";
 	header += writeHeader();
 
 	return (header);
-
 }
 
 std::string		Response::getStatusMessage(int code)
@@ -436,7 +444,7 @@ std::string		Response::getStatusMessage(int code)
 	return ("Unknown Code");
 }
 
-
+//auto_index ile ilgili
 std::string         Response::getPage(const char *path, std::string const &host, int port) {
     std::string dirName(path);
     DIR *dir = opendir(path);
@@ -466,7 +474,7 @@ std::string         Response::getPage(const char *path, std::string const &host,
     closedir(dir);
     return page;
 }
-
+//auto_index ile ilgili
 std::string         Response::getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) {
     std::stringstream   ss;
     ss << "\t\t<p><a href=\"http://" + host + ":" <<\

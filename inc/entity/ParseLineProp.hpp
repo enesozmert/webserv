@@ -8,16 +8,16 @@
 class ParseLineProp
 {
 private:
-    size_t _index;
-    size_t _scopeOpenIndex;
-    size_t _scopeCloseIndex;
+    size_t      _index;
+    size_t      _scopeOpenIndex;
+    size_t      _scopeCloseIndex;
     std::string _scopeName;
     std::string _line;
-    bool _isScopeOpen;
-    bool _isScopeClose;
+    bool        _isScopeOpen;
+    bool        _isScopeClose;
 
 public:
-    ParseLineProp(/* args */) : _index(0) ,_scopeOpenIndex(0), _scopeCloseIndex(0), _isScopeOpen(false), _isScopeClose(false) {}
+    ParseLineProp() : _index(0) ,_scopeOpenIndex(0), _scopeCloseIndex(0), _isScopeOpen(false), _isScopeClose(false) {}
     ~ParseLineProp() {}
     ParseLineProp(const ParseLineProp &other) : _index(other._index),
                                                 _scopeOpenIndex(other._scopeOpenIndex), _scopeCloseIndex(other._scopeCloseIndex),
@@ -54,17 +54,15 @@ public:
     {
         return _line;
     }
-
     bool getIsScopeOpen()
     {
         return _isScopeOpen;
     }
-
     bool getIsScopeClose()
     {
         return _isScopeClose;
     }
-
+    
     void setIndex(size_t _index)
     {
         this->_index = _index;

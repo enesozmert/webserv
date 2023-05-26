@@ -12,10 +12,10 @@
 class SyntaxConfig
 {
     private:
-        ConfigException _configException;
+        ConfigException                 _configException;
         std::map<size_t, ParseLineProp> _parseLineProps;
-        size_t _httpScopeCount;
-        size_t _serverScopeCount;
+        size_t                          _httpScopeCount;
+        size_t                          _serverScopeCount;
     public:
         SyntaxConfig();
         ~SyntaxConfig();
@@ -23,8 +23,8 @@ class SyntaxConfig
         SyntaxConfig(std::map<size_t, ParseLineProp> parseLineProps);
         SyntaxConfig &operator=(const SyntaxConfig &syntaxConfig);
 
-        void setParseLineProps(std::map<size_t, ParseLineProp> parseLineProps);
-        void analizer();
+        void    setParseLineProps(std::map<size_t, ParseLineProp> parseLineProps);
+        void    analizer();
     private:
         int checkSemicolon(const int &index);
         int checkBrackets(const int &index);

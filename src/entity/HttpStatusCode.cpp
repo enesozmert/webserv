@@ -5,9 +5,7 @@ HttpStatusCode::HttpStatusCode()
     this->initErrorCodes();
 }
 
-HttpStatusCode::~HttpStatusCode()
-{
-}
+HttpStatusCode::~HttpStatusCode() {}
 
 HttpStatusCode::HttpStatusCode(const HttpStatusCode &httpErrorCode)
 {

@@ -1,12 +1,8 @@
 #include "../inc/entity/CgiScope.hpp"
 
-CgiScope::CgiScope()
-{
-}
+CgiScope::CgiScope() {}
 
-CgiScope::~CgiScope()
-{
-}
+CgiScope::~CgiScope() {}
 
 CgiScope::CgiScope(const CgiScope &cgiScope)
 {
@@ -31,6 +27,7 @@ std::string CgiScope::getCgiParam()
 {
     return (this->_param);
 }
+
 std::string CgiScope::getCgiParamKeyword()
 {
     std::istringstream iss(this->_param);
@@ -40,6 +37,7 @@ std::string CgiScope::getCgiParamKeyword()
     return (keyword);
 }
 std::vector<std::string> CgiScope::getCgiParamValues()
+
 {
     std::istringstream iss(this->_param);
     std::vector<std::string> result;

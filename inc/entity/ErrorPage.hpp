@@ -14,9 +14,9 @@ class HttpStatusCode;
 class ErrorPage : public ISubScope
 {
     protected:
-        std::string _errorPage;
-        std::vector<std::string> _errorPageCodes;
-        std::string _errorPagePath;
+        std::vector<std::string>    _errorPageCodes;
+        std::string                 _errorPage;
+        std::string                 _errorPagePath;
         
         HttpStatusCode _httpStatusCode;
     public:
@@ -25,11 +25,11 @@ class ErrorPage : public ISubScope
         ErrorPage(const ErrorPage &errorPage);
         ErrorPage &operator=(const ErrorPage &errorPage);
     
-        std::vector<std::string> getErrorPageCodes();
-        std::string getErrorPagePath();
-        std::string getErrorPage();
+        std::vector<std::string>    getErrorPageCodes();
+        std::string                 getErrorPagePath();
+        std::string                 getErrorPage();
 
-        void setErrorPageCodes(std::string code);
-        void setErrorPagePath(std::string pagePath);
-        void setErrorPage(std::string errorPage);
+        void                        setErrorPageCodes(std::string code);
+        void                        setErrorPagePath(std::string pagePath);
+        void                        setErrorPage(std::string errorPage);
 };

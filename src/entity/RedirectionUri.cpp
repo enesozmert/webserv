@@ -1,12 +1,8 @@
 #include "../inc/entity/RedirectionUri.hpp"
 
-RedirectionUri::RedirectionUri()
-{
-}
+RedirectionUri::RedirectionUri() {}
 
-RedirectionUri::~RedirectionUri()
-{
-}
+RedirectionUri::~RedirectionUri() {}
 
 RedirectionUri::RedirectionUri(const RedirectionUri &redirectionUri)
 {
