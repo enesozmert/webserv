@@ -56,13 +56,8 @@ void SyntaxConfig::analizer()
 int SyntaxConfig::checkSemicolon(const int &index)
 {
     std::string line;
-    //std::string line2;
-
 
     line = this->_parseLineProps[index].getLine();
-    //line2 = this->_parseLineProps[index + 1].getLine();
-    // if (line.find("{") == std::string::npos && line.find("}") == std::string::npos && \
-    //    line2.find("{") == std::string::npos && line2.find("}") == std::string::npos)
     if (line.find("{") == std::string::npos && line.find("}") == std::string::npos)
     {
         size_t newlinePos = line.find('\n');

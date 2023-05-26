@@ -11,8 +11,7 @@
 #include "../database/DataBase.hpp"
 #include "IScope.hpp"
 #include "Variable.hpp"
-class ErrorPage;
-class RedirectionUri;
+
 class LocationScope : public IScope, public CgiScope, public ErrorPage, public RedirectionUri
 {
     private:
