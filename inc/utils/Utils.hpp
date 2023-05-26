@@ -13,6 +13,7 @@
 #include <limits>
 #include <sys/stat.h>
 #include <cstring>
+
 inline std::string	removeAdjacentSlashes(const std::string &str)
 {
 	std::string	ret;
@@ -69,16 +70,7 @@ inline unsigned int	strToIp(std::string strIp)
 	return final;
 }
 
-inline std::string	to_string(size_t n)
-{
-	std::stringstream tmp;
-
-	tmp << n;
-
-	return tmp.str();
-}
-
-inline char	**mapToEnv(std::map<std::string, std::string> map)
+inline char	**mapToEnvForm(std::map<std::string, std::string> map)
 {
 	char	**str = new char*[map.size() + 1];
 	int	j = 0;

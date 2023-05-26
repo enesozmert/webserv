@@ -13,6 +13,6 @@ class IScope
         IScope() {}
         virtual ~IScope() {}
         virtual std::string getName() const = 0;
-        virtual IScope* cloneNew() const = 0;
-        virtual IScope* clone() const = 0;
+        virtual IScope*     cloneNew() const = 0;
+        virtual IScope*     clone() const = 0;
 };

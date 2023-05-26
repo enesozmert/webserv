@@ -1,13 +1,11 @@
 #include "../inc/error/ConfigException.hpp"
 
-ConfigException::ConfigException(/* args */)
+ConfigException::ConfigException()
 {
     errorFill();
 }
 
-ConfigException::~ConfigException()
-{
-}
+ConfigException::~ConfigException() {}
 
 ConfigException::ConfigException(const ConfigException &configException)
 {

@@ -13,6 +13,6 @@ class IRequest
         IRequest() {}
         virtual ~IRequest() {}
         virtual std::string getName() const = 0;
-        virtual IRequest* cloneNew() const = 0;
-        virtual IRequest* clone() const = 0;
+        virtual IRequest*   cloneNew() const = 0;
+        virtual IRequest*   clone() const = 0;
 };

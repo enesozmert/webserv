@@ -96,14 +96,14 @@ void    Server::process(long socket, HttpScope* http)
         matchedServer = this->getServerForRequest(this->_listen, request->getIp(), http);
         matchedLocation = this->getLocationForRequest(matchedServer, request->getPath());
 
-        std::cout << YELLOW << "matchedServer->getHost() = " << matchedServer->getHost() << RESET << std::endl;
+        /* std::cout << YELLOW << "matchedServer->getHost() = " << matchedServer->getHost() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getName() = " << matchedServer->getName() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getRoot() = " << matchedServer->getRoot() << RESET << std::endl;
-        // std::cout << YELLOW << "matchedServer->getCgi_pass() = " << matchedServer->getCgi_pass() << RESET << std::endl;
-        //std::cout << YELLOW << "matchedServer->getIndex().front() = " << matchedServer->getIndex().front() << RESET << std::endl;
+        std::cout << YELLOW << "matchedServer->getCgi_pass() = " << matchedServer->getCgi_pass() << RESET << std::endl;
+        std::cout << YELLOW << "matchedServer->getIndex().front() = " << matchedServer->getIndex().front() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getErrorPage().getPageName() = " << matchedServer->getErrorPage().getErrorPagePath() << RESET << std::endl;
         std::cout << YELLOW << "matchedServer->getServerName().front() = " << matchedServer->getServerName().front() << RESET << std::endl;
-
+ */
 
         response.createResponse(request, matchedServer, matchedLocation);
 

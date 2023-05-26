@@ -1,14 +1,11 @@
 #include "../inc/entity/HttpMethod.hpp"
 
-HttpMethod::HttpMethod(/* args */)
+HttpMethod::HttpMethod()
 {
     this->initMethods();
 }
 
-HttpMethod::~HttpMethod()
-{
-}
-
+HttpMethod::~HttpMethod(){}
 
 HttpMethod::HttpMethod(const HttpMethod &httpMethod)
 {

@@ -4,9 +4,7 @@ ErrorPage::ErrorPage()
 {
 }
 
-ErrorPage::~ErrorPage()
-{
-}
+ErrorPage::~ErrorPage() {}
 
 ErrorPage::ErrorPage(const ErrorPage &errorPage)
 {

@@ -11,15 +11,13 @@ class HttpMethod
 {
     private:
         std::vector<std::string> _methods;
+        void initMethods();
     public:
         HttpMethod();
         ~HttpMethod();
         HttpMethod(const HttpMethod &requestMethod);
 
-        std::vector<std::string> get();
-        void set(std::string method);
-
-        bool checkMethodName(std::string methodName);
-    private:
-        void initMethods();
+        std::vector<std::string>    get();
+        void                        set(std::string method);
+        bool                        checkMethodName(std::string methodName);
 };

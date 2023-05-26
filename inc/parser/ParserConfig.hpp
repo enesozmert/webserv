@@ -29,25 +29,23 @@ class ConfigException;
 class ParserConfig
 {
     private:
-        HttpScope *_parsedHttp;
-        HttpScope http;
-        ServerScope server;
-        LocationScope location;
+        HttpScope*      _parsedHttp;
+        HttpScope       http;
+        ServerScope     server;
+        LocationScope   location;
 
-        HttpScope *httpPtr;
-        ServerScope *serverPtr;
-        LocationScope *locationPtr;
+        HttpScope*      httpPtr;
+        ServerScope*    serverPtr;
+        LocationScope*  locationPtr;
 
-        std::vector<std::string> _lines;
+        std::vector<std::string>        _lines;
         std::map<size_t, ParseLineProp> _parseLineProps;
-        std::vector<ParseLineProp> _orderParseLineProps;
-        std::vector<std::string> _scopeNames;
-        std::vector<std::string> _orderScopeNames;
-        std::map<size_t, IScope *> _matchedClass;
+        std::vector<ParseLineProp>      _orderParseLineProps;
+        std::vector<std::string>        _scopeNames;
+        std::vector<std::string>        _orderScopeNames;
+        std::map<size_t, IScope *>      _matchedClass;
+        size_t                          _matchedClassIndex;
 
-        size_t _matchedClassIndex;
-
-        //exception
         ConfigException _configException;
     public:
         ParserConfig();

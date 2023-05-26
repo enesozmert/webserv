@@ -12,25 +12,25 @@
 class CgiScope : public ISubScope
 {
     protected:
-        std::string _pass;
-        std::string _param;
-        std::string _paramKeyword;
-        std::vector<std::string> _paramValues;
+        std::string                 _pass;
+        std::string                 _param;
+        std::string                 _paramKeyword;
+        std::vector<std::string>    _paramValues;
     public:
         CgiScope();
         ~CgiScope();
         CgiScope(const CgiScope &cgiScope);
         CgiScope &operator=(const CgiScope &cgiScope);
 
-        std::string getPass();
-        std::string getParam();
-        std::string getParamKeyword();
-        std::vector<std::string> getParamValues();
+        std::string                 getPass();
+        std::string                 getParam();
+        std::vector<std::string>    getParamKeyword();
+        std::vector<std::string>    getParamValues();
 
-        void setPass(std::string pass);
-        void setParam(std::string param);
-        void setParamKeyword(std::string keyword);
-        void setParamValues(std::vector<std::string> values);
+        void                        setPass(std::string pass);
+        void                        setParam(std::string param);
+        void                        setParamKeyword(std::string keyword);
+        void                        setParamValues(std::vector<std::string> values);
 
         // std::string getName() const;
         // CgiScope *cloneNew() const;

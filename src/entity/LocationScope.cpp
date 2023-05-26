@@ -1,13 +1,11 @@
 #include "../inc/entity/LocationScope.hpp"
 
-LocationScope::LocationScope(/* args */)
+LocationScope::LocationScope()
 {
     this->keywordFill();
 }
 
-LocationScope::~LocationScope()
-{
-}
+LocationScope::~LocationScope() {}
 
 LocationScope::LocationScope(const LocationScope &location) : CgiScope(location),
     ErrorPage(location), RedirectionUri(location)
@@ -97,6 +95,11 @@ void LocationScope::setKeywordDatabase(DataBase<Variable<std::string> > keywordD
     this->_keywordDatabase = keywordDatabase;
 }
 
+void LocationScope::setPath(std::string path)
+{
+    this->_path = path;
+}
+
 void LocationScope::keywordFill()
 {
     _keywordDatabase.insertData(Variable<std::string>("root",&this->_root));
@@ -110,11 +113,6 @@ void LocationScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("return", &this->_redirectionUri));
 }
 
-void LocationScope::setPath(std::string path)
-{
-    this->_path = path;
-}
-
 std::string LocationScope::getName() const
 {
     return (this->name);
@@ -123,7 +121,6 @@ std::string LocationScope::getName() const
 LocationScope* LocationScope::cloneNew() const { return new LocationScope(); }
 LocationScope* LocationScope::clone() const { return new LocationScope(*this); }
 
-//fatma ekledi
 bool LocationScope::usesLongestMatch() const {
     return longestMatch;
 }

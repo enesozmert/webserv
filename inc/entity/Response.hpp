@@ -60,7 +60,7 @@ public:
     void	                    setAllow(const std::string& allow = "");
     void	                    setContentLanguage(const std::string& lang);
     void	                    setContentLength(size_t size);
-    void	                    setContentLocation(const std::string& path, int code);
+    void	                    setContentLocation(const std::string& path);
     void	                    setContentType(std::string type, std::string path);
     void	                    setDate(void);
     void	                    setLastModified(const std::string& path);
@@ -72,7 +72,7 @@ public:
     void                        setErrorMap();
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
-    void                        setParams(std::string _paramKeyword, std::vector<std::string> _paramValue);
+    void                        setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue);
 
     void                        resetValues(void);
     void                        createResponse(Request *request, ServerScope *server, LocationScope *location);

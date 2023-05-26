@@ -6,9 +6,7 @@ ParserConfig::ParserConfig() : _matchedClassIndex(0)
 {
 }
 
-ParserConfig::~ParserConfig()
-{
-}
+ParserConfig::~ParserConfig() {}
 
 std::string ParserConfig::getCheckFileExtension(File &file, std::string &fileName)
 {

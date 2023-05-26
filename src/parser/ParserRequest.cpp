@@ -1,12 +1,8 @@
 #include "../inc/parser/ParserRequest.hpp"
 
-ParserRequest::ParserRequest(/* args */)
-{
-}
+ParserRequest::ParserRequest() {}
 
-ParserRequest::~ParserRequest()
-{
-}
+ParserRequest::~ParserRequest() {}
 
 ParserRequest::ParserRequest(std::string raw) : _raw(raw){}
 
