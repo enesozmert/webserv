@@ -19,79 +19,76 @@ std::map<int, std::string>  Response::getErrorMap()
     return (this->_errorMap);
 }
 
+void    Response::setErrors()
+{
+	this->_errors.clear();
+	this->_errors[100] = "Continue";
+	this->_errors[200] = "OK";
+	this->_errors[201] = "Created";
+	this->_errors[204] = "No Content";
+	this->_errors[400] = "Bad Request";
+	this->_errors[403] = "Forbidden";
+	this->_errors[404] = "Not Found";
+	this->_errors[405] = "Method Not Allowed";
+	this->_errors[413] = "Payload Too Large";
+	this->_errors[500] = "Internal Server Error";
+}
+
 void    Response::setErrorMap()
 {
 	this->_errorMap.clear();
-	this->_errorMap[100] = "Continue";
-	this->_errorMap[200] = "OK";
-	this->_errorMap[201] = "Created";
-	this->_errorMap[204] = "No Content";
-	this->_errorMap[400] = "Bad Request";
-	this->_errorMap[403] = "Forbidden";
-	this->_errorMap[404] = "Not Found";
-	this->_errorMap[405] = "Method Not Allowed";
-	this->_errorMap[413] = "Payload Too Large";
-	this->_errorMap[500] = "Internal Server Error";
+    this->_errorMap[400] = "configs/default_error_pages/400.html";
+    this->_errorMap[403] = "configs/default_error_pages/403.html";
+    this->_errorMap[404] = "configs/default_error_pages/404.html";
+    this->_errorMap[405] = "configs/default_error_pages/405.html";
+	this->_errorMap[410] = "configs/default_error_pages/410.html";
+    this->_errorMap[413] = "configs/default_error_pages/413.html";
+    this->_errorMap[500] = "configs/default_error_pages/500.html";
 }
 
-void			Response::setAllow(std::vector<std::string> methods)
+void			Response::setAllowMethods(std::vector<std::string> methods)
 {
 	std::vector<std::string>::iterator it = methods.begin();
 
 	while (it != methods.end())
 	{
-		this->_allow += *(it++);
+		this->_allow_methods += *(it++);
 
 		if (it != methods.end())
-			this->_allow += ", ";
+			this->_allow_methods += ", ";
 	}
 }
 
-void			Response::setAllow(const std::string& allow)
+void			Response::setContentLength()
 {
-	this->_allow = allow;
+	_contentLength = std::to_string(this->_response.size());
 }
 
-void			Response::setContentLanguage(const std::string& lang)
+void			Response::setContentType()
 {
-	_contentLanguage = lang;
-}
-
-void			Response::setContentLength(size_t size)
-{
-	_contentLength = std::to_string(size);
-}
-
-void	Response::setContentLocation(const std::string& path)
-{
-	_contentLocation = path;
-}
-
-void			Response::setContentType(std::string type, std::string path)
-{
-	if (type != "")
+	if (this->_type != "")
 	{
-		_contentType = type;
+		_contentType = this->_type;
 		return ;
 	}
-	type = path.substr(path.rfind(".") + 1, path.size() - path.rfind("."));
-	if (type == "html")
+	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
+	if (this->_type == "html")
 		_contentType = "text/html";
-	else if (type == "css")
+	else if (this->_type == "css")
 		_contentType = "text/css";
-	else if (type == "js")
+	else if (this->_type == "js")
 		_contentType = "text/javascript";
-	else if (type == "jpeg" || type == "jpg")
+	else if (this->_type == "jpeg" || this->_type == "jpg")
 		_contentType = "image/jpeg";
-	else if (type == "png")
+	else if (this->_type == "png")
 		_contentType = "image/png";
-	else if (type == "bmp")
+	else if (this->_type == "bmp")
 		_contentType = "image/bmp";
 	else
 		_contentType = "text/plain";
 }
 
-void			Response::setDate(void)
+void			Response::setDate()
 {
 	char			buffer[100];
 	struct timeval	tv;
@@ -103,13 +100,13 @@ void			Response::setDate(void)
 	_date = std::string(buffer);
 }
 
-void			Response::setLastModified(const std::string& path)
+void			Response::setLastModified()
 {
 	char			buffer[100];
 	struct stat		stats;
 	struct tm		*tm;
 
-	if (stat(path.c_str(), &stats) == 0)
+	if (stat(this->_path.c_str(), &stats) == 0)
 	{
 		tm = gmtime(&stats.st_mtime);
 		strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
@@ -117,25 +114,25 @@ void			Response::setLastModified(const std::string& path)
 	}
 }
 
-void			Response::setLocation(int code, const std::string& redirect)
+void			Response::setLocation()
 {
-	if (code == 201 || code / 100 == 3)
+	if (this->statusCode == 201 || this->statusCode / 100 == 3)
 	{
-		_location = redirect;
+		_location = this->_path;
 	}
 }
 
-void			Response::setRetryAfter(int code, int sec)
+void			Response::setRetryAfter()
 {
-	if (code == 503 || code == 429 || code == 301)
+	if (this->statusCode == 503 || this->statusCode == 429 || this->statusCode == 301)
 	{
-		_retryAfter = std::to_string(sec);
+		_retryAfter = std::to_string(3);
 	}
 }
 
 void			Response::setServer(void)
 {
-	_server = "webserv";//buraya farklı isim verilebilir mi?
+	_server = "webserv";
 }
 
 void			Response::setTransferEncoding(void)
@@ -143,29 +140,26 @@ void			Response::setTransferEncoding(void)
 	_transferEncoding = "identity";
 }
 
-void			Response::setWwwAuthenticate(int code)
+void			Response::setWwwAuthenticate()
 {
-	if (code == 401)
+	if (this->statusCode == 401)
 	{
 		_wwwAuthenticate = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
 	}
 }
 
-void			Response::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
+void			Response::setValues()
 {
-	setAllow();
-	setErrorMap();
-	setContentLanguage(lang);
-	setContentLength(size);
-	setContentLocation(contentLocation);
-	setContentType(type, path);
+	setErrors();
+	setContentLength();
+	setContentType();
 	setDate();
-	setLastModified(path);
-	setLocation(code, path);
-	setRetryAfter(code, 3);
+	setLastModified();
+	setLocation();
+	setRetryAfter();
 	setServer();
 	setTransferEncoding();
-	setWwwAuthenticate(code);
+	setWwwAuthenticate();
 }
 
 void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex)
@@ -192,31 +186,27 @@ void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
+	setErrorMap();
+	this->_allow = request->getHttpMethodName();
 	this->statusCode = request->getReturnCode();//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	//this->_cgi_pass = location->getPass();
   	setIndexs(location->getIndex(), server->getIndex());
 	//setParams(location->getParamKeyword(), location->getParamValues());
   	this->_contentLocation = _indexs.at(0);
 	this->_path = location->getRoot() + _indexs.at(0);//this->_path = "./tests/test1/index.html";
+	this->_contentLanguage = request->getAcceptLanguages().front().first;
 	//std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 
-
-    if (location->getAutoindex() == "on")
-        this->_isAutoIndex = true;
-    else if (location->getAutoindex() == "off")
-        this->_isAutoIndex = false;
-
-
-    if (std::find(location->getAllowMethods().begin(), location->getAllowMethods().end(), request->getHttpMethodName()) == location->getAllowMethods().end())
+    if (std::find(location->getAllowMethods().begin(), location->getAllowMethods().end(), this->_allow) == location->getAllowMethods().end())
 		this->statusCode = 405;
 	else if (atoi(location->getClientBodyBufferSize().c_str()) < static_cast<int>(request->getBody().size()))
 		this->statusCode = 413;
 
     if (this->statusCode == 405 || this->statusCode == 413)
 	{
-		_response = notAllowed(location->getAllowMethods(), location->getPath(), this->statusCode, request->getAcceptLanguages().front().first) + "\r\n";
+		_response = notAllowed(location->getAllowMethods()) + "\r\n";
 		return ;
 	}
 
@@ -237,8 +227,8 @@ std::string		Response::writeHeader(void)
 {
 	std::string	header = "";
 
-	if (_allow != "")
-		header += "Allow: " + _allow + "\r\n";
+	if (_allow_methods != "")
+		header += "Allow: " + _allow_methods + "\r\n";
 	if (_contentLanguage != "")
 		header += "Content-Language: " + _contentLanguage + "\r\n";
 	if (_contentLength != "")
@@ -266,17 +256,17 @@ std::string		Response::writeHeader(void)
 }
 
 
-std::string		Response::notAllowed(std::vector<std::string> methods, const std::string& path, int code, const std::string& lang)
+std::string		Response::notAllowed(std::vector<std::string> methods)
 {
 	std::string	header;
 
-	resetValues();
-	setValues(0, path, code, "", path, lang);
-	setAllow(methods);
+	_response = "";
+	setValues();
+	setAllowMethods(methods);
 
-	if (code == 405)
+	if (this->statusCode == 405)
 		header = "HTTP/1.1 405 Method Not Allowed\r\n";
-	else if (code == 413)
+	else if (this->statusCode == 413)
 		header = "HTTP/1.1 413 Payload Too Large\r\n";
 	header += writeHeader();
 
@@ -306,14 +296,14 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 		_response = _response.substr(i, j - i);
 	}
 	else if  (this->statusCode == 200)
-		this->statusCode = readContent(server);
+		readContent();
 	else
-		_response = this->readHtml(_errorMap[this->statusCode]);
+		_response = this->readHtml();
 	
 	if (this->statusCode == 500)
-		_response = this->readHtml(_errorMap[this->statusCode]);
+		_response = this->readHtml();
 
-	_response = getHeader(_response.size(), _path, this->statusCode, _type, this->_contentLocation, this->_contentLanguage) + "\r\n" + _response;
+	_response = getHeader() + "\r\n" + _response;
 }
 
 void			Response::DELETEmethod()
@@ -329,8 +319,8 @@ void			Response::DELETEmethod()
 	else
 		this->statusCode = 404;
 	if (this->statusCode == 403 || this->statusCode == 404)
-		_response = this->readHtml(_errorMap[this->statusCode]);
-	_response = getHeader(_response.size(), _path, this->statusCode, _type, this->_contentLocation, this->_contentLanguage) + "\r\n" + _response;
+		_response = this->readHtml();
+	_response = getHeader() + "\r\n" + _response;
 }
 
 void			Response::POSTmethod(Request* request, ServerScope* server)
@@ -362,18 +352,18 @@ void			Response::POSTmethod(Request* request, ServerScope* server)
 		_response = "";
 	}
 	if (this->statusCode == 500)
-		_response = this->readHtml(_errorMap[this->statusCode]);
-	_response = getHeader(_response.size(), _path, this->statusCode, _type, this->_contentLocation, this->_contentLanguage) + "\r\n" + _response;
+		_response = this->readHtml();
+	_response = getHeader() + "\r\n" + _response;
 }
 
-std::string		Response::readHtml(const std::string& path)
+std::string		Response::readHtml()
 {
 	std::ofstream		file;
 	std::stringstream	buffer;
 
-	if (pathIsFile(path))
+	if (pathIsFile(_errorMap[this->statusCode]))
 	{
-		file.open(path.c_str(), std::ifstream::in);
+		file.open(_errorMap[this->statusCode].c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 			return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
 
@@ -387,7 +377,7 @@ std::string		Response::readHtml(const std::string& path)
 		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
 }
 
-int				Response::readContent(ServerScope *server)
+void				Response::readContent()
 {
 	std::ifstream		file;
 	std::stringstream	buffer;
@@ -399,101 +389,36 @@ int				Response::readContent(ServerScope *server)
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
-			_response = this->readHtml(_errorMap[403]);
-			return (403);
+			this->statusCode = 403;
+			_response = this->readHtml();
+			return ;
 		}
-
 		buffer << file.rdbuf();
 		_response = buffer.str();
-
 		file.close();
+		return ;
 	}
-	else if (_isAutoIndex) 
-	{
-		buffer << getPage(_path.c_str(), server->getHost(), atoi(server->getPort().c_str()));
-		_response = buffer.str();
-		_type = "text/html";
-	}
-	else
-	{
-		_response = this->readHtml(_errorMap[404]);
-		return (404);
-	}
-
-	return (200);
+	this->statusCode = 404;
+	_response = this->readHtml();
+	return ;
 }
 
 
-std::string		Response::getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
+std::string		Response::getHeader()
 {
 	std::string	header;
 
-	resetValues();
-	setValues(size, path, code, type, contentLocation, lang);
+	setValues();
 
-	header = "HTTP/1.1 " + std::to_string(code) + " " + getStatusMessage(code) + "\r\n";
+	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + getStatusMessage() + "\r\n";
 	header += writeHeader();
 
 	return (header);
 }
 
-std::string		Response::getStatusMessage(int code)
+std::string		Response::getStatusMessage()
 {
-	if (_errorMap.find(code) != _errorMap.end())
-		return _errorMap[code];
+	if (_errors.find(this->statusCode) != _errors.end())
+		return _errors[this->statusCode];
 	return ("Unknown Code");
-}
-
-//auto_index ile ilgili
-std::string         Response::getPage(const char *path, std::string const &host, int port) {
-    std::string dirName(path);
-    DIR *dir = opendir(path);
-    std::string page =\
-    "<!DOCTYPE html>\n\
-    <html>\n\
-    <head>\n\
-            <title>" + dirName + "</title>\n\
-    </head>\n\
-    <body>\n\
-    <h1>INDEX</h1>\n\
-    <p>\n";
-
-    if (dir == NULL) {
-        std::cerr << "Error: could not open [" << path << "]" << std::endl;
-        return "";
-    }
-    if (dirName[0] != '/')
-        dirName = "/" + dirName;
-    for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) {
-        page += getLink(std::string(dirEntry->d_name), dirName, host, port);
-    }
-    page +="\
-    </p>\n\
-    </body>\n\
-    </html>\n";
-    closedir(dir);
-    return page;
-}
-//auto_index ile ilgili
-std::string         Response::getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) {
-    std::stringstream   ss;
-    ss << "\t\t<p><a href=\"http://" + host + ":" <<\
-        port << dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
-    return ss.str();
-}
-
-void			Response::resetValues(void)
-{
-	_allow = "";
-	_contentLanguage = "";
-	_contentLength = "";
-	_contentLocation = "";
-	_contentType = "";
-	_date = "";
-	_lastModified = "";
-	_location = "";
-	_retryAfter = "";
-	_server = "";
-	_transferEncoding = "";
-	_wwwAuthenticate = "";
 }
