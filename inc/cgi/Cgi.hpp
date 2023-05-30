@@ -24,7 +24,7 @@ class Cgi
     
     public:
         Cgi();
-    	Cgi(Request *request, ServerScope* server, std::string& _path, std::map<std::string, std::string> EnvForCGI); // sets up env according to the request
+    	Cgi(Request *request, ServerScope* server, std::string& path); // sets up env according to the request
         ~Cgi();
     
     	std::string		executeCgi(const std::string &scriptName);	// executes cgi and returns body

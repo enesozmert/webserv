@@ -14,9 +14,9 @@ void myTerminationHandler() {
 
 int main(int ac, char **av)
 {
-/*     (void)av;
-    (void)ac; */
-    
+   /*  (void)av;
+    (void)ac;
+     */
     std::string av1;
     //av1 = "configs/default.config";
     HttpScope *http;
@@ -26,12 +26,11 @@ int main(int ac, char **av)
     ConfigException configException;
     // std::set_terminate(myTerminationHandler);
 
-    if (ac != 2)
+   if (ac != 2)
     {
         configException.run(106);
         return (-1);
     }
-    
     //get-filename
     av1 = av[1];
 
@@ -43,7 +42,7 @@ int main(int ac, char **av)
 
     parser->parse(av1);
     http = parser->getHttp();
-    std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
+    /* std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
     http->writeListens(http->getListens());
     // std::cout << "http->getServers().at(0)->getListen().host : " << http->getServers().at(0)->getListen().host << std::endl;
     // std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;

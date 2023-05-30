@@ -312,12 +312,10 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, c
 {
     int locationScopeIndex = 0;
 
-    //hangi index kullanılacak?
     locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
     locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
     if (locationScopeIndex == -1)
         locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
     std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
-    //locationScopeIndex 2 dönüyor ve out_of_range hatası fırlatıyor????
     return (matchedServerScope->getLocations().at(locationScopeIndex));
 }
