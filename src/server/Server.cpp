@@ -313,9 +313,10 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, c
     int locationScopeIndex = 0;
 
     locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-    locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
     if (locationScopeIndex == -1)
-        locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
+        locationScopeIndex = 0;
+    //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
+    //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
     std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
     return (matchedServerScope->getLocations().at(locationScopeIndex));
 }
