@@ -75,6 +75,7 @@ public:
     std::string                 writeHeader(void);
     std::string                 readHtml();
     void                        readContent();
+    std::string                 selectIndex();
 
     void    GETmethod(Request* request, ServerScope* server);
     void	DELETEmethod();

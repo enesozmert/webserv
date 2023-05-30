@@ -184,18 +184,28 @@ void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<
 	}
 }
 
+std::string Response::selectIndex()
+{
+	for(std::vector<std::string>::iterator it = this->_indexs.begin(); it != this->_indexs.end(); it++){
+		if (!pathIsFile(*it))
+			return(*it);
+	}
+	std::cerr << RED << "No index found" << RESET << std::endl;
+    return (0);
+}
+
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
 	setErrorMap();
 	this->_allow = request->getHttpMethodName();
 	this->statusCode = request->getReturnCode();//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
-	//this->_cgi_pass = location->getPass();
+	this->_cgi_pass = location->getCgiPass();
   	setIndexs(location->getIndex(), server->getIndex());
 	//setParams(location->getParamKeyword(), location->getParamValues());
-  	this->_contentLocation = _indexs.at(0);
-	this->_path = location->getRoot() + _indexs.at(0);//this->_path = "./tests/test1/index.html";
+  	this->_contentLocation = selectIndex();
+	this->_path = location->getRoot() + this->_contentLocation;//this->_path = "./tests/test1/index.html";
 	this->_contentLanguage = request->getAcceptLanguages().front().first;
-	//std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
+	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 
@@ -277,7 +287,7 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path, this->_cgi_params);
+		Cgi	cgi(request, server, this->_path);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
@@ -327,7 +337,7 @@ void			Response::POSTmethod(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path, _cgi_params);
+		Cgi	cgi(request, server, this->_path);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 

@@ -1,30 +1,28 @@
 #include "../inc/cgi/Cgi.hpp"
 
-Cgi::Cgi(Request *request, ServerScope* server, std::string& _path, std::map<std::string, std::string> envParams): _body(request->getBody())
+Cgi::Cgi(Request *request, ServerScope* server, std::string& path): _body(request->getBody())
 {
 	this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
 	this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
-	this->_env.insert(std::make_pair("SCRIPT_NAME", _path));
-	this->_env.insert(std::make_pair("SCRIPT_FILENAME", _path));
+	this->_env.insert(std::make_pair("SCRIPT_NAME", path));
+	this->_env.insert(std::make_pair("SCRIPT_FILENAME", path));
 	this->_env.insert(std::make_pair("REQUEST_METHOD", request->getHttpMethodName()));
 	this->_env.insert(std::make_pair("CONTENT_LENGTH", std::to_string(this->_body.length())));
 	this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
-	this->_env.insert(std::make_pair("PATH_INFO", request->getPath())); //might need some change, using config path/contentLocation
-	this->_env.insert(std::make_pair("PATH_TRANSLATED", request->getPath())); //might need some change, using config path/contentLocation
 	this->_env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
 	this->_env.insert(std::make_pair("REMOTEaddr", server->getHost()));
 	this->_env.insert(std::make_pair("REQUEST_URI", request->getPath() + request->getQuery()));
     this->_env.insert(std::make_pair("SERVER_PORT", server->getPort()));
 	this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
 	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "php-cgi/1.1"));
-	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "webserv"));//burayı değiştirebiliriz.
-	this->_env.insert(envParams.begin(), envParams.end());//config dosyasındaki cgi_param'ların tutulduğu map'i ekliyoruz.
+	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "webserv/2.0"));
 }
 
 
 std::string		Cgi::executeCgi(const std::string& scriptName) 
 {
-	std::cout << RED << "Cgi çalışmaya başladı" << RESET << std::endl;
+	std::cout << CYAN << "Cgi çalışmaya başladı" << RESET << std::endl;
+	std::cout << CYAN << "scriptName : " << scriptName << RESET << std::endl;
 	pid_t		pid;
 	int			saveStdin;
 	int			saveStdout;
@@ -111,7 +109,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 
 	if (!pid)
 		exit(0);
-
+	std::cout << RED << "newBody: " << newBody << RESET << std::endl;
 	return (newBody);
 }
 
