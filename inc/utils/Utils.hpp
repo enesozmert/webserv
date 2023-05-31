@@ -148,3 +148,13 @@ inline unsigned long stoul_cxx98(const std::string& str, size_t* idx = 0, int ba
 
     return result;
 }
+
+inline void signalHandler( int signum ) 
+{
+   std::cout << "\nInterrupt signal (" << signum << ") received.\n";
+
+   // cleanup and close up stuff here  
+   // terminate program  
+
+   exit(signum);  
+}

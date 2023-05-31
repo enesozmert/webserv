@@ -1,6 +1,8 @@
 #include "../inc/entity/Response.hpp"
 
-Response::Response(){}
+Response::Response(){
+	resetValues();
+}
 
 Response::~Response(){}
 
@@ -271,6 +273,8 @@ std::string		Response::notAllowed(std::vector<std::string> methods)
 	std::string	header;
 
 	_response = "";
+
+	resetValues();
 	setValues();
 	setAllowMethods(methods);
 
@@ -418,6 +422,7 @@ std::string		Response::getHeader()
 {
 	std::string	header;
 
+	resetValues();
 	setValues();
 
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + getStatusMessage() + "\r\n";
@@ -431,4 +436,22 @@ std::string		Response::getStatusMessage()
 	if (_errors.find(this->statusCode) != _errors.end())
 		return _errors[this->statusCode];
 	return ("Unknown Code");
+}
+
+void			Response::resetValues()
+{
+	_allow = "";
+	_allow_methods = "";
+	_contentLanguage = "";
+	_contentLength = "";
+	_contentLocation = "";
+	_contentType = "";
+	_date = "";
+	_lastModified = "";
+	_location = "";
+	_retryAfter = "";
+	_server = "";
+	_transferEncoding = "";
+	_wwwAuthenticate = "";
+	//initErrorMap();
 }

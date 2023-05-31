@@ -1,20 +1,15 @@
 #include "../inc/server/Server.hpp"
 
-Server::Server() {}
+Server::Server() {
+    fd = -1;
+}
 
 Server::~Server() {}
 
-Server::Server(const t_listen &_listen)
+Server::Server(const t_listen &listen)
 {
-    this->SocketConnected = false;
-    this->_listen = _listen;
+    this->_listen = listen;
     fd = -1;
-    this->setUpSocket();
-}
-
-bool Server::getSocketConnected() const
-{
-    return SocketConnected;
 }
 
 long Server::getFd(void) const
@@ -35,26 +30,26 @@ void Server::setAddr(void)
     addr.sin_port = htons(_listen.port);
 }
 
-void Server::setUpSocket()
+int Server::setUpSocket()
 {
     fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
     if (fd == -1)
     {
         std::cerr << RED << "Could not create server." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
-        return ;
+        return -1;
     }
     this->setAddr();
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
     {
         std::cerr << RED << "Could not bind port " << _listen.port << "." << RESET << std::endl;
-        return ;
+        return -1;
     }
     if (listen(fd, 10) == -1) // aynı anda max 10 bağlantı kabul etmeye hazır
     {
         std::cerr << RED << "Could not listen." << RESET << std::endl;
-        return ;
+        return -1;
     }
-    SocketConnected = true;
+    return (0);
 }
 
 long Server::accept(void)
@@ -93,7 +88,7 @@ void    Server::process(long socket, HttpScope* http)
         parserRequest.parse();
         request = parserRequest.getRequest();
 
-        matchedServer = this->getServerForRequest(this->_listen, request->getIp(), http);
+        matchedServer = this->getServerForRequest(this->_listen, http);
         matchedLocation = this->getLocationForRequest(matchedServer, request->getPath());
 
         /* std::cout << YELLOW << "matchedServer->getHost() = " << matchedServer->getHost() << RESET << std::endl;
@@ -187,9 +182,9 @@ int Server::recv(long socket)
     if (Recieved == 0 || Recieved == -1)
     {
         this->close(socket);
-        if (Recieved == 0)
+        if (!Recieved)
             std::cout << RED << "\rConnection was closed by client.\n" << RESET << std::endl;
-        else if(Recieved == -1)
+        else
             std::cout << RED << "\rRead error, closing connection.\n" << RESET << std::endl;
         return (-1);
     }
@@ -279,31 +274,18 @@ void Server::clean()
 /****************************************************************/
 
 
-ServerScope*        Server::getServerForRequest(t_listen& address, const std::string& hostname, HttpScope* http)
+ServerScope*        Server::getServerForRequest(t_listen& address, HttpScope* http)
 {
-    std::vector<ServerScope *>  matchingServers;
     std::vector<ServerScope *>  serverScope;
 
     serverScope = http->getServers();
     for (std::vector<ServerScope *>::const_iterator it = serverScope.begin() ; it != serverScope.end(); it++)
     {
         if (address.host == (*it)->getListen().host && address.port == (*it)->getListen().port)
-        {
-            matchingServers.push_back(*it);
-            for(size_t i = 0; i < (*it)->getServerName().size(); i++)
-            {
-                if((*it)->getServerName().at(i) == hostname)
-                    return *it;
-            }
-        }
+            return(*it);
     }
-    if (matchingServers.empty())
-    {
-        std::cerr << "there is no possible server" << std::endl;
-        return NULL;
-    }
-    // If no server name matches, return the first matching server
-    return matchingServers.front();
+    std::cerr << "there is no possible server" << std::endl;
+    return NULL;
 }
 
 
@@ -313,8 +295,15 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, c
     size_t locationScopeIndex = 0;
 
     locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
+<<<<<<< HEAD
     // locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
     // locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
+=======
+    if (locationScopeIndex == -1)
+        locationScopeIndex = 0;
+    //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
+    //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
+>>>>>>> efb68763a2dcea689da83e95f914e181e1dd69dd
     std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
     return (matchedServerScope->getLocations().at(locationScopeIndex));
 }
