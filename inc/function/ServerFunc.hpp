@@ -2,10 +2,10 @@
 
 #include "../server/Server.hpp"
 
-inline int getMatchLocationPathIndex(ServerScope *matchedServerScope, std::string path) 
+inline size_t getMatchLocationPathIndex(ServerScope *matchedServerScope, std::string path) 
 {
     int defaultLocationScopeSize = 0;
-    int result = -1;
+    size_t result = 0;
     std::vector<LocationScope *> selectedLocationScope;
 
     selectedLocationScope = matchedServerScope->getLocations(); 
@@ -16,24 +16,20 @@ inline int getMatchLocationPathIndex(ServerScope *matchedServerScope, std::strin
             defaultLocationScopeSize++;
             result++;
         }
-        else
-        {
-            return (-1);
-        }
     }
 
     if (defaultLocationScopeSize != 1)
     {
         //error
-        return (-1);
+        return (0);
     }
     std::cout << "result getMatchLocationPathIndex : " << result << std::endl;
     return (result);
 }
 
-inline int getDefaultLocationPathIndex(ServerScope *matchedServerScope) {
+inline size_t getDefaultLocationPathIndex(ServerScope *matchedServerScope) {
     int defaultLocationScopeSize = 0;
-    int result = -1;
+    size_t result = 0;
     std::vector<LocationScope *> selectedLocationScope;
 
     selectedLocationScope = matchedServerScope->getLocations(); 
@@ -44,16 +40,12 @@ inline int getDefaultLocationPathIndex(ServerScope *matchedServerScope) {
             defaultLocationScopeSize++;
             result++;
         }
-        else
-        {
-            return (-1);
-        }
     }
 
     if (defaultLocationScopeSize != 1)
     {
         //error
-        return (-1);
+        return (0);
     }
     std::cout << "result getDefaultLocationPathIndex : " << result << std::endl;
     return (result);
@@ -62,7 +54,7 @@ inline int getDefaultLocationPathIndex(ServerScope *matchedServerScope) {
 inline size_t getLongestLocationPathIndex(ServerScope *matchedServerScope) 
 {
     size_t maxPathLength = 0;
-    int result = -1;
+    size_t result = 0;
     std::vector<LocationScope *> selectedLocationScope;
 
     selectedLocationScope = matchedServerScope->getLocations();
