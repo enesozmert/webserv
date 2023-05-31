@@ -38,17 +38,13 @@ void SyntaxConfig::analizer()
     int result;
 
     result = -1;
-    method_function p[3] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets,
-                            &SyntaxConfig::checkHttpCountGreaterThanZero};
+    method_function p[2] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets};
     for (size_t i = 0; i < this->_parseLineProps.size(); i++)
     {
         result = (this->*p[0])(i);
         _configException.run(result);
 
         result = (this->*p[1])(i);
-        _configException.run(result);
-
-         result = (this->*p[2])(i);
         _configException.run(result);
     }
 }
@@ -57,13 +53,13 @@ int SyntaxConfig::checkSemicolon(const int &index)
 {
     std::string line;
 
-    line = this->_parseLineProps[index].getLine();
-    if (line.find("{") == std::string::npos && line.find("}") == std::string::npos)
+    if (!this->_parseLineProps[index].getIsScopeOpen() && !this->_parseLineProps[index].getIsScopeClose())
     {
+        line = this->_parseLineProps[index].getLine();
         size_t newlinePos = line.find('\n');
         std::string newLineSubString = line.substr(0, newlinePos);
         size_t semicolonPos = newLineSubString.find(';');
-        if (semicolonPos == std::string::npos)
+        if (semicolonPos == std::string::npos || line[line.length() - 1] != ';')
         {
             return (111);
         }

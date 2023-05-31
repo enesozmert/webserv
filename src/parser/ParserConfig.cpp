@@ -47,11 +47,32 @@ void ParserConfig::parseFile(std::string &fileName)
     while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
-        std::string lineTrim = trim(line, " \r\t");
-        this->_lines.push_back(lineTrim);
+        std::string lineTrim = trim(line, " \r\t\n");
+        if (line.find("{") != std::string::npos)
+        {
+            this->_lines.push_back(trim(lineTrim, " \n\r\t{"));
+            this->_lines.push_back("{");
+        }
+        else if (line.find("}") != std::string::npos)
+        {
+            if (trim(lineTrim, " \n\r\t}")[0] != '\0')
+                this->_lines.push_back(trim(lineTrim, " \n\r\t}"));
+            this->_lines.push_back("}");
+        }
+        else
+        {
+            this->_lines.push_back(trim(lineTrim, " \n\r\t"));
+        }
         fileCleanContents.erase(0, pos + 1);
     }
     file.close();
+    for (size_t i = 0; i < this->_lines.size(); i++)
+    {
+        std::cout << "lines [" << i << "] : " << this->_lines[i] << std::endl;
+    }
+
+    std::cout << "26 line" << (int)this->_lines[26][0] << std::endl;
+    
 }
 
 void ParserConfig::parseScope(const std::vector<std::string> &lines)
@@ -80,12 +101,12 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         {
             lineTrim = "location";
         }
-        if (lineTrim.find(_scopeNames[scopeOpenCount]) != std::string::npos && line.find("{") != std::string::npos)
+        if (lineTrim.find(_scopeNames[scopeOpenCount]) != std::string::npos && lines[i + 1].find("{") != std::string::npos)
         {
             scopeOpenIndex = i;
             scopeName = _scopeNames[scopeOpenCount];
             parseLineProp->setIsScopeOpen(true);
-            scopeCloseIndex = findClosingScopeIndex(lines, i);
+            scopeCloseIndex = findClosingScopeIndex(lines, i + 1);
         }
         if (line.find("{") != std::string::npos)
         {
@@ -106,7 +127,7 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         _parseLineProps.insert(std::pair<size_t, ParseLineProp>((parseLineProp)->getIndex(), *parseLineProp));
         delete parseLineProp;
     }
-/*     for (size_t i = 0; i < _parseLineProps.size(); i++)
+    for (size_t i = 0; i < _parseLineProps.size(); i++)
     {
         std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i].getIndex() << std::endl;
         std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i].getLine() << std::endl;
@@ -116,7 +137,7 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i].getIsScopeOpen() << std::endl;
         std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i].getIsScopeClose() << std::endl;
         std::cout << "****************************" << std::endl;
-    } */
+    } 
 }
 
 void ParserConfig::parseMatchClass()
