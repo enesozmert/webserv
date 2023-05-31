@@ -38,8 +38,8 @@ void SyntaxConfig::analizer()
     int result;
 
     result = -1;
-    method_function p[3] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets,
-        &SyntaxConfig::checkHttpCountGreaterThanZero};
+    method_function p[4] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets,
+                            &SyntaxConfig::checkHttpCountGreaterThanZero, &SyntaxConfig::checkVariableSpace};
     for (size_t i = 0; i < this->_parseLineProps.size(); i++)
     {
         result = (this->*p[0])(i);
@@ -51,9 +51,8 @@ void SyntaxConfig::analizer()
         result = (this->*p[2])(i);
         _configException.run(result);
 
-        // result = (this->*p[3])(i);
-        // std::cout << "result : " << result << std::endl;
-        // _configException.run(result);
+        result = (this->*p[3])(i);
+        _configException.run(result);
     }
 }
 
@@ -92,8 +91,35 @@ int SyntaxConfig::checkBrackets(const int &index)
 }
 int SyntaxConfig::checkVariableSpace(const int &index)
 {
-    (void)index;
-    return (false);
+    std::string line;
+    bool found = false;
+
+    if (!this->_parseLineProps[index].getIsScopeOpen() && !this->_parseLineProps[index].getIsScopeClose())
+    {
+        line = this->_parseLineProps[index].getLine();
+        if (line[0] <= 32)
+            return (122);
+        if (line[line.length() - 2] <= 32)
+            return (120);
+        if (line[line.length() - 1] <= 32 && line[line.length() - 1] != '\0')
+            return (121);
+        for (size_t i = 0; i < line.length(); ++i)
+        {
+            if (line[i] <= 32)
+            {
+                if (found)
+                {
+                    return (119);
+                }
+                found = true;
+            }
+            else
+            {
+                found = false;
+            }
+        }
+    }
+    return (-1);
 }
 int SyntaxConfig::checkHttpCountGreaterThanZero(const int &index)
 {

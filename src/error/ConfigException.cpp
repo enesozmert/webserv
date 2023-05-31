@@ -47,6 +47,10 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(116, "Server Convert Error"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(117, "Location Convert Error"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(118, "Invalid content in file"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(119, "More than one consecutive space in a line"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(120, "You cannot put a space before a semicolon"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(121, "You cannot put a space after a semicolon"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(122, "You cannot put a space at the beginning of a line"));
 }
 
 void ConfigException::exceptionHandler()
