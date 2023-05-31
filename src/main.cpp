@@ -3,6 +3,7 @@
 #include "../inc/parser/ParserRequest.hpp"
 #include "../inc/server/Cluster.hpp"
 #include "../inc/syntax/SyntaxConfig.hpp"
+#include "../inc/utils/Utils.hpp"
 
 #include <iostream>
 #include <string>
@@ -88,11 +89,13 @@ int main(int ac, char **av)
     // std::cout << "request->getVersion() : " << request->getVersion() << std::endl;
     // std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
+    signal(SIGINT, signalHandler);
     Cluster cluster;
     try {
-		    cluster.setUpCluster(http);
+		    if (cluster.setUpCluster(http) == -1)
+                return (-1);
 			cluster.run();
-			cluster.clean();			
+			//cluster.clean();
 		}
 	catch (std::exception &e) {
 			std::cerr << e.what() << std::endl;

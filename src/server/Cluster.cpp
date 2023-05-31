@@ -2,11 +2,20 @@
 
 Cluster::Cluster() {
 	FD_ZERO(&fd_master);
-	FD_ZERO(&reading_set);
 	FD_ZERO(&writing_set);
+	FD_ZERO(&reading_set);
 }
 
-Cluster::~Cluster() {}
+Cluster::~Cluster() {
+	std::cout << YELLOW << "Cluster destruct" << RESET << std::endl;
+	this->cleanServers();
+	this->cleanSockets();
+	this->cleanReady();
+	FD_ZERO(&fd_master);
+	FD_ZERO(&writing_set);
+	FD_ZERO(&reading_set);
+	
+}
 
 int Cluster::setUpCluster(HttpScope* http)
 {
@@ -26,7 +35,7 @@ int Cluster::setUpCluster(HttpScope* http)
 		long		fd;//server içinde oluşturulacak socket fd'si
 
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
-		if (server.getSocketConnected())
+		if (server.setUpSocket() != -1)
 		{
 			fd = server.getFd();
 			FD_SET(fd, &fd_master);
@@ -39,7 +48,7 @@ int Cluster::setUpCluster(HttpScope* http)
 	}
 	if (max_fd == 0)
 	{
-		std::cerr << "Could not setup cluster !" << std::endl;
+		std::cerr << RED << "Could not setup cluster !" << RESET << std::endl;
 		return (-1);
 	}
 	return (0);
@@ -161,6 +170,7 @@ void	Cluster::run()
 {
 	while (1)
 	{
+		signal(SIGINT, signalHandler);
 		this->select_return_value = 0;
 		while (select_return_value == 0)
 			select_section();
@@ -168,11 +178,13 @@ void	Cluster::run()
 		if (select_return_value > 0)
 		{
 			//ilk başta ready vector'ü boş olduğu için burayı es geçecek.
-			send_section();
+			if (ready.size() != 0)
+				send_section();
 			//ilk başta sockets map'i boş olduğu için burayı da es geçecek.
-			recv_section();
-			//ilk buraya accept'e giri
-			accept_section();	
+			else if (sockets.size() != 0)
+                recv_section();
+			else if (servers.size() != 0)
+				accept_section();	
 		}
 		else
 		{
@@ -188,11 +200,24 @@ void	Cluster::run()
 	}
 }
 
-void	Cluster::clean(void)
+void	Cluster::cleanServers()
 {
 	for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
 		it->second.clean();
 }
+void	Cluster::cleanSockets()
+{
+	for (std::map<long, Server *>::iterator it = sockets.begin() ; it != sockets.end() ; it++)
+		it->second->close(it->first);
+	sockets.clear();
+}
+void	Cluster::cleanReady()
+{
+	for (std::vector<int>::iterator it = ready.begin() ; it != ready.end() ; it++)
+		close(*it);
+	ready.clear();
+}
+
 
 
 

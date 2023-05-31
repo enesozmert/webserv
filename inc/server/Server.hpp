@@ -24,7 +24,6 @@ class Server {
     	t_listen					_listen;//host and port
     	long						fd;
     	struct sockaddr_in			addr;//host ve port ayarlanacak
-        bool                        SocketConnected;
 
     public:
         Server();
@@ -33,8 +32,7 @@ class Server {
 
         long            getFd() const;
         t_listen        getListen() const;
-        bool            getSocketConnected() const;
-        void            setUpSocket();
+        int             setUpSocket();
         void            setAddr();
         void            clean();
         void            close(int socket);
@@ -43,6 +41,6 @@ class Server {
         void            processChunk(long socket);
         int             send(long socket);
         int             recv(long socket);
-        ServerScope*    getServerForRequest(t_listen& address, const std::string& hostname, HttpScope* http);
+        ServerScope*    getServerForRequest(t_listen& address, HttpScope* http);
         LocationScope*  getLocationForRequest(ServerScope *matchedServerScope, const std::string& path); 
 };
