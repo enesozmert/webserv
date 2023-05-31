@@ -11,17 +11,12 @@ inline int getMatchLocationPathIndex(ServerScope *matchedServerScope, std::strin
     selectedLocationScope = matchedServerScope->getLocations(); 
     for (std::vector<LocationScope *>::iterator it = selectedLocationScope.begin(); it != selectedLocationScope.end(); it++)
     {
-        if ((*it)->getPath().substr((*it)->getPath().length(), (*it)->getPath().length() - 1) == path)
+        if ((*it)->getPath().compare(path) == 0)
         {
             defaultLocationScopeSize++;
             result++;
         }
-        else
-        {
-            return (-1);
-        }
     }
-
     if (defaultLocationScopeSize != 1)
     {
         //error
