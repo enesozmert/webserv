@@ -68,6 +68,7 @@ public:
     void                        setValues();
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue);
+    void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
 
     void                        resetValues();
     void                        createResponse(Request *request, ServerScope *server, LocationScope *location);

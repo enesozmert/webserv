@@ -186,6 +186,19 @@ void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<
 	}
 }
 
+void Response::setLanguage(std::vector<std::pair<std::string, float> > languages)
+{
+
+	for (size_t i = 0; i < languages.size(); i++)
+	{
+		if (!this->_contentLanguage.empty()) {
+            this->_contentLanguage += ", ";
+        }
+        this->_contentLanguage += languages[i].first;	
+	}
+	
+}
+
 std::string Response::selectIndex()
 {
 	for(std::vector<std::string>::iterator it = this->_indexs.begin(); it != this->_indexs.end(); it++){
@@ -206,7 +219,8 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
 	//setParams(location->getParamKeyword(), location->getParamValues());
   	this->_contentLocation = selectIndex();
 	this->_path = location->getRoot() + this->_contentLocation;//this->_path = "./tests/test1/index.html";
-	this->_contentLanguage = request->getAcceptLanguages().front().first;
+	setLanguage(request->getAcceptLanguages());
+	std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
 	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
@@ -409,6 +423,7 @@ void				Response::readContent()
 		}
 		buffer << file.rdbuf();
 		_response = buffer.str();
+		std::cout << YELLOW << "_response :" << _response << RESET << std::endl;
 		file.close();
 		return ;
 	}

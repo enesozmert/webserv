@@ -295,15 +295,8 @@ LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, c
     size_t locationScopeIndex = 0;
 
     locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-<<<<<<< HEAD
-    // locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
-    // locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
-=======
-    if (locationScopeIndex == -1)
-        locationScopeIndex = 0;
     //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
     //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
->>>>>>> efb68763a2dcea689da83e95f914e181e1dd69dd
     std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
     return (matchedServerScope->getLocations().at(locationScopeIndex));
 }
