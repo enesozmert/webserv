@@ -66,13 +66,8 @@ void ParserConfig::parseFile(std::string &fileName)
         fileCleanContents.erase(0, pos + 1);
     }
     file.close();
-    for (size_t i = 0; i < this->_lines.size(); i++)
-    {
-        std::cout << "lines [" << i << "] : " << this->_lines[i] << std::endl;
-    }
-
-    std::cout << "26 line" << (int)this->_lines[26][0] << std::endl;
-    
+    if (this->_lines.size() == 0)
+        this->_configException.run(118);
 }
 
 void ParserConfig::parseScope(const std::vector<std::string> &lines)

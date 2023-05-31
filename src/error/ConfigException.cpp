@@ -44,13 +44,14 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(113, "Http scope count not equal to one"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(114, "Server scope count zero"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(115, "Http Convert Error"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(116, "Http Convert Error"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(117, "Http Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(116, "Server Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(117, "Location Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(118, "Invalid content in file"));
 }
 
 void ConfigException::exceptionHandler()
 {
-    throw MyException(this->_exception.getErrorMessage());
+    throw MyException("Excepiton : " + this->_exception.getErrorMessage());
 }
 
 void ConfigException::run(int errorCode)

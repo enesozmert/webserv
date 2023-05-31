@@ -41,23 +41,23 @@ int main(int ac, char **av)
     http = parser->getHttp();
     // std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
     // http->writeListens(http->getListens());
-    std::cout << "http->getServers().at(0)->getListen().host : " << http->getServers().at(0)->getListen().host << std::endl;
-    std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
-    std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getIndex().at(1) << std::endl;
-    std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
-    std::cout << "http->getServers().at(0)->getIp() : " << http->getServers().at(0)->getIp() << std::endl;
-    std::cout << "http->getServers().at(0)->getPort() : " << http->getServers().at(0)->getPort() << std::endl;
-    std::cout << "getPath() : " << http->getServers().at(0)->getLocations().at(1)->getPath() << std::endl;
-    std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
-    std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
-    std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
-    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiPass() << " end" << std::endl;
-    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiParamKeyword() << " end" << std::endl;
-    std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiParamValues().at(0) << " end" << std::endl;
-    std::cout << "http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() << std::endl;
-    std::cout << "http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() << std::endl;
-    std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) << std::endl;
-    std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() : " << http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() << std::endl;
+    // std::cout << "http->getServers().at(0)->getListen().host : " << http->getServers().at(0)->getListen().host << std::endl;
+    // std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
+    // std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getIndex().at(1) << std::endl;
+    // std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
+    // std::cout << "http->getServers().at(0)->getIp() : " << http->getServers().at(0)->getIp() << std::endl;
+    // std::cout << "http->getServers().at(0)->getPort() : " << http->getServers().at(0)->getPort() << std::endl;
+    // std::cout << "getPath() : " << http->getServers().at(0)->getLocations().at(1)->getPath() << std::endl;
+    // std::cout << "http->getServers().at(0)->getHost() : " << http->getServers().at(0)->getHost() << std::endl;
+    // std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
+    // std::cout << "http->getServers().at(1)->getLocations().at(0)->getRoot() : " << http->getServers().at(1)->getLocations().at(0)->getRoot() << std::endl;
+    // std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiPass() << " end" << std::endl;
+    // std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiParamKeyword() << " end" << std::endl;
+    // std::cout << "cgi pass : " << http->getServers().at(0)->getLocations().at(0)->getCgiParamValues().at(0) << " end" << std::endl;
+    // std::cout << "http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionCode() << std::endl;
+    // std::cout << "http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() << std::endl;
+    // std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) << std::endl;
+    // std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() : " << http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() << std::endl;
    
     // std::string httpRequest = "POST /processsampleform.php HTTP/1.1\r\n"
     //                           "Host: www.tutorialspoint.com\r\n"

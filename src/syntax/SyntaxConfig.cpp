@@ -15,7 +15,7 @@ SyntaxConfig::SyntaxConfig(const SyntaxConfig &syntaxConfig) : _httpScopeCount(0
     *this = syntaxConfig;
 }
 
-SyntaxConfig::SyntaxConfig(std::map<size_t, ParseLineProp> parseLineProps) : _httpScopeCount(0),_serverScopeCount(0)
+SyntaxConfig::SyntaxConfig(std::map<size_t, ParseLineProp> parseLineProps) : _httpScopeCount(0), _serverScopeCount(0)
 {
     this->_parseLineProps = parseLineProps;
 }
@@ -38,7 +38,8 @@ void SyntaxConfig::analizer()
     int result;
 
     result = -1;
-    method_function p[2] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets};
+    method_function p[3] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets,
+        &SyntaxConfig::checkHttpCountGreaterThanZero};
     for (size_t i = 0; i < this->_parseLineProps.size(); i++)
     {
         result = (this->*p[0])(i);
@@ -46,6 +47,13 @@ void SyntaxConfig::analizer()
 
         result = (this->*p[1])(i);
         _configException.run(result);
+
+        result = (this->*p[2])(i);
+        _configException.run(result);
+
+        // result = (this->*p[3])(i);
+        // std::cout << "result : " << result << std::endl;
+        // _configException.run(result);
     }
 }
 
@@ -90,7 +98,7 @@ int SyntaxConfig::checkVariableSpace(const int &index)
 int SyntaxConfig::checkHttpCountGreaterThanZero(const int &index)
 {
     int result = -1;
-    if (this->_parseLineProps[index].getScopeName() == "http" && this->_parseLineProps[index].getIsScopeOpen() == true)
+    if (this->_parseLineProps[index].getLine() == "http" && this->_parseLineProps[index].getScopeName() == "http" && this->_parseLineProps[index].getIsScopeOpen())
     {
         this->_httpScopeCount += 1;
     }
@@ -100,10 +108,12 @@ int SyntaxConfig::checkHttpCountGreaterThanZero(const int &index)
 int SyntaxConfig::checkServerCountEqualZero(const int &index)
 {
     int result = -1;
-    if (this->_parseLineProps[index].getScopeName() == "server" && this->_parseLineProps[index].getIsScopeOpen() == true)
+    if (this->_parseLineProps[index].getLine() == "server" && this->_parseLineProps[index].getScopeName() == "server" && this->_parseLineProps[index].getIsScopeOpen())
     {
-        this->_serverScopeCount += 1;
+        this->_serverScopeCount = 1;
     }
+    else
+        return (-1);
     this->_serverScopeCount == 0 ? result = 114 : result = -1;
-    return (result);
+    return result;
 }
