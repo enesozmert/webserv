@@ -1,10 +1,6 @@
 #include "../inc/server/Cluster.hpp"
 
-Cluster::Cluster() {
-	FD_ZERO(&fd_master);
-	FD_ZERO(&writing_set);
-	FD_ZERO(&reading_set);
-}
+Cluster::Cluster() {}
 
 Cluster::~Cluster() {
 	std::cout << YELLOW << "Cluster destruct" << RESET << std::endl;
