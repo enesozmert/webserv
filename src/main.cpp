@@ -89,8 +89,13 @@ int main(int ac, char **av)
     // std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
     Cluster cluster;
-    cluster.setUpCluster(http);
-    //cluster.run();
-
+    try {
+		    cluster.setUpCluster(http);
+			cluster.run();
+			cluster.clean();			
+		}
+	catch (std::exception &e) {
+			std::cerr << e.what() << std::endl;
+		}
     return (0);
 }

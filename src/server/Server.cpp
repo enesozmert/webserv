@@ -1,14 +1,17 @@
 #include "../inc/server/Server.hpp"
 
-Server::Server() {}
+Server::Server() {
+    this->clean();
+}
 
 Server::~Server() {}
 
-Server::Server(const t_listen &_listen)
+Server::Server(const t_listen &listen)
 {
     this->SocketConnected = false;
-    this->_listen = _listen;
-    fd = -1;
+    this->_listen.port = listen.port;
+    this->_listen.host = listen.host;
+    this->clean();
     this->setUpSocket();
 }
 

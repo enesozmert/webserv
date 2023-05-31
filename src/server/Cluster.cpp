@@ -1,12 +1,12 @@
 #include "../inc/server/Cluster.hpp"
 
-Cluster::Cluster() {}
-
-Cluster::~Cluster()
-{
-    for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
-		it->second.clean();
+Cluster::Cluster() {
+	FD_ZERO(&fd_master);
+	FD_ZERO(&reading_set);
+	FD_ZERO(&writing_set);
 }
+
+Cluster::~Cluster() {}
 
 int Cluster::setUpCluster(HttpScope* http)
 {
@@ -158,7 +158,7 @@ void 	Cluster::accept_section()
 }
 
 void	Cluster::run()
-{	
+{
 	while (1)
 	{
 		this->select_return_value = 0;
@@ -187,5 +187,12 @@ void	Cluster::run()
 		}
 	}
 }
+
+void	Cluster::clean(void)
+{
+	for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
+		it->second.clean();
+}
+
 
 

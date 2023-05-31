@@ -69,7 +69,7 @@ public:
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue);
 
-    void                        resetValues(void);
+    void                        resetValues();
     void                        createResponse(Request *request, ServerScope *server, LocationScope *location);
     std::string                 notAllowed(std::vector<std::string> methods);
     std::string                 writeHeader(void);

@@ -31,6 +31,7 @@ class Cluster
         //setUp-->run-->select-->accept-->recv-->send
         int		setUpCluster(HttpScope* http);
     	void	run();
+        void	clean();
         void	select_section();//havuzdan fd seçimi yapılır
         void 	accept_section();//client'a hizmet için hazır bir socket oluşturulur
         void	recv_section();
