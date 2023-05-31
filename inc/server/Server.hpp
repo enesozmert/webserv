@@ -24,6 +24,7 @@ class Server {
     	t_listen					_listen;//host and port
     	long						fd;
     	struct sockaddr_in			addr;//host ve port ayarlanacak
+        int                         locationScopeIndex;
 
     public:
         Server();
@@ -42,5 +43,5 @@ class Server {
         int             send(long socket);
         int             recv(long socket);
         ServerScope*    getServerForRequest(t_listen& address, HttpScope* http);
-        LocationScope*  getLocationForRequest(ServerScope *matchedServerScope, const std::string& path); 
+        void             getLocationForRequest(ServerScope *matchedServerScope, const std::string& path); 
 };
