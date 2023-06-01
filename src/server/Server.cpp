@@ -291,18 +291,12 @@ ServerScope*        Server::getServerForRequest(t_listen& address, HttpScope* ht
 //benim yazdığım daha basic olan
 void  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::string& path) 
 {
-<<<<<<< HEAD
-    size_t locationScopeIndex = 0;
-
-    locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-=======
     this->locationScopeIndex = 0;
 
     this->locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
     std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
     if(this->locationScopeIndex == -1)
         std::cerr << RED << "There is no possible location" << RESET << std::endl;
->>>>>>> f94afb60b9517f6f22e1c4a556e3503eb8b92c25
     //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
     //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
 }
