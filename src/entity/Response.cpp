@@ -123,13 +123,6 @@ void			Response::setTransferEncoding(void)
 	_transferEncoding = "identity";
 }
 
-void			Response::setWwwAuthenticate()
-{
-	if (this->statusCode == 401)
-	{
-		_wwwAuthenticate = "Basic realm=\"Access requires authentification\" charset=\"UTF-8\"";
-	}
-}
 
 void			Response::setValues()
 {
@@ -142,7 +135,6 @@ void			Response::setValues()
 	setRetryAfter();
 	setServer();
 	setTransferEncoding();
-	setWwwAuthenticate();
 }
 
 void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex)
@@ -154,7 +146,7 @@ void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<st
 		this->_indexs.push_back(*itt);
 }
 
-void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue)
+/* void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue)
 {
 	int i = 0;
 	if (_paramValue.size() == _paramKeyword.size())
@@ -165,7 +157,7 @@ void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<
 			i++;
 		}
 	}
-}
+} */
 
 std::string Response::selectIndex()
 {
@@ -242,8 +234,6 @@ std::string		Response::writeHeader(void)
 		header += "Server: " + _server + "\r\n";
 	if (_transferEncoding != "")
 		header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
-	if (_wwwAuthenticate != "")
-		header += "WWW-Authenticate: " + _wwwAuthenticate + "\r\n";
 	header += "\r\n";
 	return (header);
 }
