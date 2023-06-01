@@ -11,23 +11,33 @@ Cgi::Cgi(Request *request, ServerScope* server, std::string& path): _body(reques
 	this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
 	this->_env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
 	this->_env.insert(std::make_pair("REMOTEaddr", server->getHost()));
+	this->_env.insert(std::make_pair("PATH_INFO", request->getPath()));
 	this->_env.insert(std::make_pair("REQUEST_URI", request->getPath() + request->getQuery()));
     this->_env.insert(std::make_pair("SERVER_PORT", server->getPort()));
 	this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
-	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "php-cgi/1.1"));
+	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "nginx"));
 	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "webserv/2.0"));
+
+	std::cout << YELLOW << "CONTENT_LENGTH = " << this->_env["CONTENT_LENGTH"] << RESET << std::endl;
+	std::cout << YELLOW << "SCRIPT_NAME = " << this->_env["SCRIPT_NAME"] << RESET << std::endl;
+	std::cout << YELLOW << "SCRIPT_FILENAME = " << this->_env["SCRIPT_FILENAME"] << RESET << std::endl;
+	std::cout << YELLOW << "CONTENT_TYPE = " << this->_env["CONTENT_TYPE"] << RESET << std::endl;
+	std::cout << YELLOW << "PATH_INFO = " << this->_env["PATH_INFO"] << RESET << std::endl;
+	std::cout << YELLOW << "REQUEST_URI = " << this->_env["REQUEST_URI"] << RESET << std::endl;
+	std::cout << YELLOW << "_body = " << this->_body << RESET << std::endl;
 }
 
 
 std::string		Cgi::executeCgi(const std::string& scriptName) 
 {
-	std::cout << CYAN << "Cgi çalışmaya başladı" << RESET << std::endl;
 	std::cout << CYAN << "scriptName : " << scriptName << RESET << std::endl;
+	std::cout << CYAN << "body : " << _body << RESET << std::endl;
 	pid_t		pid;
 	int			saveStdin;
 	int			saveStdout;
 	char		**env;
 	std::string	newBody;
+
 
 	try {
 		env = mapToEnvForm(this->_env);//envleri map'ten char **str'ye çeviriyoruz.
@@ -52,6 +62,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	long	fdOut = fileno(fOut);
 	int		ret = 1;
 
+	//if (this->_env["REQUEST_METHOD"] == "POST")
 	write(fdIn, _body.c_str(), _body.size());
 	lseek(fdIn, 0, SEEK_SET);
 	//Daha sonra, lseek() fonksiyonu kullanılarak dosya okuma yazma konumu (offset) ayarlanır.
@@ -70,11 +81,9 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	}
 	else if (!pid)
 	{
-		char * const * nll = NULL;
-
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(scriptName.c_str(), nll, env);
+		execve(scriptName.c_str(), NULL, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 	}

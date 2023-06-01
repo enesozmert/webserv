@@ -166,7 +166,7 @@ std::string Response::selectIndex()
 			return(*it);
 	}
 	std::cerr << RED << "No index found" << RESET << std::endl;
-    return (0);
+    return NULL;
 }
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
@@ -180,6 +180,7 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
   	this->_contentLocation = selectIndex();
 	this->_path = location->getRoot() + this->_contentLocation;//this->_path = "./tests/test1/index.html";
 	this->_contentLanguage = request->getAcceptLanguages().front().first;
+	
 	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
@@ -272,7 +273,7 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 			if (str.find("Status: ") == 0)
 				this->statusCode = std::atoi(str.substr(8, 3).c_str());
 			else if (str.find("Content-type: ") == 0)
-				_type = str.substr(14, str.size());
+				this->_contentType = str.substr(14, str.size());
 			i += str.size() + 2;
 		}
 		while (_response.find("\r\n", j) == j)
