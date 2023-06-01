@@ -10,7 +10,7 @@
 #include "../database/DataBase.hpp"
 #include "IRequest.hpp"
 #include "Variable.hpp"
-#include "HttpMethod.hpp"
+#include "../http/HttpMethod.hpp"
 
 class HttpMethod;
 class Request : public IRequest

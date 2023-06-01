@@ -14,21 +14,6 @@ int	Response::getStatusCode()
     return (this->statusCode);
 }
 
-void    Response::setErrors()
-{
-	this->_errors.clear();
-	this->_errors[100] = "Continue";
-	this->_errors[200] = "OK";
-	this->_errors[201] = "Created";
-	this->_errors[204] = "No Content";
-	this->_errors[400] = "Bad Request";
-	this->_errors[403] = "Forbidden";
-	this->_errors[404] = "Not Found";
-	this->_errors[405] = "Method Not Allowed";
-	this->_errors[413] = "Payload Too Large";
-	this->_errors[500] = "Internal Server Error";
-}
-
 void			Response::setAllowMethods(std::vector<std::string> methods)
 {
 	std::vector<std::string>::iterator it = methods.begin();
@@ -55,20 +40,21 @@ void			Response::setContentType()
 		return ;
 	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
-	if (this->_type == "html")
-		_contentType = "text/html";
-	else if (this->_type == "css")
-		_contentType = "text/css";
-	else if (this->_type == "js")
-		_contentType = "text/javascript";
-	else if (this->_type == "jpeg" || this->_type == "jpg")
-		_contentType = "image/jpeg";
-	else if (this->_type == "png")
-		_contentType = "image/png";
-	else if (this->_type == "bmp")
-		_contentType = "image/bmp";
-	else
-		_contentType = "text/plain";
+	this->_contentType = _httpContentType.contentTypeGenerator(this->_type);
+	// if (this->_type == "html")
+	// 	_contentType = "text/html";
+	// else if (this->_type == "css")
+	// 	_contentType = "text/css";
+	// else if (this->_type == "js")
+	// 	_contentType = "text/javascript";
+	// else if (this->_type == "jpeg" || this->_type == "jpg")
+	// 	_contentType = "image/jpeg";
+	// else if (this->_type == "png")
+	// 	_contentType = "image/png";
+	// else if (this->_type == "bmp")
+	// 	_contentType = "image/bmp";
+	// else
+	// 	_contentType = "text/plain";
 }
 
 void			Response::setDate()
@@ -133,7 +119,6 @@ void			Response::setWwwAuthenticate()
 
 void			Response::setValues()
 {
-	setErrors();
 	setContentLength();
 	setContentType();
 	setDate();
@@ -420,16 +405,8 @@ std::string		Response::getHeader()
 
 	setValues();
 
-	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + getStatusMessage() + "\r\n";
+	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
 
 	return (header);
 }
-
-std::string		Response::getStatusMessage()
-{
-	if (_errors.find(this->statusCode) != _errors.end())
-		return _errors[this->statusCode];
-	return ("Unknown Code");
-}
-

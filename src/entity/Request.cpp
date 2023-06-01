@@ -239,7 +239,7 @@ void Request::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("keep-alive", &this->_keepAlive));
     _keywordDatabase.insertData(Variable<std::string>("connection", &this->_connection));
     _keywordDatabase.insertData(Variable<std::string>("referer", &this->_referer));
-    _keywordDatabase.insertData(Variable<std::string>("content-type", &this->_contentLength));
+    _keywordDatabase.insertData(Variable<std::string>("content-type", &this->_contentType));
     _keywordDatabase.insertData(Variable<std::string>("content-length", &this->_contentLength));
     _keywordDatabase.insertData(Variable<std::string>("auth-scheme", &this->_authScheme));
     _keywordDatabase.insertData(Variable<std::string>("authorization", &this->_authorization));

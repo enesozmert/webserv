@@ -8,7 +8,7 @@
 #include "ISubScope.hpp"
 #include "Variable.hpp"
 #include "../database/DataBase.hpp"
-#include "HttpStatusCode.hpp"
+#include "../http/HttpStatusCode.hpp"
 
 class HttpStatusCode;
 class ErrorPage : public ISubScope
