@@ -90,7 +90,6 @@ void    Server::process(long socket, HttpScope* http)
 
         matchedServer = this->getServerForRequest(this->_listen, http);
         this->getLocationForRequest(matchedServer, request->getPath());
-        matchedLocation = matchedServer->getLocations().at(this->locationScopeIndex);
         if (matchedServer == NULL || this->locationScopeIndex == -1)
         {
             _requests.erase(socket);
@@ -99,6 +98,7 @@ void    Server::process(long socket, HttpScope* http)
         }
         else
         {
+            matchedLocation = matchedServer->getLocations().at(this->locationScopeIndex);
             response.createResponse(request, matchedServer, matchedLocation);
 
             // socket,request olan map yapısının requestini siliyoruz
