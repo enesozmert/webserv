@@ -1,10 +1,8 @@
 #include "../inc/entity/Response.hpp"
 
-Response::Response(){
-	resetValues();
-}
+Response::Response() {}
 
-Response::~Response(){}
+Response::~Response() {}
 
 std::string		Response::getResponse()
 {
@@ -14,11 +12,6 @@ std::string		Response::getResponse()
 int	Response::getStatusCode()
 {
     return (this->statusCode);
-}
-
-std::map<int, std::string>  Response::getErrorMap()
-{
-    return (this->_errorMap);
 }
 
 void    Response::setErrors()
@@ -34,18 +27,6 @@ void    Response::setErrors()
 	this->_errors[405] = "Method Not Allowed";
 	this->_errors[413] = "Payload Too Large";
 	this->_errors[500] = "Internal Server Error";
-}
-
-void    Response::setErrorMap()
-{
-	this->_errorMap.clear();
-    this->_errorMap[400] = "configs/default_error_pages/400.html";
-    this->_errorMap[403] = "configs/default_error_pages/403.html";
-    this->_errorMap[404] = "configs/default_error_pages/404.html";
-    this->_errorMap[405] = "configs/default_error_pages/405.html";
-	this->_errorMap[410] = "configs/default_error_pages/410.html";
-    this->_errorMap[413] = "configs/default_error_pages/413.html";
-    this->_errorMap[500] = "configs/default_error_pages/500.html";
 }
 
 void			Response::setAllowMethods(std::vector<std::string> methods)
@@ -211,7 +192,7 @@ std::string Response::selectIndex()
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-	setErrorMap();
+	this->_error_page = location->getErrorPage();
 	this->_allow = request->getHttpMethodName();
 	this->statusCode = request->getReturnCode();//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->_cgi_pass = location->getCgiPass();
@@ -288,7 +269,6 @@ std::string		Response::notAllowed(std::vector<std::string> methods)
 
 	_response = "";
 
-	resetValues();
 	setValues();
 	setAllowMethods(methods);
 
@@ -329,7 +309,7 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 		_response = this->readHtml();
 	
 	if (this->statusCode == 500)
-		_response = this->readHtml();
+		_response = "<!DOCTYPE html>\n<html><title>500</title><body>Server couldn't handle your request. Still, you won't kill it so easily !</body></html>\n";
 
 	_response = getHeader() + "\r\n" + _response;
 }
@@ -380,7 +360,7 @@ void			Response::POSTmethod(Request* request, ServerScope* server)
 		_response = "";
 	}
 	if (this->statusCode == 500)
-		_response = this->readHtml();
+		_response = "<!DOCTYPE html>\n<html><title>500</title><body>Server couldn't handle your request. Still, you won't kill it so easily !</body></html>\n";
 	_response = getHeader() + "\r\n" + _response;
 }
 
@@ -388,10 +368,11 @@ std::string		Response::readHtml()
 {
 	std::ofstream		file;
 	std::stringstream	buffer;
-
-	if (pathIsFile(_errorMap[this->statusCode]))
+	if (this->statusCode == 403)
+		return ("<!DOCTYPE html>\n<html><title>403</title><body>This request cannot be authorized (invalid permissions or credentials)</body></html>\n");
+	if (pathIsFile(this->_error_page))
 	{
-		file.open(_errorMap[this->statusCode].c_str(), std::ifstream::in);
+		file.open(this->_error_page.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 			return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
 
@@ -402,7 +383,7 @@ std::string		Response::readHtml()
 		return (buffer.str());
 	}
 	else
-		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
+		return ("<!DOCTYPE html>\n<html><title>404</title><body>There was an error finding your error page</body></html>\n");
 }
 
 void				Response::readContent()
@@ -418,7 +399,7 @@ void				Response::readContent()
 		if (file.is_open() == false)
 		{
 			this->statusCode = 403;
-			_response = this->readHtml();
+			_response = "<!DOCTYPE html>\n<html><title>403</title><body>This request cannot be authorized (invalid permissions or credentials)</body></html>\n";
 			return ;
 		}
 		buffer << file.rdbuf();
@@ -437,7 +418,6 @@ std::string		Response::getHeader()
 {
 	std::string	header;
 
-	resetValues();
 	setValues();
 
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + getStatusMessage() + "\r\n";
@@ -453,20 +433,3 @@ std::string		Response::getStatusMessage()
 	return ("Unknown Code");
 }
 
-void			Response::resetValues()
-{
-	_allow = "";
-	_allow_methods = "";
-	_contentLanguage = "";
-	_contentLength = "";
-	_contentLocation = "";
-	_contentType = "";
-	_date = "";
-	_lastModified = "";
-	_location = "";
-	_retryAfter = "";
-	_server = "";
-	_transferEncoding = "";
-	_wwwAuthenticate = "";
-	//initErrorMap();
-}

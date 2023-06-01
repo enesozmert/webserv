@@ -89,24 +89,23 @@ void    Server::process(long socket, HttpScope* http)
         request = parserRequest.getRequest();
 
         matchedServer = this->getServerForRequest(this->_listen, http);
-        matchedLocation = this->getLocationForRequest(matchedServer, request->getPath());
+        this->getLocationForRequest(matchedServer, request->getPath());
+        matchedLocation = matchedServer->getLocations().at(this->locationScopeIndex);
+        if (matchedServer == NULL || this->locationScopeIndex == -1)
+        {
+            _requests.erase(socket);
+            _requests.insert(std::make_pair(socket, ""));
+            return ;
+        }
+        else
+        {
+            response.createResponse(request, matchedServer, matchedLocation);
 
-        /* std::cout << YELLOW << "matchedServer->getHost() = " << matchedServer->getHost() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getName() = " << matchedServer->getName() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getRoot() = " << matchedServer->getRoot() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getCgi_pass() = " << matchedServer->getCgi_pass() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getIndex().front() = " << matchedServer->getIndex().front() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getErrorPage().getPageName() = " << matchedServer->getErrorPage().getErrorPagePath() << RESET << std::endl;
-        std::cout << YELLOW << "matchedServer->getServerName().front() = " << matchedServer->getServerName().front() << RESET << std::endl;
- */
-
-        response.createResponse(request, matchedServer, matchedLocation);
-
-        // socket,request olan map yapısının requestini siliyoruz
-        _requests.erase(socket);
-        // requeste cevap oluşturup map içinde socket,response şeklinde tutuyoruz.
-        _requests.insert(std::make_pair(socket, response.getResponse()));
-
+            // socket,request olan map yapısının requestini siliyoruz
+            _requests.erase(socket);
+            // requeste cevap oluşturup map içinde socket,response şeklinde tutuyoruz.
+            _requests.insert(std::make_pair(socket, response.getResponse()));
+        }
         //not:
         //www.google.com:80
         //192.282.23.2:
@@ -284,19 +283,26 @@ ServerScope*        Server::getServerForRequest(t_listen& address, HttpScope* ht
         if (address.host == (*it)->getListen().host && address.port == (*it)->getListen().port)
             return(*it);
     }
-    std::cerr << "there is no possible server" << std::endl;
+    std::cerr << RED << "There is no possible server" << RESET << std::endl;
     return NULL;
 }
 
 
 //benim yazdığım daha basic olan
-LocationScope*  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::string& path) 
+void  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::string& path) 
 {
+<<<<<<< HEAD
     size_t locationScopeIndex = 0;
 
     locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
+=======
+    this->locationScopeIndex = 0;
+
+    this->locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
+    std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
+    if(this->locationScopeIndex == -1)
+        std::cerr << RED << "There is no possible location" << RESET << std::endl;
+>>>>>>> f94afb60b9517f6f22e1c4a556e3503eb8b92c25
     //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
     //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
-    std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
-    return (matchedServerScope->getLocations().at(locationScopeIndex));
 }

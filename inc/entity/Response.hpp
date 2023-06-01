@@ -24,6 +24,7 @@ private:
     std::vector<std::string>	        _indexs;
     std::string					        _path;// local path for request
 	std::string					        _cgi_pass;
+    std::string					        _error_page;
     std::map<std::string, std::string>	_cgi_params;
 
 
