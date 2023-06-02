@@ -4,11 +4,17 @@ Response::Response() {}
 
 Response::~Response() {}
 
-std::string Response::getStatusMessage()
+Response::Response(const Response &response)
 {
-	if (_errors.find(this->statusCode) != _errors.end())
-		return _errors[this->statusCode];
-	return ("Unknown Code");
+	*this = response;
+}
+
+Response& Response::operator=(const Response &response)
+{
+	if (this == &response)
+        return (*this);
+    this->_response = response._response;
+    return (*this);
 }
 
 int Response::getStatusCode()
@@ -45,6 +51,11 @@ DataBase<Variable<std::string> > Response::getKeywordDataBase()
     return (this->_keywordDatabase);
 }
 
+void Response::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
+{
+    this->_keywordDatabase = keywordDatabase;
+}
+
 void Response::setStaticErrorPage()
 {
 	this->staticErrorPage.clear();
@@ -71,13 +82,18 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setContentType()
 {
+
 	if (this->_type != "")
 	{
+		std::cout << "this->_type != boş değilse" << std::endl;
 		_contentType = this->_type;
 		return;
 	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 	this->_contentType = _httpContentType.contentTypeGenerator(this->_type);
+	std::cout << "this->_path = " << this->_path << std::endl;
+	std::cout << "this->_type = " << this->_type << std::endl;
+	std::cout << "this->_contentType = " <<  this->_contentType << std::endl;
 }
 
 void Response::setDate()
@@ -128,22 +144,16 @@ void Response::setLanguage(std::vector<std::pair<std::string, float> > languages
 	}
 }
 
-std::string Response::selectIndex()
-{
-	for (std::vector<std::string>::iterator it = this->_indexs.begin(); it != this->_indexs.end(); it++)
-	{
-		if (!pathIsFile(*it))
-			return (*it);
-	}
-	std::cerr << RED << "No index found" << RESET << std::endl;
-	return NULL;
-}
-
-int Response::setPaths(ServerScope *server, LocationScope *location)
+int Response::setPaths(ServerScope *server, LocationScope *location, std::string path)
 {
 	(void)server;
+	(void)path;
 	this->_contentLocation = selectIndex();
-	this->_path = location->getRoot() + this->_contentLocation; // this->_path = "./tests/test1/index.html";
+	this->_path = removeAdjacentSlashes(location->getRoot() + path);
+	if (!pathIsFile(this->_path) && this->_method == "GET") 
+		this->_path = removeAdjacentSlashes(location->getRoot() + _contentLocation);
+	// this->_path = "./tests/test1/bob.jpg" bu yoksa indexe bakacak
+	// this->_path = "./tests/test1/index.html";
 	this->_cgi_pass = location->getCgiPass();
 	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
@@ -158,6 +168,7 @@ void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
 {
+	std::cout << YELLOW << "request.getPath() : " << request->getPath() << RESET << std::endl;
 	this->statusCode = request->getReturnCode(); // statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->_body = request->getBody();
 	this->_server = "webserv";
@@ -170,7 +181,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setLastModified();
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex()); // index yoksa hata mı vermeli?
-	setPaths(server, location);
+	setPaths(server, location, request->getPath());
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	return 0;
 }
@@ -377,12 +388,6 @@ std::string Response::getHeader()
 	return (header);
 }
 
-
-void Response::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
-{
-    this->_keywordDatabase = keywordDatabase;
-}
-
 void Response::keywordFill()
 {
     _keywordDatabase.insertData(Variable<std::string>("Allow", &this->_allows));
@@ -393,4 +398,15 @@ void Response::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
     _keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
     _keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
+}
+
+std::string Response::selectIndex()
+{
+	for (std::vector<std::string>::iterator it = this->_indexs.begin(); it != this->_indexs.end(); it++)
+	{
+		if (!pathIsFile(*it))
+			return (*it);
+	}
+	std::cerr << RED << "No index found" << RESET << std::endl;
+	return NULL;
 }

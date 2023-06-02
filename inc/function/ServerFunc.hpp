@@ -2,7 +2,7 @@
 
 #include "../server/Server.hpp"
 
-inline size_t getMatchLocationPathIndex(ServerScope *matchedServerScope, std::string path) 
+/* inline int getMatchLocationPathIndex(ServerScope *matchedServerScope, std::string path) 
 {
     std::vector<LocationScope *> selectedLocationScope;
     int index = -1;
@@ -23,9 +23,9 @@ inline size_t getMatchLocationPathIndex(ServerScope *matchedServerScope, std::st
         }
     return (-1);
 }
+ */
 
-
-/* inline int getMatchLocationPathIndex(ServerScope *matchedServerScope, std::string path) 
+inline int getMatchLocationPathIndex(ServerScope *matchedServerScope, std::string path) 
 {
     std::vector<LocationScope *> selectedLocationScope;
     int index = -1;
@@ -53,7 +53,7 @@ inline size_t getMatchLocationPathIndex(ServerScope *matchedServerScope, std::st
     if(defaultLocation != -1)
         return(defaultLocation);
     return (-1);
-} */
+}
 
 
 inline size_t getDefaultLocationPathIndex(ServerScope *matchedServerScope) {

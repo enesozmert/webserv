@@ -12,6 +12,20 @@ Server::Server(const t_listen &listen)
     fd = -1;
 }
 
+Server::Server(const Server &server)
+{
+	*this = server;
+}
+
+/* Server& Server::operator=(const Server &server)
+{
+	if (this == &server)
+        return (*this);
+    this->_requests = server._requests;
+    this->_listen = server._listen;
+    return (*this);
+}
+ */
 long Server::getFd(void) const
 {
     return (fd);

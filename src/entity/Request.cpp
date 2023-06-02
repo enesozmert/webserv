@@ -6,10 +6,16 @@ Request::Request()
     this->keywordFill();
 }
 Request::~Request() {}
-Request::Request(const Request& request)
+/* Request::Request(const Request& request)
 {
     (*this) = request;
 }
+Request& Request::operator=(const Request &request)
+{
+	if (this == &request)
+        return (*this);
+    return (*this);
+} */
 std::string Request::getVersion()
 {
     return (this->_version);
