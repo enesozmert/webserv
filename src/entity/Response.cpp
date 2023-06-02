@@ -4,14 +4,36 @@ Response::Response() {}
 
 Response::~Response() {}
 
-std::string		Response::getResponse()
+std::string		Response::getStatusMessage()
 {
-    return (this->_response);
+	if (_errors.find(this->statusCode) != _errors.end())
+		return _errors[this->statusCode];
+	return ("Unknown Code");
 }
 
 int	Response::getStatusCode()
 {
     return (this->statusCode);
+}
+
+std::string	Response::getPath()
+{
+    return (this->_path);
+}
+
+std::string	Response::getCgiPass()
+{
+    return (this->_cgiPass);
+}
+
+std::string	Response::getBody()
+{
+    return (this->_body);
+}
+
+std::string	Response::getMethod()
+{
+    return (this->_method);
 }
 
 void    Response::setErrors()
@@ -29,6 +51,14 @@ void    Response::setErrors()
 	this->_errors[500] = "Internal Server Error";
 }
 
+void Response::setStaticErrorPage()
+{
+	this->staticErrorPage.clear();
+	this->staticErrorPage[404] = "<!DOCTYPE html>\n<html><title>404</title><body>There was an error finding your error page</body></html>\n";
+	this->staticErrorPage[500] = "<!DOCTYPE html>\n<html><title>500</title><body>Server couldn't handle your request. Still, you won't kill it so easily !</body></html>\n";
+	this->staticErrorPage[403] = "<!DOCTYPE html>\n<html><title>403</title><body>This request cannot be authorized (invalid permissions or credentials)</body></html>\n";
+}
+
 void			Response::setAllowMethods(std::vector<std::string> methods)
 {
 	std::vector<std::string>::iterator it = methods.begin();
@@ -40,11 +70,6 @@ void			Response::setAllowMethods(std::vector<std::string> methods)
 		if (it != methods.end())
 			this->_allow_methods += ", ";
 	}
-}
-
-void			Response::setContentLength()
-{
-	_contentLength = std::to_string(this->_response.size());
 }
 
 void			Response::setContentType()
@@ -97,45 +122,6 @@ void			Response::setLastModified()
 	}
 }
 
-void			Response::setLocation()
-{
-	if (this->statusCode == 201 || this->statusCode / 100 == 3)
-	{
-		_location = this->_path;
-	}
-}
-
-void			Response::setRetryAfter()
-{
-	if (this->statusCode == 503 || this->statusCode == 429 || this->statusCode == 301)
-	{
-		_retryAfter = std::to_string(3);
-	}
-}
-
-void			Response::setServer(void)
-{
-	_server = "webserv";
-}
-
-void			Response::setTransferEncoding(void)
-{
-	_transferEncoding = "identity";
-}
-
-
-void			Response::setValues()
-{
-	setErrors();
-	setContentLength();
-	setContentType();
-	setDate();
-	setLastModified();
-	setLocation();
-	setRetryAfter();
-	setServer();
-	setTransferEncoding();
-}
 
 void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex)
 {
@@ -145,19 +131,6 @@ void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<st
 	for (std::vector<std::string>::iterator itt = _serverIndex.begin(); itt != _serverIndex.end(); itt++)
 		this->_indexs.push_back(*itt);
 }
-
-/* void    Response::setParams(std::vector<std::string> _paramKeyword, std::vector<std::string> _paramValue)
-{
-	int i = 0;
-	if (_paramValue.size() == _paramKeyword.size())
-	{
-		for (std::vector<std::string>::iterator it = _paramValue.begin(); it != _paramValue.end(); it++)
-		{
-			this->_cgi_params[_paramKeyword.at(i)] = *it;
-			i++;
-		}
-	}
-} */
 
 std::string Response::selectIndex()
 {
@@ -169,85 +142,75 @@ std::string Response::selectIndex()
     return NULL;
 }
 
-void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
+int Response::setPaths(ServerScope *server, LocationScope *location)
 {
-	this->_error_page = location->getErrorPage();
-	this->_allow = request->getHttpMethodName();
-	this->statusCode = request->getReturnCode();//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
-	this->_cgi_pass = location->getCgiPass();
-  	setIndexs(location->getIndex(), server->getIndex());
-	//setParams(location->getParamKeyword(), location->getParamValues());
-  	this->_contentLocation = selectIndex();
+	this->_contentLocation = selectIndex();
 	this->_path = location->getRoot() + this->_contentLocation;//this->_path = "./tests/test1/index.html";
-	this->_contentLanguage = request->getAcceptLanguages().front().first;
-	
+	this->_cgi_pass = location->getCgiPass();
+
 	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
+}
 
-    if (std::find(location->getAllowMethods().begin(), location->getAllowMethods().end(), this->_allow) == location->getAllowMethods().end())
-		this->statusCode = 405;
-	else if (atoi(location->getClientBodyBufferSize().c_str()) < static_cast<int>(request->getBody().size()))
-		this->statusCode = 413;
+void Response::setClientBodyBufferSize(std::string bodyBufferSize)
+{
+	this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
+}
 
-    if (this->statusCode == 405 || this->statusCode == 413)
+int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
+{
+	this->statusCode = request->getReturnCode();//statusCode 200 olarak initledik. İlk 200 olarak atanacak.
+	this->_body = request->getBody();
+	this->_server = "webserv";
+	this->_error_page = location->getErrorPage();
+	this->_method = request->getHttpMethodName();
+	this->_contentLanguage = request->getAcceptLanguages().front().first;
+	setErrors();
+	setStaticErrorPage();
+	setDate();
+	setLastModified();
+	setAllowMethods(location->getAllowMethods());
+  	setIndexs(location->getIndex(), server->getIndex());//index yoksa hata mı vermeli?
+	setPaths(server, location);
+	setClientBodyBufferSize(location->getClientBodyBufferSize());
+}
+
+void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
+{
+	if (setResponse(request, server, location) == -1)
+		std::cerr << RED << "Error setting response" << RESET << std::endl;
+	
+    if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_method) == _allow_methods.end())
 	{
-		_response = notAllowed(location->getAllowMethods()) + "\r\n";
+		this->statusCode = 405;
+		_response = notAllowed() + "\r\n";
+		return ;
+
+	}
+	else if (this->_clientBodybufferSize < static_cast<int>(this->_body.size()))
+	{
+		this->statusCode = 413;
+		_response = notAllowed() + "\r\n";
 		return ;
 	}
 
-    if (this->statusCode == 200)
-    {
-        if (request->getHttpMethodName() == "GET")
-            GETmethod(request, server);
-        else if (request->getHttpMethodName() == "POST")
-            POSTmethod(request, server);
-        else if (request->getHttpMethodName() == "DELETE")
-            DELETEmethod();
-        else
-            std::cerr << "buraya ne eklememiz lazım bilemedim" << std::endl;   
-    }
+    if (this->statusCode == 200 && this->_method == "GET")
+        GET_method(request, server);
+    else if (this->statusCode == 200 && this->_method == "POST")
+        POST_method(request, server);
+    else if (this->statusCode == 200 && this->_method == "DELETE")
+        DELETE_method();
 }
 
-std::string		Response::writeHeader(void)
-{
-	std::string	header = "";
-
-	if (_allow_methods != "")
-		header += "Allow: " + _allow_methods + "\r\n";
-	if (_contentLanguage != "")
-		header += "Content-Language: " + _contentLanguage + "\r\n";
-	if (_contentLength != "")
-		header += "Content-Length: " + _contentLength + "\r\n";
-	if (_contentLocation != "")
-		header += "Content-Location: " + _contentLocation + "\r\n";
-	if (_contentType != "")
-		header += "Content-Type: " + _contentType + "\r\n";
-	if (_date != "")
-		header += "Date: " + _date + "\r\n";
-	if (_lastModified != "")
-		header += "Last-Modified: " + _lastModified + "\r\n";
-	if (_location != "")
-		header += "Location: " + _location + "\r\n";
-	if (_retryAfter != "")
-		header += "Retry-After: " + _retryAfter + "\r\n";
-	if (_server != "")
-		header += "Server: " + _server + "\r\n";
-	if (_transferEncoding != "")
-		header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
-	header += "\r\n";
-	return (header);
-}
-
-
-std::string		Response::notAllowed(std::vector<std::string> methods)
+std::string		Response::notAllowed()
 {
 	std::string	header;
 
 	_response = "";
 
-	setValues();
-	setAllowMethods(methods);
+	setContentType();
+	this->_contentLength = std::to_string(this->_response.size());
 
 	if (this->statusCode == 405)
 		header = "HTTP/1.1 405 Method Not Allowed\r\n";
@@ -258,11 +221,11 @@ std::string		Response::notAllowed(std::vector<std::string> methods)
 	return (header);
 }
 
-void			Response::GETmethod(Request* request, ServerScope* server)
+void			Response::GET_method(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path);
+		Cgi	cgi(request, server, *this);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
@@ -286,12 +249,12 @@ void			Response::GETmethod(Request* request, ServerScope* server)
 		_response = this->readHtml();
 	
 	if (this->statusCode == 500)
-		_response = "<!DOCTYPE html>\n<html><title>500</title><body>Server couldn't handle your request. Still, you won't kill it so easily !</body></html>\n";
-
+		_response = staticErrorPage[500];
+	
 	_response = getHeader() + "\r\n" + _response;
 }
 
-void			Response::DELETEmethod()
+void			Response::DELETE_method()
 {
 	_response = "";
 	if (pathIsFile(_path))
@@ -305,10 +268,11 @@ void			Response::DELETEmethod()
 		this->statusCode = 404;
 	if (this->statusCode == 403 || this->statusCode == 404)
 		_response = this->readHtml();
+
 	_response = getHeader() + "\r\n" + _response;
 }
 
-void			Response::POSTmethod(Request* request, ServerScope* server)
+void			Response::POST_method(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
@@ -337,7 +301,8 @@ void			Response::POSTmethod(Request* request, ServerScope* server)
 		_response = "";
 	}
 	if (this->statusCode == 500)
-		_response = "<!DOCTYPE html>\n<html><title>500</title><body>Server couldn't handle your request. Still, you won't kill it so easily !</body></html>\n";
+		_response = staticErrorPage[500];
+	
 	_response = getHeader() + "\r\n" + _response;
 }
 
@@ -345,13 +310,15 @@ std::string		Response::readHtml()
 {
 	std::ofstream		file;
 	std::stringstream	buffer;
+
 	if (this->statusCode == 403)
-		return ("<!DOCTYPE html>\n<html><title>403</title><body>This request cannot be authorized (invalid permissions or credentials)</body></html>\n");
+		return (staticErrorPage[403]);
+
 	if (pathIsFile(this->_error_page))
 	{
 		file.open(this->_error_page.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
-			return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
+			return (staticErrorPage[404]);
 
 		buffer << file.rdbuf();
 		file.close();
@@ -360,7 +327,7 @@ std::string		Response::readHtml()
 		return (buffer.str());
 	}
 	else
-		return ("<!DOCTYPE html>\n<html><title>404</title><body>There was an error finding your error page</body></html>\n");
+		return (staticErrorPage[404]);
 }
 
 void				Response::readContent()
@@ -376,7 +343,7 @@ void				Response::readContent()
 		if (file.is_open() == false)
 		{
 			this->statusCode = 403;
-			_response = "<!DOCTYPE html>\n<html><title>403</title><body>This request cannot be authorized (invalid permissions or credentials)</body></html>\n";
+			_response = staticErrorPage[403];
 			return ;
 		}
 		buffer << file.rdbuf();
@@ -389,23 +356,40 @@ void				Response::readContent()
 	return ;
 }
 
+std::string		Response::writeHeader(void)
+{
+	std::string	header = "";
+
+	if (_allow_methods != "")
+		header += "Allow: " + _allow_methods + "\r\n";
+	if (_contentLanguage != "")
+		header += "Content-Language: " + _contentLanguage + "\r\n";
+	if (_contentLength != "")
+		header += "Content-Length: " + _contentLength + "\r\n";
+	if (_contentLocation != "")
+		header += "Content-Location: " + _contentLocation + "\r\n";
+	if (_contentType != "")
+		header += "Content-Type: " + _contentType + "\r\n";
+	if (_date != "")
+		header += "Date: " + _date + "\r\n";
+	if (_lastModified != "")
+		header += "Last-Modified: " + _lastModified + "\r\n";
+	if (_server != "")
+		header += "Server: " + _server + "\r\n";
+	header += "\r\n";
+	return (header);
+}
 
 std::string		Response::getHeader()
 {
 	std::string	header;
 
-	setValues();
+	setContentType();
+	this->_contentLength = std::to_string(this->_response.size());
 
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + getStatusMessage() + "\r\n";
 	header += writeHeader();
 
 	return (header);
-}
-
-std::string		Response::getStatusMessage()
-{
-	if (_errors.find(this->statusCode) != _errors.end())
-		return _errors[this->statusCode];
-	return ("Unknown Code");
 }
 

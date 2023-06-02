@@ -1,22 +1,19 @@
 #include "../inc/cgi/Cgi.hpp"
 
-Cgi::Cgi(Request *request, ServerScope* server, std::string& path): _body(request->getBody())
+Cgi::Cgi(Request *request, ServerScope* server, Response *response): _body(response->getBody())
 {
 	this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
 	this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
-	this->_env.insert(std::make_pair("SCRIPT_NAME", path));
-	this->_env.insert(std::make_pair("SCRIPT_FILENAME", path));
-	this->_env.insert(std::make_pair("REQUEST_METHOD", request->getHttpMethodName()));
+	this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
+	this->_env.insert(std::make_pair("REQUEST_METHOD", response->getMethod()));
 	this->_env.insert(std::make_pair("CONTENT_LENGTH", std::to_string(this->_body.length())));
 	this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
-	this->_env.insert(std::make_pair("QUERY_STRING", request->getQuery()));
+	this->_env.insert(std::make_pair("PATH_INFO", request->getPath()));//CGI script'in ek bilgileri veya parametreleri içeren yol bilgisi(cgi_param)
+	this->_env.insert(std::make_pair("REQUEST_URI", request->getPath()));
 	this->_env.insert(std::make_pair("REMOTEaddr", server->getHost()));
-	this->_env.insert(std::make_pair("PATH_INFO", request->getPath()));
-	this->_env.insert(std::make_pair("REQUEST_URI", request->getPath() + request->getQuery()));
     this->_env.insert(std::make_pair("SERVER_PORT", server->getPort()));
 	this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
-	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "nginx"));
-	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "webserv/2.0"));
+	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "nginx/webserv"));
 
 	std::cout << YELLOW << "CONTENT_LENGTH = " << this->_env["CONTENT_LENGTH"] << RESET << std::endl;
 	std::cout << YELLOW << "SCRIPT_NAME = " << this->_env["SCRIPT_NAME"] << RESET << std::endl;
@@ -30,26 +27,23 @@ Cgi::Cgi(Request *request, ServerScope* server, std::string& path): _body(reques
 
 std::string		Cgi::executeCgi(const std::string& scriptName) 
 {
-	std::cout << CYAN << "scriptName : " << scriptName << RESET << std::endl;
-	std::cout << CYAN << "body : " << _body << RESET << std::endl;
-	pid_t		pid;
-	int			saveStdin;
-	int			saveStdout;
-	char		**env;
+	std::cout << YELLOW << "scriptName : " << scriptName << RESET << std::endl;
+
+	int			saveStdin= dup(STDIN_FILENO);;
+	int			saveStdout = dup(STDOUT_FILENO);;
 	std::string	newBody;
 
-
+	char	**env = nullptr;
 	try {
 		env = mapToEnvForm(this->_env);//envleri map'ten char **str'ye çeviriyoruz.
 	}
-	catch (std::bad_alloc &e) {
+	catch (const std::bad_alloc& e) {
 		std::cerr << e.what() << std::endl;
+		return "Status: 500\r\n\r\n";
 	}
 
 	// SAVING STDIN AND STDOUT IN ORDER TO TURN THEM BACK TO NORMAL LATER
 	//orijinal stdin ve stdout'u burada tutuyoruz ki kaybetmeyelim.
-	saveStdin = dup(STDIN_FILENO);
-	saveStdout = dup(STDOUT_FILENO);
 	//tmpfile() işlevi, geçici bir dosya oluşturur ve dosya tanımlayıcısı için bir FILE işaretçisi döndürür. 
 	//Bu işlev, geçici dosyaların oluşturulması ve yönetilmesi için kolay bir yol sağlar.
 	//tmpfile() işlevi, oluşturulan dosyanın ismini, konumunu ve boyutunu ayarlar
@@ -58,9 +52,8 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	FILE	*fIn = tmpfile();
 	FILE	*fOut = tmpfile();
 	//fileno() işlevi, bir FILE işaretçisine karşılık gelen dosya tanımlayıcısını döndürür.
-	long	fdIn = fileno(fIn);
-	long	fdOut = fileno(fOut);
-	int		ret = 1;
+	int fdIn = fileno(fIn);
+	int fdOut = fileno(fOut);
 
 	//if (this->_env["REQUEST_METHOD"] == "POST")
 	write(fdIn, _body.c_str(), _body.size());
@@ -72,8 +65,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	//Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
 	//SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
 
-	pid = fork();
-
+	pid_t pid = fork();
 	if (pid == -1)
 	{
 		std::cerr << "Fork crashed." << std::endl;
@@ -83,18 +75,19 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(scriptName.c_str(), NULL, env);
+		execve(scriptName.c_str(), nullptr, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
+		exit(1);
 	}
 	else
 	{
 		char	buffer[CGI_BUFSIZE] = {0};
 
-		waitpid(-1, NULL, 0);
+		waitpid(-1, nullptr, 0);
 		lseek(fdOut, 0, SEEK_SET);
 
-		ret = 1;
+		int ret = 1;
 		while (ret > 0)
 		{
 			memset(buffer, 0, CGI_BUFSIZE);
@@ -116,9 +109,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 		delete[] env[i];
 	delete[] env;
 
-	if (!pid)
-		exit(0);
-	std::cout << RED << "newBody: " << newBody << RESET << std::endl;
+	std::cout << YELLOW << "newBody: " << newBody << RESET << std::endl;
 	return (newBody);
 }
 
