@@ -13,9 +13,11 @@
 
 #include "../entity/HttpScope.hpp"
 #include "../entity/Request.hpp"
+#include "../entity/Response.hpp"
 #include "../utils/Utils.hpp"
 ;
 class Request;
+class Response;
 class Cgi
 {
     private:
@@ -24,7 +26,7 @@ class Cgi
     
     public:
         Cgi();
-    	Cgi(Request *request, ServerScope* server, std::string& path); // sets up env according to the request
+    	Cgi(Request *request, ServerScope* server, Response* response); // sets up env according to the request
         ~Cgi();
     
     	std::string		executeCgi(const std::string &scriptName);	// executes cgi and returns body
