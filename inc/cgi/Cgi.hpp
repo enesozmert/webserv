@@ -17,6 +17,7 @@
 #include "../utils/Utils.hpp"
 ;
 class Request;
+class Response;
 class Cgi
 {
     private:

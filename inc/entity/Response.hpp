@@ -27,7 +27,7 @@ private:
     std::string					        _error_page;
     std::map<std::string, std::string>	_cgi_params;
     std::string					        _method;
-    std::string					        _allow_methods;
+    std::string					        _allow_methods;//vector yap
 	std::string					        _contentLanguage;
 	std::string					        _contentLength;
 	std::string					        _contentLocation;
@@ -51,6 +51,7 @@ public:
     std::string                 getBody();
     std::string                 getMethod();
     std::string                 getCgiPass();
+    std::string                 getResponse();
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();

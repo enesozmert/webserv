@@ -21,9 +21,14 @@ std::string	Response::getPath()
     return (this->_path);
 }
 
+std::string	Response::getResponse()
+{
+    return (this->_response);
+}
+
 std::string	Response::getCgiPass()
 {
-    return (this->_cgiPass);
+    return (this->_cgi_pass);
 }
 
 std::string	Response::getBody()
@@ -144,6 +149,7 @@ std::string Response::selectIndex()
 
 int Response::setPaths(ServerScope *server, LocationScope *location)
 {
+	(void)server;
 	this->_contentLocation = selectIndex();
 	this->_path = location->getRoot() + this->_contentLocation;//this->_path = "./tests/test1/index.html";
 	this->_cgi_pass = location->getCgiPass();
@@ -151,6 +157,7 @@ int Response::setPaths(ServerScope *server, LocationScope *location)
 	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
+	return 0;
 }
 
 void Response::setClientBodyBufferSize(std::string bodyBufferSize)
@@ -170,10 +177,11 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setStaticErrorPage();
 	setDate();
 	setLastModified();
-	setAllowMethods(location->getAllowMethods());
+	//setAllowMethods(location->getAllowMethods());
   	setIndexs(location->getIndex(), server->getIndex());//index yoksa hata mı vermeli?
 	setPaths(server, location);
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
+	return 0;
 }
 
 void    Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
@@ -181,19 +189,19 @@ void    Response::createResponse(Request *request, ServerScope *server, Location
 	if (setResponse(request, server, location) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 	
-    if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_method) == _allow_methods.end())
+    /* if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_method) == _allow_methods.end())
 	{
 		this->statusCode = 405;
 		_response = notAllowed() + "\r\n";
 		return ;
 
-	}
+	} 
 	else if (this->_clientBodybufferSize < static_cast<int>(this->_body.size()))
 	{
 		this->statusCode = 413;
 		_response = notAllowed() + "\r\n";
 		return ;
-	}
+	}*/
 
     if (this->statusCode == 200 && this->_method == "GET")
         GET_method(request, server);
@@ -225,7 +233,7 @@ void			Response::GET_method(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, *this);
+		Cgi	cgi(request, server, this);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
@@ -276,7 +284,7 @@ void			Response::POST_method(Request* request, ServerScope* server)
 {
 	if (this->_cgi_pass != "")
 	{
-		Cgi	cgi(request, server, this->_path);
+		Cgi	cgi(request, server, this);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
