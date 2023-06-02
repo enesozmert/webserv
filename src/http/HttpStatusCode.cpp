@@ -25,7 +25,7 @@ HttpVariable<int, std::string> HttpStatusCode::getByStatusCode(int statusCode)
     {
         HttpVariable<int, std::string> statusCode;
         statusCode.setKey(-1);
-        statusCode.setValue("Unknow Code");
+        statusCode.setValue("Unknown Code");
         return (statusCode);
     }
     return (this->getKeywordDataBase().getByNameData<int, IsStatusCodeVariableStatusCodeEqual>(statusCode));
