@@ -26,6 +26,8 @@ class Cgi
     
     public:
         Cgi();
+        Cgi(const Cgi &cgi);
+        Cgi& operator=(const Cgi &cgi);
     	Cgi(Request *request, ServerScope* server, Response* response); // sets up env according to the request
         ~Cgi();
     

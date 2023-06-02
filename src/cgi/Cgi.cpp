@@ -1,5 +1,23 @@
 #include "../inc/cgi/Cgi.hpp"
 
+Cgi::Cgi() {}
+
+Cgi::~Cgi(){}
+
+Cgi::Cgi(const Cgi &cgi)
+{
+	*this = cgi;
+}
+
+Cgi& Cgi::operator=(const Cgi &cgi)
+{
+	if (this == &cgi)
+        return (*this);
+    this->_body = cgi._body;
+	this->_env = cgi._env;
+    return (*this);
+}
+
 Cgi::Cgi(Request *request, ServerScope* server, Response *response): _body(response->getBody())
 {
 	this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
@@ -113,4 +131,4 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	return (newBody);
 }
 
-Cgi::~Cgi(){}
+

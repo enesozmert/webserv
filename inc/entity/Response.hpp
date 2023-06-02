@@ -49,16 +49,17 @@ private:
 public:
     Response();
     ~Response();
+    Response(const Response &response);
+    Response &operator=(const Response &response);
 
-    int                         getStatusCode();
-    std::string                 getHeader();
-    std::string                 getStatusMessage();
-    std::string                 getPath();
-    std::string                 getBody();
-    std::string                 getMethod();
-    std::string                 getCgiPass();
-    std::string                 getResponse();
-    DataBase<Variable<std::string> >            getKeywordDataBase();
+    int                                 getStatusCode();
+    std::string                         getHeader();
+    std::string                         getPath();
+    std::string                         getBody();
+    std::string                         getMethod();
+    std::string                         getCgiPass();
+    std::string                         getResponse();
+    DataBase<Variable<std::string> >    getKeywordDataBase();
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
@@ -66,7 +67,7 @@ public:
     void	                    setLastModified();
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setStaticErrorPage();
-    int                         setPaths(ServerScope *server, LocationScope *location);
+    int                         setPaths(ServerScope *server, LocationScope *location, std::string path);
     void                        setClientBodyBufferSize(std::string bodyBufferSize);
     int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
     void                        setLanguage(std::vector<std::pair<std::string, float> > languages);

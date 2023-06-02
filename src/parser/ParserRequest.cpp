@@ -32,7 +32,7 @@ void ParserRequest::parse(std::string raw)
         lineTrim = trim(line, "\n\r");
         std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
         this->_lines.push_back(lineTrim);
-		std::cout << PURPLE << "lineTrim REQUEST : " << lineTrim << RESET << std::endl;
+		//std::cout << PURPLE << "lineTrim REQUEST : " << lineTrim << RESET << std::endl;
 		raw.erase(0, pos + 1);
 	}
 	parseFirstLine();

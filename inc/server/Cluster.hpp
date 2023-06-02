@@ -27,6 +27,8 @@ class Cluster
     public:
         Cluster();
         ~Cluster();
+        Cluster(const Cluster &cluster);
+        Cluster &operator=(const Cluster &cluster);
     
         //setUp-->run-->select-->accept-->recv-->send
         int		setUpCluster(HttpScope* http);

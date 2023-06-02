@@ -10,7 +10,20 @@ Cluster::~Cluster() {
 	FD_ZERO(&fd_master);
 	FD_ZERO(&writing_set);
 	FD_ZERO(&reading_set);
-	
+}
+
+Cluster::Cluster(const Cluster &cluster)
+{
+	*this = cluster;
+}
+
+Cluster& Cluster::operator=(const Cluster &cluster)
+{
+	if (this == &cluster)
+        return (*this);
+	this->servers = cluster.servers;
+	this->sockets= cluster.sockets;
+    return (*this);
 }
 
 int Cluster::setUpCluster(HttpScope* http)

@@ -29,6 +29,8 @@ class Server {
     public:
         Server();
         Server(const t_listen &listen);
+        Server(const Server &server);
+        //Server &operator=(const Server &server);
         ~Server();
 
         long            getFd() const;

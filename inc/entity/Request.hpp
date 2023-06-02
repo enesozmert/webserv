@@ -42,7 +42,8 @@ class Request : public IRequest
     public:
         Request();
         ~Request();
-        Request(const Request& request);
+        //Request(const Request& request);
+        //Request &operator=(const Request &request);
 
         int                                         getPort();
         int                                         getContentLength();
