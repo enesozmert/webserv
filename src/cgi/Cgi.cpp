@@ -127,7 +127,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 		delete[] env[i];
 	delete[] env;
 
-	std::cout << YELLOW << "newBody: " << newBody << RESET << std::endl;
+	std::cout << "newBody: " << newBody << std::endl;
 	return (newBody);
 }
 

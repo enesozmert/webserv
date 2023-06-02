@@ -250,7 +250,7 @@ int Server::send(long socket)
 	}
 
     std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);
-    std::cout << PURPLE << "str = " << str << RESET << std::endl;
+    //std::cout << PURPLE << "str = " << str << RESET << std::endl;
     int SentData = ::send(socket, str.c_str(), str.size(), 0);//gönderilen veri boyutu döner
 
     if (SentData == -1)
