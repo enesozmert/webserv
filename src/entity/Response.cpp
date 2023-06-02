@@ -149,7 +149,13 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 	(void)server;
 	(void)path;
 	this->_contentLocation = selectIndex();
-	this->_path = removeAdjacentSlashes(location->getRoot() + path);
+	std::string trimmed;
+	trimmed = trim(path, "\n\r\t ");
+	if (trimmed == "/favicon.ico")
+		this->_path = "./tests/icon.png";
+	else
+		this->_path = removeAdjacentSlashes(location->getRoot() + path);
+	
 	if (!pathIsFile(this->_path) && this->_method == "GET") 
 		this->_path = removeAdjacentSlashes(location->getRoot() + _contentLocation);
 	// this->_path = "./tests/test1/bob.jpg" bu yoksa indexe bakacak
@@ -353,7 +359,7 @@ void Response::readContent()
 		}
 		buffer << file.rdbuf();
 		_response = buffer.str();
-		std::cout << YELLOW << "_response :" << _response << RESET << std::endl;
+		//std::cout << YELLOW << "_response :" << _response << RESET << std::endl;
 		file.close();
 		return;
 	}

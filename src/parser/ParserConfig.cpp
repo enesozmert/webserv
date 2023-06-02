@@ -299,7 +299,7 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
         {
             this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        // std::cout << "locaation ok : " << tempScopes[i] << std::endl;
+        // std::cout << "location ok : " << tempScopes[i] << std::endl;
     }
     _matchedClass.at(_matchedClassIndex) = this->locationPtr;
 
