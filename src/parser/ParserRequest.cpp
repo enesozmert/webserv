@@ -31,12 +31,14 @@ void ParserRequest::parse(std::string raw)
 		line = raw.substr(0, pos + 1);
         lineTrim = trim(line, "\n\r");
         std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
-		raw.erase(0, pos + 1);
         this->_lines.push_back(lineTrim);
+		std::cout << PURPLE << "lineTrim REQUEST : " << lineTrim << RESET << std::endl;
+		raw.erase(0, pos + 1);
 	}
-	this->parseFirstLine();
-	this->parseKeyValue();
-	this->parseBody();
+	parseFirstLine();
+	parseKeyValue();
+	parseBody();
+	parseRequestClone();
 }
 
 void ParserRequest::parseFirstLine()
@@ -74,6 +76,11 @@ void ParserRequest::parseKeyValue()
 }
 
 void ParserRequest::parseBody()
+{
+	//cgi veya js fecth ile test edilip kodu yazılacak
+}
+
+void ParserRequest::parseRequestClone()
 {
 	this->parsedRequest = this->request.clone();
 }

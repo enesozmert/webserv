@@ -5,10 +5,10 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "ServerScope.hpp"
-#include "ErrorPage.hpp"
-#include "IScope.hpp"
-#include "Variable.hpp"
+#include "../entity/ServerScope.hpp"
+#include "../entity/ErrorPage.hpp"
+#include "../entity/IScope.hpp"
+#include "../entity/Variable.hpp"
 
 class ServerScope;
 class ErrorPage;

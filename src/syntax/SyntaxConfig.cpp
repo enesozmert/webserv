@@ -15,7 +15,7 @@ SyntaxConfig::SyntaxConfig(const SyntaxConfig &syntaxConfig) : _httpScopeCount(0
     *this = syntaxConfig;
 }
 
-SyntaxConfig::SyntaxConfig(std::map<size_t, ParseLineProp> parseLineProps) : _httpScopeCount(0),_serverScopeCount(0)
+SyntaxConfig::SyntaxConfig(std::map<size_t, ParseLineProp> parseLineProps) : _httpScopeCount(0), _serverScopeCount(0)
 {
     this->_parseLineProps = parseLineProps;
 }
@@ -38,8 +38,8 @@ void SyntaxConfig::analizer()
     int result;
 
     result = -1;
-    method_function p[3] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets,
-                            &SyntaxConfig::checkHttpCountGreaterThanZero};
+    method_function p[4] = {&SyntaxConfig::checkSemicolon, &SyntaxConfig::checkBrackets,
+                            &SyntaxConfig::checkHttpCountGreaterThanZero, &SyntaxConfig::checkVariableSpace};
     for (size_t i = 0; i < this->_parseLineProps.size(); i++)
     {
         result = (this->*p[0])(i);
@@ -48,7 +48,10 @@ void SyntaxConfig::analizer()
         result = (this->*p[1])(i);
         _configException.run(result);
 
-         result = (this->*p[2])(i);
+        result = (this->*p[2])(i);
+        _configException.run(result);
+
+        result = (this->*p[3])(i);
         _configException.run(result);
     }
 }
@@ -57,13 +60,13 @@ int SyntaxConfig::checkSemicolon(const int &index)
 {
     std::string line;
 
-    line = this->_parseLineProps[index].getLine();
-    if (line.find("{") == std::string::npos && line.find("}") == std::string::npos)
+    if (!this->_parseLineProps[index].getIsScopeOpen() && !this->_parseLineProps[index].getIsScopeClose())
     {
+        line = this->_parseLineProps[index].getLine();
         size_t newlinePos = line.find('\n');
         std::string newLineSubString = line.substr(0, newlinePos);
         size_t semicolonPos = newLineSubString.find(';');
-        if (semicolonPos == std::string::npos)
+        if (semicolonPos == std::string::npos || line[line.length() - 1] != ';')
         {
             return (111);
         }
@@ -88,13 +91,40 @@ int SyntaxConfig::checkBrackets(const int &index)
 }
 int SyntaxConfig::checkVariableSpace(const int &index)
 {
-    (void)index;
-    return (false);
+    std::string line;
+    bool found = false;
+
+    if (!this->_parseLineProps[index].getIsScopeOpen() && !this->_parseLineProps[index].getIsScopeClose())
+    {
+        line = this->_parseLineProps[index].getLine();
+        if (line[0] <= 32)
+            return (122);
+        if (line[line.length() - 2] <= 32)
+            return (120);
+        if (line[line.length() - 1] <= 32 && line[line.length() - 1] != '\0')
+            return (121);
+        for (size_t i = 0; i < line.length(); ++i)
+        {
+            if (line[i] <= 32)
+            {
+                if (found)
+                {
+                    return (119);
+                }
+                found = true;
+            }
+            else
+            {
+                found = false;
+            }
+        }
+    }
+    return (-1);
 }
 int SyntaxConfig::checkHttpCountGreaterThanZero(const int &index)
 {
     int result = -1;
-    if (this->_parseLineProps[index].getScopeName() == "http" && this->_parseLineProps[index].getIsScopeOpen() == true)
+    if (this->_parseLineProps[index].getLine() == "http" && this->_parseLineProps[index].getScopeName() == "http" && this->_parseLineProps[index].getIsScopeOpen())
     {
         this->_httpScopeCount += 1;
     }
@@ -104,10 +134,12 @@ int SyntaxConfig::checkHttpCountGreaterThanZero(const int &index)
 int SyntaxConfig::checkServerCountEqualZero(const int &index)
 {
     int result = -1;
-    if (this->_parseLineProps[index].getScopeName() == "server" && this->_parseLineProps[index].getIsScopeOpen() == true)
+    if (this->_parseLineProps[index].getLine() == "server" && this->_parseLineProps[index].getScopeName() == "server" && this->_parseLineProps[index].getIsScopeOpen())
     {
-        this->_serverScopeCount += 1;
+        this->_serverScopeCount = 1;
     }
+    else
+        return (-1);
     this->_serverScopeCount == 0 ? result = 114 : result = -1;
-    return (result);
+    return result;
 }

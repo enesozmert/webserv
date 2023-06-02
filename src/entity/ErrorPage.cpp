@@ -35,7 +35,7 @@ std::vector<std::string> ErrorPage::getErrorPageCodes()
             }
         }
 
-        if (isNumber && _httpStatusCode.checkErrorCode(token)) {
+        if (isNumber && _httpStatusCode.checkStatusCode(atoi(token.c_str()))) {
             this->_errorPageCodes.push_back(token);
         }
     }

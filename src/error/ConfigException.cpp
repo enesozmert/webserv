@@ -44,13 +44,18 @@ void ConfigException::errorFill()
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(113, "Http scope count not equal to one"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(114, "Server scope count zero"));
     _errorDatabase.insertData(ExceptionVariable<int, std::string>(115, "Http Convert Error"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(116, "Http Convert Error"));
-    _errorDatabase.insertData(ExceptionVariable<int, std::string>(117, "Http Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(116, "Server Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(117, "Location Convert Error"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(118, "Invalid content in file"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(119, "More than one consecutive space in a line"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(120, "You cannot put a space before a semicolon"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(121, "You cannot put a space after a semicolon"));
+    _errorDatabase.insertData(ExceptionVariable<int, std::string>(122, "You cannot put a space at the beginning of a line"));
 }
 
 void ConfigException::exceptionHandler()
 {
-    throw MyException(this->_exception.getErrorMessage());
+    throw MyException("Excepiton : " + this->_exception.getErrorMessage());
 }
 
 void ConfigException::run(int errorCode)

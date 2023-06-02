@@ -29,6 +29,7 @@ class ParserRequest
         void parseFirstLine();
         void parseKeyValue();
         void parseBody();
+        void parseRequestClone();
 
         std::string  findKey(const std::string &line);
         std::string  findValue(const std::string &line);

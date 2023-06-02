@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 #include "ISubScope.hpp"
-#include "HttpStatusCode.hpp"
+#include "../http/HttpStatusCode.hpp"
 
 class HttpStatusCode;
 class RedirectionUri : public ISubScope
