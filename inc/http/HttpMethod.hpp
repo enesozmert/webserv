@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include "../database/DataBase.hpp"
-#include "IRequest.hpp"
+#include "../entity/IRequest.hpp"
 
 class HttpMethod
 {

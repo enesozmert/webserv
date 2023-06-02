@@ -30,7 +30,7 @@ std::string RedirectionUri::getRedirectionCode()
     std::stringstream sp(this->_redirectionUri);
 
     sp >> std::ws >> result;
-    bool isResult = this->_httpStatusCode.checkErrorCode(result);
+    bool isResult = this->_httpStatusCode.checkStatusCode(atoi(result.c_str()));
     result = isResult ? result : "none";
     this->_redirectionCode = result;
     return (result);

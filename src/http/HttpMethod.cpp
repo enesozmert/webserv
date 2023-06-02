@@ -1,4 +1,4 @@
-#include "../inc/entity/HttpMethod.hpp"
+#include "../inc/http/HttpMethod.hpp"
 
 HttpMethod::HttpMethod()
 {

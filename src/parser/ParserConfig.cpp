@@ -47,11 +47,27 @@ void ParserConfig::parseFile(std::string &fileName)
     while ((pos = fileCleanContents.find_first_of(delimiter)) != std::string::npos)
     {
         std::string line = fileCleanContents.substr(0, pos + 1);
-        std::string lineTrim = trim(line, " \r\t");
-        this->_lines.push_back(lineTrim);
+        std::string lineTrim = trim(line, " \r\t\n");
+        if (line.find("{") != std::string::npos)
+        {
+            this->_lines.push_back(trim(lineTrim, " \n\r\t{"));
+            this->_lines.push_back("{");
+        }
+        else if (line.find("}") != std::string::npos)
+        {
+            if (trim(lineTrim, " \n\r\t}")[0] != '\0')
+                this->_lines.push_back(trim(lineTrim, " \n\r\t}"));
+            this->_lines.push_back("}");
+        }
+        else
+        {
+            this->_lines.push_back(trim(lineTrim, " \n\r\t"));
+        }
         fileCleanContents.erase(0, pos + 1);
     }
     file.close();
+    if (this->_lines.size() == 0)
+        this->_configException.run(118);
 }
 
 void ParserConfig::parseScope(const std::vector<std::string> &lines)
@@ -80,12 +96,12 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         {
             lineTrim = "location";
         }
-        if (lineTrim.find(_scopeNames[scopeOpenCount]) != std::string::npos && line.find("{") != std::string::npos)
+        if (lineTrim.find(_scopeNames[scopeOpenCount]) != std::string::npos && lines[i + 1].find("{") != std::string::npos)
         {
             scopeOpenIndex = i;
             scopeName = _scopeNames[scopeOpenCount];
             parseLineProp->setIsScopeOpen(true);
-            scopeCloseIndex = findClosingScopeIndex(lines, i);
+            scopeCloseIndex = findClosingScopeIndex(lines, i + 1);
         }
         if (line.find("{") != std::string::npos)
         {
@@ -106,17 +122,17 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         _parseLineProps.insert(std::pair<size_t, ParseLineProp>((parseLineProp)->getIndex(), *parseLineProp));
         delete parseLineProp;
     }
-/*     for (size_t i = 0; i < _parseLineProps.size(); i++)
-    {
-        std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i].getIndex() << std::endl;
-        std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i].getLine() << std::endl;
-        std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i].getScopeOpenIndex() << std::endl;
-        std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i].getScopeName() << std::endl;
-        std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i].getScopeCloseIndex() << std::endl;
-        std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i].getIsScopeOpen() << std::endl;
-        std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i].getIsScopeClose() << std::endl;
-        std::cout << "****************************" << std::endl;
-    } */
+    // for (size_t i = 0; i < _parseLineProps.size(); i++)
+    // {
+    //     std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i].getIndex() << std::endl;
+    //     std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i].getLine() << std::endl;
+    //     std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i].getScopeOpenIndex() << std::endl;
+    //     std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i].getScopeName() << std::endl;
+    //     std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i].getScopeCloseIndex() << std::endl;
+    //     std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i].getIsScopeOpen() << std::endl;
+    //     std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i].getIsScopeClose() << std::endl;
+    //     std::cout << "****************************" << std::endl;
+    // } 
 }
 
 void ParserConfig::parseMatchClass()

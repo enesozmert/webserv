@@ -4,6 +4,7 @@
 #include <exception>
 #include <cstdlib>
 #include "IException.hpp"
+#include "../utils/Utils.hpp"
 
 class HandleException
 {
@@ -17,12 +18,12 @@ public:
         }
         catch (const IException &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            std::cerr << RED << ex.what() << RESET << std::endl;
             exit(-1);
         }
         catch (...)
         {
-            std::cerr << "Unknown exception caught" << std::endl;
+            std::cerr << RED << "Unknown exception caught" << RESET << std::endl;
             exit(-1);
         }
     }

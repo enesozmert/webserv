@@ -85,20 +85,21 @@ void			Response::setContentType()
 		return ;
 	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
-	if (this->_type == "html")
-		_contentType = "text/html";
-	else if (this->_type == "css")
-		_contentType = "text/css";
-	else if (this->_type == "js")
-		_contentType = "text/javascript";
-	else if (this->_type == "jpeg" || this->_type == "jpg")
-		_contentType = "image/jpeg";
-	else if (this->_type == "png")
-		_contentType = "image/png";
-	else if (this->_type == "bmp")
-		_contentType = "image/bmp";
-	else
-		_contentType = "text/plain";
+	this->_contentType = _httpContentType.contentTypeGenerator(this->_type);
+	// if (this->_type == "html")
+	// 	_contentType = "text/html";
+	// else if (this->_type == "css")
+	// 	_contentType = "text/css";
+	// else if (this->_type == "js")
+	// 	_contentType = "text/javascript";
+	// else if (this->_type == "jpeg" || this->_type == "jpg")
+	// 	_contentType = "image/jpeg";
+	// else if (this->_type == "png")
+	// 	_contentType = "image/png";
+	// else if (this->_type == "bmp")
+	// 	_contentType = "image/bmp";
+	// else
+	// 	_contentType = "text/plain";
 }
 
 void			Response::setDate()
@@ -127,7 +128,6 @@ void			Response::setLastModified()
 	}
 }
 
-
 void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex)
 {
 	//_locationIndex ve _serverIndex ayrı ayrı vector olarak al
@@ -135,6 +135,19 @@ void	Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<st
 		this->_indexs.push_back(*it);
 	for (std::vector<std::string>::iterator itt = _serverIndex.begin(); itt != _serverIndex.end(); itt++)
 		this->_indexs.push_back(*itt);
+}
+
+void Response::setLanguage(std::vector<std::pair<std::string, float> > languages)
+{
+
+	for (size_t i = 0; i < languages.size(); i++)
+	{
+		if (!this->_contentLanguage.empty()) {
+            this->_contentLanguage += ", ";
+        }
+        this->_contentLanguage += languages[i].first;	
+	}
+	
 }
 
 std::string Response::selectIndex()
@@ -153,7 +166,6 @@ int Response::setPaths(ServerScope *server, LocationScope *location)
 	this->_contentLocation = selectIndex();
 	this->_path = location->getRoot() + this->_contentLocation;//this->_path = "./tests/test1/index.html";
 	this->_cgi_pass = location->getCgiPass();
-
 	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
@@ -172,7 +184,8 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_server = "webserv";
 	this->_error_page = location->getErrorPage();
 	this->_method = request->getHttpMethodName();
-	this->_contentLanguage = request->getAcceptLanguages().front().first;
+	setLanguage(request->getAcceptLanguages());
+	std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
 	setErrors();
 	setStaticErrorPage();
 	setDate();
@@ -356,6 +369,7 @@ void				Response::readContent()
 		}
 		buffer << file.rdbuf();
 		_response = buffer.str();
+		std::cout << YELLOW << "_response :" << _response << RESET << std::endl;
 		file.close();
 		return ;
 	}
@@ -395,9 +409,10 @@ std::string		Response::getHeader()
 	setContentType();
 	this->_contentLength = std::to_string(this->_response.size());
 
-	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + getStatusMessage() + "\r\n";
+	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
 
 	return (header);
 }
+
 

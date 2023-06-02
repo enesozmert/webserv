@@ -1,17 +1,17 @@
 #pragma once
 
-#include "../entity/HttpScope.hpp"
-#include "../entity/Request.hpp"
-#include "../utils/Utils.hpp"
-#include "../cgi/Cgi.hpp"
-
 #include <list>
 #include <sys/time.h>
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <dirent.h>
-
+#include "../entity/HttpScope.hpp"
+#include "../http/HttpStatusCode.hpp"
+#include "../http/HttpContentType.hpp"
+#include "../entity/Request.hpp"
+#include "../utils/Utils.hpp"
+#include "../cgi/Cgi.hpp"
 
 class Response
 {
@@ -39,7 +39,21 @@ private:
     std::string					        _body;
 
 
-  
+    std::string					_allow;
+    std::string					_allow_methods;
+	std::string					_contentLanguage;
+	std::string					_contentLength;
+	std::string					_contentLocation;
+	std::string					_contentType;
+	std::string					_date;
+	std::string					_lastModified;
+	std::string					_location;
+	std::string					_retryAfter;
+	std::string					_server;
+	std::string					_transferEncoding;
+	std::string                 _wwwAuthenticate;
+    HttpContentType             _httpContentType;
+    HttpStatusCode              _httpStatusCode;
 public:
     Response();
     ~Response();
@@ -63,6 +77,9 @@ public:
     int                         setPaths(ServerScope *server, LocationScope *location);
     void                        setClientBodyBufferSize(std::string bodyBufferSize);
     int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
+
+    void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
+
 
     void                        createResponse(Request *request, ServerScope *server, LocationScope *location);
     std::string                 notAllowed();

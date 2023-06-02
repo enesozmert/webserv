@@ -14,8 +14,8 @@ class SyntaxConfig
     private:
         ConfigException                 _configException;
         std::map<size_t, ParseLineProp> _parseLineProps;
-        size_t                          _httpScopeCount;
-        size_t                          _serverScopeCount;
+        int                             _httpScopeCount;
+        int                             _serverScopeCount;
     public:
         SyntaxConfig();
         ~SyntaxConfig();
