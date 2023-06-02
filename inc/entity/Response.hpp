@@ -12,6 +12,7 @@
 #include "../entity/Request.hpp"
 #include "../utils/Utils.hpp"
 #include "../cgi/Cgi.hpp"
+#include "../database/DataBase.hpp"
 
 class Response
 {
@@ -27,7 +28,8 @@ private:
     std::string					        _error_page;
     std::map<std::string, std::string>	_cgi_params;
     std::string					        _method;
-    std::string					        _allow_methods;//vector yap
+    std::string					        _allows;
+    std::vector<std::string>		    _allow_methods;
 	std::string					        _contentLanguage;
 	std::string					        _contentLength;
 	std::string					        _contentLocation;
@@ -37,23 +39,13 @@ private:
 	std::string					        _server;
     int                                 _clientBodybufferSize;
     std::string					        _body;
-
-
-    std::string					_allow;
-    std::string					_allow_methods;
-	std::string					_contentLanguage;
-	std::string					_contentLength;
-	std::string					_contentLocation;
-	std::string					_contentType;
-	std::string					_date;
-	std::string					_lastModified;
-	std::string					_location;
-	std::string					_retryAfter;
-	std::string					_server;
-	std::string					_transferEncoding;
-	std::string                 _wwwAuthenticate;
-    HttpContentType             _httpContentType;
-    HttpStatusCode              _httpStatusCode;
+	std::string					        _location;
+	std::string					        _retryAfter;
+	std::string					        _transferEncoding;
+	std::string                         _wwwAuthenticate;
+    HttpContentType                     _httpContentType;
+    HttpStatusCode                      _httpStatusCode;
+    DataBase<Variable<std::string> >    _keywordDatabase;
 public:
     Response();
     ~Response();
@@ -66,19 +58,20 @@ public:
     std::string                 getMethod();
     std::string                 getCgiPass();
     std::string                 getResponse();
+    DataBase<Variable<std::string> >            getKeywordDataBase();
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
     void	                    setDate();
     void	                    setLastModified();
-    void                        setErrors();
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setStaticErrorPage();
     int                         setPaths(ServerScope *server, LocationScope *location);
     void                        setClientBodyBufferSize(std::string bodyBufferSize);
     int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
-
     void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
+    void                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
+    void                        keywordFill();
 
 
     void                        createResponse(Request *request, ServerScope *server, LocationScope *location);
@@ -91,4 +84,6 @@ public:
     void                        GET_method(Request* request, ServerScope* server);
     void	                    POST_method(Request* request, ServerScope* server);
     void	                    DELETE_method();
+
+
 };
