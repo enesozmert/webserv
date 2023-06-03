@@ -152,7 +152,7 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 	std::string trimmed;
 	trimmed = trim(path, "\n\r\t ");
 	if (trimmed == "/favicon.ico")
-		this->_path = "./tests/icon.png";
+		this->_path = "/favicon.ico";
 	else
 		this->_path = removeAdjacentSlashes(location->getRoot() + path);
 	
