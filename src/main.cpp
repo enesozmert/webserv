@@ -15,6 +15,8 @@ void myTerminationHandler() {
 
 int main(int ac, char **av)
 {
+    /* (void)ac;
+    (void)av; */
     std::string av1;
     HttpScope *http;
     ParserConfig *parser = new ParserConfig();
@@ -31,6 +33,7 @@ int main(int ac, char **av)
 
     //get-filename
     av1 = av[1];
+    //av1 = "configs/default.config";
 
     //parseSyntaxForSyntaxAnalizer
     parserSyntax->parseSyntax(av1);
