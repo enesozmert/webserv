@@ -22,16 +22,16 @@ Cgi::Cgi(Request *request, ServerScope* server, Response *response): _body(respo
 {
 	this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
 	this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
-	this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
+	this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getPath()));//CGI script'in tam dosya yolunu
 	this->_env.insert(std::make_pair("REQUEST_METHOD", response->getMethod()));
 	this->_env.insert(std::make_pair("CONTENT_LENGTH", std::to_string(this->_body.length())));
 	this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
 	this->_env.insert(std::make_pair("PATH_INFO", request->getPath()));//CGI script'in ek bilgileri veya parametreleri içeren yol bilgisi(cgi_param)
 	this->_env.insert(std::make_pair("REQUEST_URI", request->getPath()));
-	this->_env.insert(std::make_pair("REMOTEaddr", server->getHost()));
+	this->_env.insert(std::make_pair("REMOTE_ADDR", request->getIp()));
     this->_env.insert(std::make_pair("SERVER_PORT", server->getPort()));
-	this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
-	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "nginx/webserv"));
+	this->_env.insert(std::make_pair("SERVER_PROTOCOL", request->getVersion()));
+	this->_env.insert(std::make_pair("SERVER_SOFTWARE", response->getServerName()));
 
 	std::cout << YELLOW << "CONTENT_LENGTH = " << this->_env["CONTENT_LENGTH"] << RESET << std::endl;
 	std::cout << YELLOW << "SCRIPT_NAME = " << this->_env["SCRIPT_NAME"] << RESET << std::endl;
@@ -45,7 +45,7 @@ Cgi::Cgi(Request *request, ServerScope* server, Response *response): _body(respo
 
 std::string		Cgi::executeCgi(const std::string& scriptName) 
 {
-	std::cout << YELLOW << "scriptName : " << scriptName << RESET << std::endl;
+	std::cout << YELLOW << "cgi scriptName : " << scriptName << RESET << std::endl;
 
 	int			saveStdin= dup(STDIN_FILENO);;
 	int			saveStdout = dup(STDOUT_FILENO);;
