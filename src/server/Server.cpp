@@ -74,7 +74,7 @@ int Server::setUpSocket()
         std::cerr << RED << "Could not listen." << RESET << std::endl;
         return -1;
     }
-    return (fd);
+    return (0);
 }
 
 long Server::accept(void)

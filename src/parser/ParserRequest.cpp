@@ -62,8 +62,8 @@ void ParserRequest::parseKeyValue()
 	std::string line;
 	std::string key;
 	std::string value;
-
-	for (size_t i = 0; i < this->_lines.size(); i++)
+	size_t i = 0;
+	for (i = 0; i < this->_lines.size(); i++)
 	{
 		line = this->_lines[i];
 		key = findKey(line);
@@ -72,6 +72,10 @@ void ParserRequest::parseKeyValue()
 		{
 			this->request.getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(key, value);
 		}
+	}
+	for (i; i < this->_lines.size(); i++)
+	{
+		this->request.setBody(_lines[i]);
 	}
 }
 

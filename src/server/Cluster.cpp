@@ -43,11 +43,11 @@ int Cluster::setUpCluster(HttpScope *http)
 		Server server(*it); // setUpSocket de burada çalışacak
 		long fd;			// server içinde oluşturulacak socket fd'si
 
-
+		fd = -1;
 		// vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
 		if (server.setUpSocket() != -1)
 		{
-			// fd = server.getFd();
+			fd = server.getFd();
 			FD_SET(fd, &fd_master);
 			servers.insert(std::make_pair(fd, server));
 			if (fd > max_fd)
