@@ -51,7 +51,7 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 
 std::string		Cgi::executeCgi(const std::string& scriptName) 
 {
-	std::cout << YELLOW << "scriptName : " << scriptName << RESET << std::endl;
+	std::cout << YELLOW << "cgi scriptName : " << scriptName << RESET << std::endl;
 
 	int			saveStdin= dup(STDIN_FILENO);;
 	int			saveStdout = dup(STDOUT_FILENO);;

@@ -25,6 +25,7 @@ private:
     std::map<int, std::string>	        _errors;
     std::vector<std::string>	        _indexs;
     std::string					        _path;
+    std::string                         _rootPath;
 	std::string					        _cgi_pass;
     std::string					        _error_page;
     std::map<std::string, std::string>	_cgi_params;
@@ -38,6 +39,8 @@ private:
 	std::string					        _date;
 	std::string					        _lastModified;
 	std::string					        _server;
+    std::string                         _host;
+    int                                 _port;
     int                                 _clientBodybufferSize;
     std::string					        _body;
 	std::string					        _location;
@@ -47,6 +50,7 @@ private:
     HttpContentType                     _httpContentType;
     HttpStatusCode                      _httpStatusCode;
     DataBase<Variable<std::string> >    _keywordDatabase;
+    bool                                _isAutoIndex;
 public:
     Response();
     ~Response();
@@ -61,11 +65,13 @@ public:
     std::string                         getCgiPass();
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
+    std::string                         getServerName();
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
     void	                    setDate();
     void	                    setLastModified();
+    void                        setAutoIndex(std::string _autoIndex);
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setStaticErrorPage();
     int                         setPaths(ServerScope *server, LocationScope *location, std::string path);
@@ -79,13 +85,16 @@ public:
     void                        createResponse(Request *request, ServerScope *server, LocationScope *location);
     std::string                 notAllowed();
     std::string                 writeHeader(void);
-    std::string                 readHtml();
+    std::string                 errorHtml();
     void                        readContent();
     std::string                 selectIndex();
 
     void                        GET_method(Request* request, ServerScope* server);
     void	                    POST_method(Request* request, ServerScope* server);
     void	                    DELETE_method();
+
+    std::string         getLink(std::string const &dirEntry, std::string const &dirName);
+    std::string         getPage();
 
 
 };

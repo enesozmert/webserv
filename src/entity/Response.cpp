@@ -27,6 +27,11 @@ std::string Response::getPath()
 	return (this->_path);
 }
 
+std::string Response::getServerName()
+{
+	return (this->_server);
+}
+
 std::string Response::getResponse()
 {
 	return (this->_response);
@@ -148,6 +153,7 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 {
 	(void)server;
 	(void)path;
+	this->_rootPath = location->getRoot();
 	this->_contentLocation = selectIndex();
 	std::string trimmed;
 	trimmed = trim(path, "\n\r\t ");
@@ -172,6 +178,16 @@ void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 	this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
 }
 
+void Response::setAutoIndex(std::string _autoIndex)
+{
+	if (_autoIndex == "on")
+		this->_isAutoIndex = true;
+	else if (_autoIndex == "off")
+		this->_isAutoIndex = false;
+
+	std::cout << "auto_index : " << _isAutoIndex << std::endl;
+}
+
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
 {
 	std::cout << YELLOW << "request.getPath() : " << request->getPath() << RESET << std::endl;
@@ -180,6 +196,9 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_server = "webserv";
 	this->_error_page = location->getErrorPage();
 	this->_method = request->getHttpMethodName();
+	this->_host = server->getHost();
+	this->_port = atoi((server->getPort()).c_str());
+	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
 	std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
 	setStaticErrorPage();
@@ -197,7 +216,6 @@ void Response::createResponse(Request *request, ServerScope *server, LocationSco
 	if (setResponse(request, server, location) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 
-	std::vector<std::string> getAllowMethods;
 	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_method) == _allow_methods.end())
 	{
 		this->statusCode = 405;
@@ -259,7 +277,7 @@ void Response::GET_method(Request *request, ServerScope *server)
 	else if (this->statusCode == 200)
 		readContent();
 	else
-		_response = this->readHtml();
+		_response = this->errorHtml();
 
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
@@ -280,7 +298,7 @@ void Response::DELETE_method()
 	else
 		this->statusCode = 404;
 	if (this->statusCode == 403 || this->statusCode == 404)
-		_response = this->readHtml();
+		_response = this->errorHtml();
 
 	_response = getHeader() + "\r\n" + _response;
 }
@@ -319,7 +337,7 @@ void Response::POST_method(Request *request, ServerScope *server)
 	_response = getHeader() + "\r\n" + _response;
 }
 
-std::string Response::readHtml()
+std::string Response::errorHtml()
 {
 	std::ofstream file;
 	std::stringstream buffer;
@@ -357,14 +375,21 @@ void Response::readContent()
 			_response = staticErrorPage[403];
 			return;
 		}
+		std::cout << "buraya girdi" << std::endl;
 		buffer << file.rdbuf();
 		_response = buffer.str();
-		//std::cout << YELLOW << "_response :" << _response << RESET << std::endl;
 		file.close();
 		return;
 	}
-	this->statusCode = 404;
-	_response = this->readHtml();
+	else if (_isAutoIndex) {
+		buffer << getPage();
+		_response = buffer.str();
+		_type = "text/html";
+	}
+	else{
+		this->statusCode = 404;
+		_response = this->errorHtml();
+	}
 	return;
 }
 
@@ -414,4 +439,43 @@ std::string Response::selectIndex()
 	}
 	std::cerr << RED << "No index found" << RESET << std::endl;
 	return NULL;
+}
+
+/********->auto_index<-*******/
+
+std::string         Response::getPage()
+{
+    std::string dirName(_rootPath.c_str());
+    DIR *dir = opendir(_rootPath.c_str());
+    std::string page =\
+    "<!DOCTYPE html>\n\
+    <html>\n\
+    <head>\n\
+            <title>" + dirName + "</title>\n\
+    </head>\n\
+    <body>\n\
+    <h1>INDEX</h1>\n\
+    <p>\n";
+
+    if (dir == NULL) {
+        std::cerr << RED << "Error: could not open [" << _rootPath << "]" << RESET << std::endl;
+        return "";
+    }
+    if (dirName[0] != '/')
+        dirName = "/" + dirName;
+    for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) {
+        page += Response::getLink(std::string(dirEntry->d_name), dirName);
+    }
+    page +="\
+    </p>\n\
+    </body>\n\
+    </html>\n";
+    closedir(dir);
+    return page;
+}
+
+std::string         Response::getLink(std::string const &dirEntry, std::string const &dirName) {
+    std::stringstream   ss;
+    ss << "\t\t<p><a href=\"http://" + this->_host << dirName + dirEntry + "\">" + dirEntry + "</a></p>\n";
+    return ss.str();
 }
