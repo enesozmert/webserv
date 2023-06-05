@@ -13,6 +13,7 @@ class Server;
 class HttpScope;
 class Cluster
 {
+
 private:
     HttpScope *httpScope; // http class gelecek
     std::map<long, Server> servers;
@@ -42,4 +43,5 @@ public:
     void recv_section();
     void send_section();
     void cleanAll();
+
 };

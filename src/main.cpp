@@ -8,7 +8,6 @@
 #include <iostream>
 #include <string>
 
-
 Cluster *clusterEnd;
 void myTerminationHandler()
 {
@@ -29,8 +28,7 @@ void signalHandler(int signum)
 
 int main(int ac, char **av)
 {
-    /* (void)ac;
-    (void)av; */
+
     std::string av1;
     HttpScope *http;
     ParserConfig *parser = new ParserConfig();
@@ -39,7 +37,7 @@ int main(int ac, char **av)
     ConfigException configException;
     // std::set_terminate(myTerminationHandler);
 
-    if (ac != 2)
+  if (ac != 2)
     {
         configException.run(106);
         return (-1);
@@ -47,7 +45,7 @@ int main(int ac, char **av)
 
     // get-filename
     av1 = av[1];
-    //av1 = "configs/default.config";
+ 
 
     // parseSyntaxForSyntaxAnalizer
     parserSyntax->parseSyntax(av1);
@@ -103,6 +101,7 @@ int main(int ac, char **av)
     // std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
     Cluster cluster;
+
     clusterEnd = &cluster;
     try
     {

@@ -1,6 +1,10 @@
 #include "../inc/server/Cluster.hpp"
 
-Cluster::Cluster() {}
+Cluster::Cluster() {
+	FD_ZERO(&fd_master);
+	FD_ZERO(&writing_set);
+	FD_ZERO(&reading_set);
+}
 
 Cluster::~Cluster()
 {
@@ -39,10 +43,11 @@ int Cluster::setUpCluster(HttpScope *http)
 		Server server(*it); // setUpSocket de burada çalışacak
 		long fd;			// server içinde oluşturulacak socket fd'si
 
+
 		// vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
 		if (server.setUpSocket() != -1)
 		{
-			fd = server.getFd();
+			// fd = server.getFd();
 			FD_SET(fd, &fd_master);
 			servers.insert(std::make_pair(fd, server));
 			if (fd > max_fd)
@@ -223,12 +228,14 @@ void Cluster::cleanReady()
 	ready.clear();
 }
 
+
 void Cluster::cleanAll()
 {
-	// FD_ZERO(&fd_master);
-	// FD_ZERO(&writing_set);
-	// FD_ZERO(&reading_set);
+	FD_ZERO(&fd_master);
+	FD_ZERO(&writing_set);
+	FD_ZERO(&reading_set);
 	this->cleanServers();
 	this->cleanSockets();
 	this->cleanReady();
 }
+

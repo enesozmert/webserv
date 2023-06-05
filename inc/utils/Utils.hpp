@@ -148,3 +148,4 @@ inline unsigned long stoul_cxx98(const std::string& str, size_t* idx = 0, int ba
 
     return result;
 }
+

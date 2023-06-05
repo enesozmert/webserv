@@ -10,6 +10,9 @@ Server::Server(const t_listen &listen)
 {
     this->_listen = listen;
     fd = -1;
+    addr.sin_family = 0;
+    addr.sin_port = 0;
+    addr.sin_addr.s_addr = 0;
 }
 
 Server::Server(const Server &server)
@@ -40,30 +43,38 @@ void Server::setAddr(void)
 {
     memset((char *)&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(_listen.host);//127.0.0.1--->2130706433
     addr.sin_port = htons(_listen.port);
+    addr.sin_addr.s_addr = htonl(_listen.host);//127.0.0.1--->2130706433
 }
 
 int Server::setUpSocket()
 {
+    int opt = 1;
     fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+    {
+        std::cerr << RED << "Could not re addr." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
+        return (-1);
+    }
     if (fd == -1)
     {
         std::cerr << RED << "Could not create server." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
         return -1;
     }
     this->setAddr();
-    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
+    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
     {
+        ::close(fd);
         std::cerr << RED << "Could not bind port " << _listen.port << "." << RESET << std::endl;
         return -1;
     }
-    if (listen(fd, 10) == -1) // aynı anda max 10 bağlantı kabul etmeye hazır
+    if (listen(fd, 4096) == -1) // aynı anda max 10 bağlantı kabul etmeye hazır
     {
+        ::close(fd);
         std::cerr << RED << "Could not listen." << RESET << std::endl;
         return -1;
     }
-    return (0);
+    return (fd);
 }
 
 long Server::accept(void)
