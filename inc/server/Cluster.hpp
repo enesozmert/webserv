@@ -36,6 +36,7 @@ class Cluster
         void	cleanServers();
         void	cleanSockets();
         void	cleanReady();
+        void	cleanAll();
         void	select_section();//havuzdan fd seçimi yapılır
         void 	accept_section();//client'a hizmet için hazır bir socket oluşturulur
         void	recv_section();

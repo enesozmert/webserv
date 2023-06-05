@@ -1,6 +1,10 @@
 #include "../inc/server/Cluster.hpp"
 
-Cluster::Cluster() {}
+Cluster::Cluster() {
+	FD_ZERO(&fd_master);
+	FD_ZERO(&writing_set);
+	FD_ZERO(&reading_set);
+}
 
 Cluster::~Cluster() {
 	std::cout << YELLOW << "Cluster destruct" << RESET << std::endl;
@@ -43,10 +47,11 @@ int Cluster::setUpCluster(HttpScope* http)
 		Server		server(*it);//setUpSocket de burada çalışacak
 		long		fd;//server içinde oluşturulacak socket fd'si
 
+		fd = -1;
 		//vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
-		if (server.setUpSocket() != -1)
+		if ((fd = server.setUpSocket()) != -1)
 		{
-			fd = server.getFd();
+			// fd = server.getFd();
 			FD_SET(fd, &fd_master);
 			servers.insert(std::make_pair(fd, server));
 			if (fd > max_fd)
@@ -54,6 +59,16 @@ int Cluster::setUpCluster(HttpScope* http)
 			std::cout << GREEN << "Setting up " << it->host << ":" << it->port << "..." << RESET << std::endl;
 			//socket oluşturuldu host:port
 		}
+		// else
+		// {
+		// 	break;
+		// }
+		// else
+		// {
+		// 	FD_CLR(fd, &fd_master);
+		// 	close(server.getFd());
+		// 	servers.erase(fd);
+		// }
 	}
 	if (max_fd == 0)
 	{
@@ -179,7 +194,6 @@ void	Cluster::run()
 {
 	while (1)
 	{
-		signal(SIGINT, signalHandler);
 		this->select_return_value = 0;
 		while (select_return_value == 0)
 			select_section();
@@ -225,6 +239,17 @@ void	Cluster::cleanReady()
 	for (std::vector<int>::iterator it = ready.begin() ; it != ready.end() ; it++)
 		close(*it);
 	ready.clear();
+}
+
+void	Cluster::cleanAll()
+{
+	this->cleanServers();
+	this->cleanSockets();
+	this->cleanReady();
+	FD_ZERO(&fd_master);
+	FD_ZERO(&writing_set);
+	FD_ZERO(&reading_set);
+
 }
 
 

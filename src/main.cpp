@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string>
 
+bool g_terminate = false;
+
 void myTerminationHandler() {
     std::cerr << "Unhandled exception, program will terminate.\n";
     // abort();
@@ -15,8 +17,8 @@ void myTerminationHandler() {
 
 int main(int ac, char **av)
 {
-    /* (void)ac;
-    (void)av; */
+    (void)ac;
+    (void)av;
     std::string av1;
     HttpScope *http;
     ParserConfig *parser = new ParserConfig();
@@ -25,15 +27,15 @@ int main(int ac, char **av)
     ConfigException configException;
     // std::set_terminate(myTerminationHandler);
 
-    if (ac != 2)
+/*     if (ac != 2)
     {
         configException.run(106);
         return (-1);
     }
-
+ */
     //get-filename
-    av1 = av[1];
-    //av1 = "configs/default.config";
+    //av1 = av[1];
+    av1 = "configs/default.config";
 
     //parseSyntaxForSyntaxAnalizer
     parserSyntax->parseSyntax(av1);
@@ -89,13 +91,12 @@ int main(int ac, char **av)
     // std::cout << "request->getVersion() : " << request->getVersion() << std::endl;
     // std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
-    signal(SIGINT, signalHandler);
     Cluster cluster;
     try {
 		    if (cluster.setUpCluster(http) == -1)
                 return (-1);
 			cluster.run();
-			//cluster.clean();
+			cluster.cleanAll();
 		}
 	catch (std::exception &e) {
 			std::cerr << e.what() << std::endl;
