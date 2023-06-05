@@ -174,7 +174,6 @@ void	Cluster::run()
 {
 	while (1)
 	{
-		std::signal(SIGINT, signalHandler);
 		this->select_return_value = 0;
 		while (select_return_value == 0)
 			select_section();
@@ -208,6 +207,7 @@ void	Cluster::cleanServers()
 {
 	for ( std::map<long, Server>::iterator it = servers.begin() ; it != servers.end() ; it++ )
 		it->second.clean();
+	servers.clear();
 }
 void	Cluster::cleanSockets()
 {
@@ -225,12 +225,12 @@ void	Cluster::cleanReady()
 
 void Cluster::cleanAll()
 {
+	// FD_ZERO(&fd_master);
+	// FD_ZERO(&writing_set);
+	// FD_ZERO(&reading_set);
 	this->cleanServers();
 	this->cleanSockets();
 	this->cleanReady();
-	FD_ZERO(&fd_master);
-	FD_ZERO(&writing_set);
-	FD_ZERO(&reading_set);
 }
 
 

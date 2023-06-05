@@ -42,16 +42,4 @@ public:
     void recv_section();
     void send_section();
     void cleanAll();
-    static void signalHandler(int signum)
-    {
-        if (signum == SIGINT)
-        {
-            std::cout << "\nInterrupt signal (" << signum << ") received.\n";
-            Cluster cluster;
-            cluster.cleanAll();
-            std::cout << "\nSuccess.\n";
-
-            exit(1);
-        }
-    }
 };

@@ -8,10 +8,23 @@
 #include <iostream>
 #include <string>
 
+
+Cluster *clusterEnd;
 void myTerminationHandler()
 {
     std::cerr << "Unhandled exception, program will terminate.\n";
     // abort();
+}
+
+void signalHandler(int signum)
+{
+    if (signum == SIGINT)
+    {
+        std::cout << "\nInterrupt signal (" << signum << ") received.\n";
+        clusterEnd->cleanAll();
+        std::cout << "\nSuccess.\n";
+        exit(1);
+    }
 }
 
 int main(int ac, char **av)
@@ -87,12 +100,13 @@ int main(int ac, char **av)
     // std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
     Cluster cluster;
+    clusterEnd = &cluster;
     try
     {
         if (cluster.setUpCluster(http) == -1)
             return (-1);
+        std::signal(SIGINT, signalHandler);
         cluster.run();
-        // cluster.clean();
     }
     catch (std::exception &e)
     {
