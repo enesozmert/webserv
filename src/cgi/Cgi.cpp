@@ -14,32 +14,38 @@ Cgi& Cgi::operator=(const Cgi &cgi)
 	if (this == &cgi)
         return (*this);
     this->_body = cgi._body;
-	this->_env = cgi._env;
     return (*this);
 }
 
-Cgi::Cgi(Request *request, ServerScope* server, Response *response): _body(response->getBody())
+Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _request(request), _response(response), _serverScope(serverScope), _body(response->getBody())
 {
-	this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
-	this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
-	this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
-	this->_env.insert(std::make_pair("REQUEST_METHOD", response->getMethod()));
-	this->_env.insert(std::make_pair("CONTENT_LENGTH", std::to_string(this->_body.length())));
-	this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
-	this->_env.insert(std::make_pair("PATH_INFO", request->getPath()));//CGI script'in ek bilgileri veya parametreleri içeren yol bilgisi(cgi_param)
-	this->_env.insert(std::make_pair("REQUEST_URI", request->getPath()));
-	this->_env.insert(std::make_pair("REMOTEaddr", server->getHost()));
-    this->_env.insert(std::make_pair("SERVER_PORT", server->getPort()));
-	this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
-	this->_env.insert(std::make_pair("SERVER_SOFTWARE", "nginx/webserv"));
+	// this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
+	// this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
+	// this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
+	// this->_env.insert(std::make_pair("REQUEST_METHOD", response->getMethod()));
+	// this->_env.insert(std::make_pair("CONTENT_LENGTH", std::to_string(this->_body.length())));
+	// this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
+	// this->_env.insert(std::make_pair("PATH_INFO", request->getPath()));//CGI script'in ek bilgileri veya parametreleri içeren yol bilgisi(cgi_param)
+	// this->_env.insert(std::make_pair("REQUEST_URI", request->getPath()));
+	// this->_env.insert(std::make_pair("REMOTEaddr", serverScope->getHost()));
+    // this->_env.insert(std::make_pair("SERVER_PORT", serverScope->getPort()));
+	// this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
+	// this->_env.insert(std::make_pair("SERVER_SOFTWARE", "nginx/webserv"));
 
-	std::cout << YELLOW << "CONTENT_LENGTH = " << this->_env["CONTENT_LENGTH"] << RESET << std::endl;
-	std::cout << YELLOW << "SCRIPT_NAME = " << this->_env["SCRIPT_NAME"] << RESET << std::endl;
-	std::cout << YELLOW << "SCRIPT_FILENAME = " << this->_env["SCRIPT_FILENAME"] << RESET << std::endl;
-	std::cout << YELLOW << "CONTENT_TYPE = " << this->_env["CONTENT_TYPE"] << RESET << std::endl;
-	std::cout << YELLOW << "PATH_INFO = " << this->_env["PATH_INFO"] << RESET << std::endl;
-	std::cout << YELLOW << "REQUEST_URI = " << this->_env["REQUEST_URI"] << RESET << std::endl;
-	std::cout << YELLOW << "_body = " << this->_body << RESET << std::endl;
+
+	// this->_request = request;
+	// this->_serverScope = serverScope;
+	// this->_response = response;
+
+	keywordFill();
+
+	// std::cout << YELLOW << "CONTENT_LENGTH = " << this->_env["CONTENT_LENGTH"] << RESET << std::endl;
+	// std::cout << YELLOW << "SCRIPT_NAME = " << this->_env["SCRIPT_NAME"] << RESET << std::endl;
+	// std::cout << YELLOW << "SCRIPT_FILENAME = " << this->_env["SCRIPT_FILENAME"] << RESET << std::endl;
+	// std::cout << YELLOW << "CONTENT_TYPE = " << this->_env["CONTENT_TYPE"] << RESET << std::endl;
+	// std::cout << YELLOW << "PATH_INFO = " << this->_env["PATH_INFO"] << RESET << std::endl;
+	// std::cout << YELLOW << "REQUEST_URI = " << this->_env["REQUEST_URI"] << RESET << std::endl;
+	// std::cout << YELLOW << "_body = " << this->_body << RESET << std::endl;
 }
 
 
@@ -51,9 +57,9 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	int			saveStdout = dup(STDOUT_FILENO);;
 	std::string	newBody;
 
-	char	**env = nullptr;
+	char	**env = NULL;
 	try {
-		env = mapToEnvForm(this->_env);//envleri map'ten char **str'ye çeviriyoruz.
+		env = mapToEnvForm(this->_envDatabase.getAllData());//envleri map'ten char **str'ye çeviriyoruz.
 	}
 	catch (const std::bad_alloc& e) {
 		std::cerr << e.what() << std::endl;
@@ -129,6 +135,32 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 
 	std::cout << "newBody: " << newBody << std::endl;
 	return (newBody);
+}
+
+DataBase<CgiVariable<std::string, std::string> > Cgi::getEnvDataBase()
+{
+    return (this->_envDatabase);
+}
+
+void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase)
+{
+    this->_envDatabase = envDatabase;
+}
+
+void Cgi::keywordFill()
+{
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", "CGI/1.1"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", _response->getCgiPass()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethod()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _request->getPath()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", _request->getPath()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
 }
 
 

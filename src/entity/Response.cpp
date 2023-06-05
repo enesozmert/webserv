@@ -387,7 +387,6 @@ std::string Response::getHeader()
 
 	setContentType();
 	this->_contentLength = std::to_string(this->_response.size());
-
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
 

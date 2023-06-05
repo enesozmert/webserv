@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <unistd.h>
 #include <dirent.h>
 #include "../entity/HttpScope.hpp"

@@ -4,12 +4,7 @@ Cluster::Cluster() {}
 
 Cluster::~Cluster() {
 	std::cout << YELLOW << "Cluster destruct" << RESET << std::endl;
-	this->cleanServers();
-	this->cleanSockets();
-	this->cleanReady();
-	FD_ZERO(&fd_master);
-	FD_ZERO(&writing_set);
-	FD_ZERO(&reading_set);
+	cleanAll();
 }
 
 Cluster::Cluster(const Cluster &cluster)
@@ -17,14 +12,14 @@ Cluster::Cluster(const Cluster &cluster)
 	*this = cluster;
 }
 
-Cluster& Cluster::operator=(const Cluster &cluster)
-{
-	if (this == &cluster)
-        return (*this);
-	this->servers = cluster.servers;
-	this->sockets= cluster.sockets;
-    return (*this);
-}
+// Cluster& Cluster::operator=(const Cluster &cluster)
+// {
+// 	if (this == &cluster)
+//         return (*this);
+// 	this->servers = cluster.servers;
+// 	this->sockets= cluster.sockets;
+//     return (*this);
+// }
 
 int Cluster::setUpCluster(HttpScope* http)
 {
@@ -179,7 +174,7 @@ void	Cluster::run()
 {
 	while (1)
 	{
-		signal(SIGINT, signalHandler);
+		std::signal(SIGINT, signalHandler);
 		this->select_return_value = 0;
 		while (select_return_value == 0)
 			select_section();
@@ -227,6 +222,16 @@ void	Cluster::cleanReady()
 	ready.clear();
 }
 
+
+void Cluster::cleanAll()
+{
+	this->cleanServers();
+	this->cleanSockets();
+	this->cleanReady();
+	FD_ZERO(&fd_master);
+	FD_ZERO(&writing_set);
+	FD_ZERO(&reading_set);
+}
 
 
 
