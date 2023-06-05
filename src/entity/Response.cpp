@@ -158,7 +158,7 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 	std::string trimmed;
 	trimmed = trim(path, "\n\r\t ");
 	if (trimmed == "/favicon.ico")
-		this->_path = "./tests/icon.png";
+		this->_path = "/favicon.ico";
 	else
 		this->_path = removeAdjacentSlashes(location->getRoot() + path);
 	
@@ -412,7 +412,6 @@ std::string Response::getHeader()
 
 	setContentType();
 	this->_contentLength = std::to_string(this->_response.size());
-
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
 

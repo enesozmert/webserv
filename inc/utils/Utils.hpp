@@ -16,7 +16,7 @@
 #include <limits>
 #include <sys/stat.h>
 #include <cstring>
-
+#include "../entity/CgiVariable.hpp"
 inline std::string	removeAdjacentSlashes(const std::string &str)
 {
 	std::string	ret;
@@ -73,13 +73,13 @@ inline unsigned int	strToIp(std::string strIp)
 	return final;
 }
 
-inline char	**mapToEnvForm(std::map<std::string, std::string> map)
+inline char	**mapToEnvForm(std::vector<CgiVariable<std::string, std::string> > map)
 {
 	char	**str = new char*[map.size() + 1];
 	int	j = 0;
-	for (std::map<std::string, std::string>::const_iterator i = map.begin(); i != map.end(); i++)
+	for (std::vector<CgiVariable<std::string, std::string> >::const_iterator i = map.begin(); i != map.end(); i++)
 	{
-		std::string	element = i->first + "=" + i->second;
+		std::string	element = i->getKey() + "=" + i->getValue();
 		str[j] = new char[element.size() + 1];
 		str[j] = strcpy(str[j], (const char*)element.c_str());
 		j++;

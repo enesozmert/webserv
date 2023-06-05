@@ -8,17 +8,27 @@
 #include <iostream>
 #include <string>
 
-bool g_terminate = false;
-
-void myTerminationHandler() {
+Cluster *clusterEnd;
+void myTerminationHandler()
+{
     std::cerr << "Unhandled exception, program will terminate.\n";
     // abort();
 }
 
+void signalHandler(int signum)
+{
+    if (signum == SIGINT)
+    {
+        std::cout << "\nInterrupt signal (" << signum << ") received.\n";
+        clusterEnd->cleanAll();
+        std::cout << "\nSuccess.\n";
+        exit(1);
+    }
+}
+
 int main(int ac, char **av)
 {
-    (void)ac;
-    (void)av;
+
     std::string av1;
     HttpScope *http;
     ParserConfig *parser = new ParserConfig();
@@ -27,21 +37,20 @@ int main(int ac, char **av)
     ConfigException configException;
     // std::set_terminate(myTerminationHandler);
 
-/*     if (ac != 2)
+  if (ac != 2)
     {
         configException.run(106);
         return (-1);
     }
- */
-    //get-filename
-    //av1 = av[1];
-    av1 = "configs/default.config";
 
-    //parseSyntaxForSyntaxAnalizer
+    // get-filename
+    av1 = av[1];
+ 
+
+    // parseSyntaxForSyntaxAnalizer
     parserSyntax->parseSyntax(av1);
     syntaxConfig.setParseLineProps(parserSyntax->getParseLineProps());
     syntaxConfig.analizer();
-
 
     parser->parse(av1);
     http = parser->getHttp();
@@ -64,7 +73,7 @@ int main(int ac, char **av)
     // std::cout << "http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() : " << http->getServers().at(0)->getLocations().at(0)->getRedirectionValue() << std::endl;
     // std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getErrorPageCodes().at(0) << std::endl;
     // std::cout << "http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() : " << http->getServers().at(0)->getLocations().at(0)->getErrorPagePath() << std::endl;
-   
+
     // std::string httpRequest = "POST /processsampleform.php HTTP/1.1\r\n"
     //                           "Host: www.tutorialspoint.com\r\n"
     //                           "User-Agent: Mozilla/5.0 (windows; U; Windows NT 6.0; en-Us; rv:1.9.0.19) Gecko/2010031422 Firefox/3.0.19 (.NET CLR 3.5.30729)\r\n"
@@ -92,14 +101,18 @@ int main(int ac, char **av)
     // std::cout << "request->getAcceptLanguages() : " << request->getAcceptLanguages().at(1).first << std::endl;
 
     Cluster cluster;
-    try {
-		    if (cluster.setUpCluster(http) == -1)
-                return (-1);
-			cluster.run();
-			cluster.cleanAll();
-		}
-	catch (std::exception &e) {
-			std::cerr << e.what() << std::endl;
-		}
+
+    clusterEnd = &cluster;
+    try
+    {
+        if (cluster.setUpCluster(http) == -1)
+            return (-1);
+        std::signal(SIGINT, signalHandler);
+        cluster.run();
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
     return (0);
 }

@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include "../entity/CgiVariable.hpp"
 #include "../entity/HttpScope.hpp"
 #include "../entity/Request.hpp"
 #include "../entity/Response.hpp"
@@ -18,18 +19,25 @@
 ;
 class Request;
 class Response;
+class ServerScope;
 class Cgi
 {
     private:
-    	std::map<std::string, std::string>	_env;// CGI betiği tarafından kullanılabilen çevre değişkenlerini içeren bir map
+        Request *_request;
+        Response *_response;
+        ServerScope *_serverScope;
+        DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
     	std::string							_body;//HTTP istek gövdesi
     
     public:
         Cgi();
         Cgi(const Cgi &cgi);
         Cgi& operator=(const Cgi &cgi);
-    	Cgi(Request *request, ServerScope* server, Response* response); // sets up env according to the request
+    	Cgi(Request *request, ServerScope* serverScope, Response* response); // sets up env according to the request
         ~Cgi();
     
     	std::string		executeCgi(const std::string &scriptName);	// executes cgi and returns body
+        DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();
+        void setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase);
+        void keywordFill();
 };
