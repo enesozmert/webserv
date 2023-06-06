@@ -93,8 +93,13 @@ void Response::setContentType()
 		return ;
 	}
 
+	if (this->_type != "")
+	{
+		_contentType = this->_type;
+		return ;
+	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
-	this->_contentType = _httpContentType.contentTypeGenerator(this->_type);
+	this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	std::cout << "this->_type = " << this->_type << std::endl;
 	std::cout << "this->_contentType = " <<  this->_contentType << std::endl;
 }
@@ -413,6 +418,7 @@ std::string Response::getHeader()
 	setContentType();
 	std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
+	setContentType();
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
 
