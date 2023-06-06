@@ -94,7 +94,7 @@ void Response::setContentType()
 		return ;
 	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
-	this->_contentType = _httpContentType.contentTypeGenerator(this->_type);
+	this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	std::cout << "this->_type = " << this->_type << std::endl;
 	std::cout << "this->_contentType = " <<  this->_contentType << std::endl;
 }

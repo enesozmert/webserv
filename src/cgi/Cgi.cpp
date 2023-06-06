@@ -158,8 +158,8 @@ void Cgi::keywordFill()
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethod()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH", "/Users/faozturk/Desktop/webserv/"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", "/Users/faozturk/Desktop/webserv/"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", "/Users/faozturk/Desktop/webserv/" + _response->getPath()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", "/Users/faozturk/Desktop/webserv/" + _response->getPath()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
