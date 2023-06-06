@@ -19,6 +19,7 @@ Cgi& Cgi::operator=(const Cgi &cgi)
 
 Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _request(request), _response(response), _serverScope(serverScope), _body(response->getBody())
 {
+	std::cout << "request->getBody() : " << request->getBody() << std::endl;
 	// this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
 	// this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
 	// this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
@@ -101,7 +102,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(scriptName.c_str(), nullptr, env);
+		execve(&scriptName[0], NULL, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 		exit(1);
@@ -110,7 +111,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	{
 		char	buffer[CGI_BUFSIZE] = {0};
 
-		waitpid(-1, nullptr, 0);
+		waitpid(-1, NULL, 0);
 		lseek(fdOut, 0, SEEK_SET);
 
 		int ret = 1;
@@ -152,18 +153,18 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 
 void Cgi::keywordFill()
 {
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", "/Users/eozmert/Desktop/webserv/"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethod()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", "/Users/faozturk/Desktop/webserv/" + _response->getPath()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", "/Users/faozturk/Desktop/webserv/" + _response->getPath()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", "/Users/eozmert/Desktop/webserv/"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
 }
 
 

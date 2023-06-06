@@ -37,7 +37,7 @@ std::string HttpContentType::contentTypeGenerator(std::string type)
     if (!this->getKeywordDataBase().isHere<std::string, IsContentTypeTypeEqual>(type))
     {
         HttpVariable<std::string, std::string> statusCode;
-        statusCode.setKey("plain");
+        statusCode.setKey("html");
         statusCode.setValue("text");
         result = statusCode.getValue() + "/" + statusCode.getKey();
         return (result);

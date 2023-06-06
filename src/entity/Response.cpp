@@ -87,6 +87,11 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setContentType()
 {
+	if (this->_type != "")
+	{
+		this->_contentType = this->_type;
+		return ;
+	}
 
 	if (this->_type != "")
 	{
@@ -206,7 +211,6 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setIndexs(location->getIndex(), server->getIndex()); // index yoksa hata mı vermeli?
 	setPaths(server, location, request->getPath());
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-
 	return 0;
 }
 
@@ -305,7 +309,7 @@ void Response::DELETE_method()
 
 void Response::POST_method(Request *request, ServerScope *server)
 {
-	if (this->_cgi_pass != "" && trim(this->_type, "\n\r\t ") == "php")
+	if (this->_cgi_pass != "")
 	{
 		std::cout << PURPLE << "cgiiiiiipost" << RESET << std::endl;
 		Cgi cgi(request, server, this);
@@ -410,7 +414,9 @@ std::string Response::writeHeader(void)
 std::string Response::getHeader()
 {
 	std::string header;
-
+	
+	setContentType();
+	std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
 	setContentType();
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";

@@ -77,7 +77,7 @@ void ParserRequest::parseKeyValue()
 
 void ParserRequest::parseBody()
 {
-	//cgi veya js fecth ile test edilip kodu yazılacak
+	this->request.setBody(this->_raw.substr(this->_raw.find("\r\n\r\n") + strlen("\r\n\r\n")));
 }
 
 void ParserRequest::parseRequestClone()

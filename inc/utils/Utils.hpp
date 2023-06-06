@@ -16,6 +16,7 @@
 #include <limits>
 #include <sys/stat.h>
 #include <cstring>
+#include <unistd.h>
 #include "../entity/CgiVariable.hpp"
 inline std::string	removeAdjacentSlashes(const std::string &str)
 {
@@ -149,3 +150,14 @@ inline unsigned long stoul_cxx98(const std::string& str, size_t* idx = 0, int ba
     return result;
 }
 
+
+inline std::string getPwd()
+{
+	char cwd[256];
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+    {
+        perror("getcwd() error");
+        exit(1);
+    }
+	return (std::string(cwd));
+}
