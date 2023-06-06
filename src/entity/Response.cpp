@@ -183,6 +183,7 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
 	}
 	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
+	this->_cgi_pass = location->getCgiPass();
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 	return 0;
@@ -190,7 +191,9 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 
 void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 {
-	this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
+	(void)bodyBufferSize;
+	//this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
+	this->_clientBodybufferSize = 4096;
 }
 
 void Response::setAutoIndex(std::string _autoIndex)
@@ -200,12 +203,11 @@ void Response::setAutoIndex(std::string _autoIndex)
 	else if (_autoIndex == "off")
 		this->_isAutoIndex = false;
 
-	std::cout << "auto_index : " << _isAutoIndex << std::endl;
+	//std::cout << "auto_index : " << _isAutoIndex << std::endl;
 }
 
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-	this->_cgi_pass = "";
 	std::cout << YELLOW << "request.getPath() : " << request->getPath() << RESET << std::endl;
 	this->statusCode = request->getReturnCode(); // statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->_body = request->getBody();
@@ -216,7 +218,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_port = atoi((server->getPort()).c_str());
 	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
-	std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
+	//std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
 	setStaticErrorPage();
 	setDate();
 	setLastModified();
@@ -225,8 +227,6 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths(server, location, request->getPath());
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	if(this->cgiType == "pl" || this->cgiType == "py" || this->cgiType == "php" )
-		this->_cgi_pass = location->getCgiPass();
 	return 0;
 }
 
@@ -273,7 +273,7 @@ std::string Response::notAllowed()
 
 void Response::GET_method(Request *request, ServerScope *server)
 {
-	if (this->_cgi_pass != "")
+	if (this->_cgi_pass != "" && request->getHttpMethodName() == "POST")
 	{
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
 		Cgi cgi(request, server, this);
@@ -325,6 +325,7 @@ void Response::DELETE_method()
 
 void Response::POST_method(Request *request, ServerScope *server)
 {
+	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
 	if (this->_cgi_pass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
@@ -396,7 +397,6 @@ void Response::readContent()
 			_response = staticErrorPage[403];
 			return;
 		}
-		std::cout << "buraya girdi" << std::endl;
 		buffer << file.rdbuf();
 		_response = buffer.str();
 		file.close();
