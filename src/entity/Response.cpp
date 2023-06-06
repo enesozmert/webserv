@@ -87,6 +87,11 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setContentType()
 {
+	if (this->_type != "")
+	{
+		this->_contentType = this->_type;
+		return ;
+	}
 
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 	this->_contentType = _httpContentType.contentTypeGenerator(this->_type);
@@ -201,7 +206,6 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setIndexs(location->getIndex(), server->getIndex()); // index yoksa hata mı vermeli?
 	setPaths(server, location, request->getPath());
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	setContentType();
 	return 0;
 }
 
@@ -248,7 +252,7 @@ std::string Response::notAllowed()
 
 void Response::GET_method(Request *request, ServerScope *server)
 {
-	if (this->_cgi_pass != "" && trim(this->_type, "\n\r\t ") == "php")
+	if (this->_cgi_pass != "")
 	{
 		std::cout << PURPLE << "cgiiiiiiget" << RESET << std::endl;
 		Cgi cgi(request, server, this);
@@ -262,7 +266,7 @@ void Response::GET_method(Request *request, ServerScope *server)
 			if (str.find("Status: ") == 0)
 				this->statusCode = std::atoi(str.substr(8, 3).c_str());
 			else if (str.find("Content-type: ") == 0)
-				this->_contentType = str.substr(14, str.size());
+				this->_type = str.substr(14, str.size());
 			i += str.size() + 2;
 		}
 		while (_response.find("\r\n", j) == j)
@@ -300,7 +304,7 @@ void Response::DELETE_method()
 
 void Response::POST_method(Request *request, ServerScope *server)
 {
-	if (this->_cgi_pass != "" && trim(this->_type, "\n\r\t ") == "php")
+	if (this->_cgi_pass != "")
 	{
 		std::cout << PURPLE << "cgiiiiiipost" << RESET << std::endl;
 		Cgi cgi(request, server, this);
@@ -314,7 +318,7 @@ void Response::POST_method(Request *request, ServerScope *server)
 			if (str.find("Status: ") == 0)
 				this->statusCode = std::atoi(str.substr(8, 3).c_str());
 			else if (str.find("Content-Type: ") == 0)
-				_type = str.substr(14, str.size());
+				this->_type = str.substr(14, str.size());
 			i += str.size() + 2;
 		}
 		while (_response.find("\r\n", j) == j)
@@ -405,7 +409,9 @@ std::string Response::writeHeader(void)
 std::string Response::getHeader()
 {
 	std::string header;
-
+	
+	setContentType();
+	std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
