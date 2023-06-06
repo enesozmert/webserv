@@ -65,6 +65,8 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 		std::cerr << e.what() << std::endl;
 		return "Status: 500\r\n\r\n";
 	}
+	std::cout << RED << "env0: " << env[0] << RESET << std::endl;
+	std::cout << RED << "env1: " << env[1] << RESET << std::endl;
 
 	// SAVING STDIN AND STDOUT IN ORDER TO TURN THEM BACK TO NORMAL LATER
 	//orijinal stdin ve stdout'u burada tutuyoruz ki kaybetmeyelim.
@@ -116,6 +118,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 		{
 			memset(buffer, 0, CGI_BUFSIZE);
 			ret = read(fdOut, buffer, CGI_BUFSIZE - 1);
+			std::cout << RED << "buffer: " << buffer << RESET << std::endl;
 			newBody += buffer;
 		}
 	}
@@ -150,13 +153,13 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 void Cgi::keywordFill()
 {
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", "CGI/1.1"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", _response->getCgiPass()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethod()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _request->getPath()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", _request->getPath()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH", "/Users/faozturk/Desktop/webserv/"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", "/Users/faozturk/Desktop/webserv/"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
