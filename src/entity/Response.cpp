@@ -22,6 +22,11 @@ int Response::getStatusCode()
 	return (this->statusCode);
 }
 
+std::string Response::getContentLocation()
+{
+	return (this->_contentLocation);
+}
+
 std::string Response::getPath()
 {
 	return (this->_path);
@@ -46,6 +51,12 @@ std::string Response::getBody()
 {
 	return (this->_body);
 }
+
+std::string Response::getRaw()
+{
+	return (this->_raw);
+}
+
 
 std::string Response::getMethod()
 {
@@ -87,19 +98,15 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setContentType()
 {
-	if (this->_type != "")
+	if (_type != "")
 	{
-		this->_contentType = this->_type;
-		return ;
-	}
-
-	if (this->_type != "")
-	{
-		_contentType = this->_type;
+		_contentType = _type;
 		return ;
 	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
+	this->cgiType = trim(this->_type, "\n\r\t ");//pl, php, py
 	this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
+	std::cout << "this->cgiType = " << this->cgiType << std::endl;
 	std::cout << "this->_type = " << this->_type << std::endl;
 	std::cout << "this->_contentType = " <<  this->_contentType << std::endl;
 }
@@ -154,23 +161,29 @@ void Response::setLanguage(std::vector<std::pair<std::string, float> > languages
 
 int Response::setPaths(ServerScope *server, LocationScope *location, std::string path)
 {
-	(void)server;
-	(void)path;
-	this->_rootPath = location->getRoot();
-	this->_contentLocation = selectIndex();
+	this->_serverRootPath = server->getRoot();
+	this->_locationRootPath = location->getRoot();
+	this->_index = selectIndex();
 	std::string trimmed;
 	trimmed = trim(path, "\n\r\t ");
+
 	if (trimmed == "/favicon.ico" || trimmed == "favicon.ico")
 		this->_path = "/tests/test1/icon.png";
-	else
-		this->_path = removeAdjacentSlashes(location->getRoot() + path);
-	
-	if (!pathIsFile(this->_path) && this->_method == "GET") 
-		this->_path = removeAdjacentSlashes(location->getRoot() + _contentLocation);
-	// this->_path = "./tests/test1/bob.jpg" bu yoksa indexe bakacak
-	// this->_path = "./tests/test1/index.html";
+
+	if (_locationRootPath != "")
+		this->_path = removeAdjacentSlashes(_locationRootPath + trimmed);
+	else if (_serverRootPath != "" && _locationRootPath == "")
+		this->_path = removeAdjacentSlashes(_serverRootPath + trimmed);
+
+	if (!pathIsFile(this->_path))//gelen path ile eşleşen bir dosya yoksa 0 döner ve içeri girer.
+	{
+		if (_locationRootPath != "")
+			this->_path = removeAdjacentSlashes(_locationRootPath + _index);
+		else if (_serverRootPath != "" && _locationRootPath == "")
+			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
+	}
+	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
 	this->_cgi_pass = location->getCgiPass();
-	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 	return 0;
@@ -178,7 +191,9 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 
 void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 {
-	this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
+	(void)bodyBufferSize;
+	//this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
+	this->_clientBodybufferSize = 4096;
 }
 
 void Response::setAutoIndex(std::string _autoIndex)
@@ -188,7 +203,7 @@ void Response::setAutoIndex(std::string _autoIndex)
 	else if (_autoIndex == "off")
 		this->_isAutoIndex = false;
 
-	std::cout << "auto_index : " << _isAutoIndex << std::endl;
+	//std::cout << "auto_index : " << _isAutoIndex << std::endl;
 }
 
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
@@ -203,19 +218,21 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_port = atoi((server->getPort()).c_str());
 	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
-	std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
+	//std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
 	setStaticErrorPage();
 	setDate();
 	setLastModified();
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex()); // index yoksa hata mı vermeli?
 	setPaths(server, location, request->getPath());
+	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	return 0;
 }
 
-void Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
+void Response::createResponse(Request *request, ServerScope *server, LocationScope *location, std::string raw)
 {
+	this->_raw = raw;
 	if (setResponse(request, server, location) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 
@@ -245,7 +262,6 @@ std::string Response::notAllowed()
 	std::string header;
 
 	_response = "";
-	setContentType();
 	this->_contentLength = "";
 	if (this->statusCode == 405)
 		header = "HTTP/1.1 405 " + _httpStatusCode.getByStatusCode(405).getValue() + "\r\n";
@@ -257,9 +273,9 @@ std::string Response::notAllowed()
 
 void Response::GET_method(Request *request, ServerScope *server)
 {
-	if (this->_cgi_pass != "")
+	if (this->_cgi_pass != "" && request->getHttpMethodName() == "POST")
 	{
-		std::cout << PURPLE << "cgiiiiiiget" << RESET << std::endl;
+		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
 		Cgi cgi(request, server, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
@@ -309,9 +325,10 @@ void Response::DELETE_method()
 
 void Response::POST_method(Request *request, ServerScope *server)
 {
+	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
 	if (this->_cgi_pass != "")
 	{
-		std::cout << PURPLE << "cgiiiiiipost" << RESET << std::endl;
+		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
 		Cgi cgi(request, server, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
@@ -380,7 +397,6 @@ void Response::readContent()
 			_response = staticErrorPage[403];
 			return;
 		}
-		std::cout << "buraya girdi" << std::endl;
 		buffer << file.rdbuf();
 		_response = buffer.str();
 		file.close();
@@ -415,10 +431,8 @@ std::string Response::getHeader()
 {
 	std::string header;
 	
-	setContentType();
 	std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
-	setContentType();
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
 
@@ -452,8 +466,8 @@ std::string Response::selectIndex()
 
 std::string         Response::getPage()
 {
-    std::string dirName(_rootPath.c_str());
-    DIR *dir = opendir(_rootPath.c_str());
+    std::string dirName(_locationRootPath.c_str());
+    DIR *dir = opendir(_locationRootPath.c_str());
     std::string page =\
     "<!DOCTYPE html>\n\
     <html>\n\
@@ -465,7 +479,7 @@ std::string         Response::getPage()
     <p>\n";
 
     if (dir == NULL) {
-        std::cerr << RED << "Error: could not open [" << _rootPath << "]" << RESET << std::endl;
+        std::cerr << RED << "Error: could not open [" << _locationRootPath << "]" << RESET << std::endl;
         return "";
     }
     if (dirName[0] != '/')

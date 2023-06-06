@@ -124,7 +124,7 @@ void    Server::process(long socket, HttpScope* http)
         else
         {
             matchedLocation = matchedServer->getLocations().at(this->locationScopeIndex);
-            response.createResponse(request, matchedServer, matchedLocation);
+            response.createResponse(request, matchedServer, matchedLocation, _requests[socket]);
 
             // socket,request olan map yapısının requestini siliyoruz
             _requests.erase(socket);
@@ -320,7 +320,7 @@ void  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::
     this->locationScopeIndex = 0;
 
     this->locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-    std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
+   // std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
     if(this->locationScopeIndex == -1)
         std::cerr << RED << "There is no possible location" << RESET << std::endl;
     //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);

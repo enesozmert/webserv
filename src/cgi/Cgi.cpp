@@ -19,7 +19,7 @@ Cgi& Cgi::operator=(const Cgi &cgi)
 
 Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _request(request), _response(response), _serverScope(serverScope), _body(response->getBody())
 {
-	std::cout << "request->getBody() : " << request->getBody() << std::endl;
+	std::cout << "*******old_body******\n " << _body << std::endl;
 	// this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
 	// this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
 	// this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
@@ -66,8 +66,6 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 		std::cerr << e.what() << std::endl;
 		return "Status: 500\r\n\r\n";
 	}
-	std::cout << RED << "env0: " << env[0] << RESET << std::endl;
-	std::cout << RED << "env1: " << env[1] << RESET << std::endl;
 
 	// SAVING STDIN AND STDOUT IN ORDER TO TURN THEM BACK TO NORMAL LATER
 	//orijinal stdin ve stdout'u burada tutuyoruz ki kaybetmeyelim.
@@ -102,7 +100,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(&scriptName[0], NULL, env);
+		execve(scriptName.c_str(), NULL, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 		exit(1);
@@ -119,7 +117,6 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 		{
 			memset(buffer, 0, CGI_BUFSIZE);
 			ret = read(fdOut, buffer, CGI_BUFSIZE - 1);
-			std::cout << RED << "buffer: " << buffer << RESET << std::endl;
 			newBody += buffer;
 		}
 	}
@@ -137,7 +134,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 		delete[] env[i];
 	delete[] env;
 
-	std::cout << "newBody: " << newBody << std::endl;
+	std::cout << "********newBody*******\n" << newBody << std::endl;
 	return (newBody);
 }
 
@@ -153,13 +150,15 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 
 void Cgi::keywordFill()
 {
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getCgiPass()));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
+    //_envDatabase.insertData(CgiVariable<std::string, std::string>("QUERY_STRING", _request->getQueryString()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", "/Users/eozmert/Desktop/webserv/"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethod()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", "/Users/eozmert/Desktop/webserv/"));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
