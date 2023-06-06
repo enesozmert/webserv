@@ -25,7 +25,9 @@ private:
     std::map<int, std::string>	        _errors;
     std::vector<std::string>	        _indexs;
     std::string					        _path;
-    std::string                         _rootPath;
+    std::string					        _index;
+    std::string                         _locationRootPath;
+    std::string                         _serverRootPath;
 	std::string					        _cgi_pass;
     std::string					        _error_page;
     std::map<std::string, std::string>	_cgi_params;
@@ -51,6 +53,7 @@ private:
     HttpStatusCode                      _httpStatusCode;
     DataBase<Variable<std::string> >    _keywordDatabase;
     bool                                _isAutoIndex;
+    std::string                         _raw;
 public:
     Response();
     ~Response();
@@ -66,6 +69,8 @@ public:
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
     std::string                         getServerName();
+    std::string                         getContentLocation();
+    std::string                         getRaw();
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
@@ -82,7 +87,7 @@ public:
     void                        keywordFill();
 
 
-    void                        createResponse(Request *request, ServerScope *server, LocationScope *location);
+    void                        createResponse(Request *request, ServerScope *server, LocationScope *location, std::string raw);
     std::string                 notAllowed();
     std::string                 writeHeader(void);
     std::string                 errorHtml();

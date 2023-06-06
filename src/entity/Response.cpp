@@ -22,6 +22,11 @@ int Response::getStatusCode()
 	return (this->statusCode);
 }
 
+std::string Response::getContentLocation()
+{
+	return (this->_contentLocation);
+}
+
 std::string Response::getPath()
 {
 	return (this->_path);
@@ -46,6 +51,12 @@ std::string Response::getBody()
 {
 	return (this->_body);
 }
+
+std::string Response::getRaw()
+{
+	return (this->_raw);
+}
+
 
 std::string Response::getMethod()
 {
@@ -87,17 +98,11 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setContentType()
 {
-	if (this->_type != "")
+/* 	if (this->_type != "")
 	{
 		this->_contentType = this->_type;
 		return ;
-	}
-
-	if (this->_type != "")
-	{
-		_contentType = this->_type;
-		return ;
-	}
+	} */
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 	this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	std::cout << "this->_type = " << this->_type << std::endl;
@@ -154,21 +159,26 @@ void Response::setLanguage(std::vector<std::pair<std::string, float> > languages
 
 int Response::setPaths(ServerScope *server, LocationScope *location, std::string path)
 {
-	(void)server;
-	(void)path;
-	this->_rootPath = location->getRoot();
-	this->_contentLocation = selectIndex();
+	this->_serverRootPath = server->getRoot();
+	this->_locationRootPath = location->getRoot();
+	this->_index = selectIndex();
 	std::string trimmed;
 	trimmed = trim(path, "\n\r\t ");
 	if (trimmed == "/favicon.ico" || trimmed == "favicon.ico")
 		this->_path = "/tests/test1/icon.png";
 	else
-		this->_path = removeAdjacentSlashes(location->getRoot() + path);
+	{
+		if(_locationRootPath != "")
+			this->_path = removeAdjacentSlashes(_locationRootPath + this->_index);
+		else if (_serverRootPath != "" && _locationRootPath == "")
+			this->_path = removeAdjacentSlashes(_serverRootPath + this->_index);
+	}
 	
-	if (!pathIsFile(this->_path) && this->_method == "GET") 
-		this->_path = removeAdjacentSlashes(location->getRoot() + _contentLocation);
+	//if (!pathIsFile(this->_path)) 
+		
 	// this->_path = "./tests/test1/bob.jpg" bu yoksa indexe bakacak
 	// this->_path = "./tests/test1/index.html";
+	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path + "/");
 	this->_cgi_pass = location->getCgiPass();
 	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
@@ -214,8 +224,9 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	return 0;
 }
 
-void Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
+void Response::createResponse(Request *request, ServerScope *server, LocationScope *location, std::string raw)
 {
+	this->_raw = raw;
 	if (setResponse(request, server, location) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 
@@ -452,8 +463,8 @@ std::string Response::selectIndex()
 
 std::string         Response::getPage()
 {
-    std::string dirName(_rootPath.c_str());
-    DIR *dir = opendir(_rootPath.c_str());
+    std::string dirName(_locationRootPath.c_str());
+    DIR *dir = opendir(_locationRootPath.c_str());
     std::string page =\
     "<!DOCTYPE html>\n\
     <html>\n\
@@ -465,7 +476,7 @@ std::string         Response::getPage()
     <p>\n";
 
     if (dir == NULL) {
-        std::cerr << RED << "Error: could not open [" << _rootPath << "]" << RESET << std::endl;
+        std::cerr << RED << "Error: could not open [" << _locationRootPath << "]" << RESET << std::endl;
         return "";
     }
     if (dirName[0] != '/')
