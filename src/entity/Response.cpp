@@ -98,13 +98,15 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setContentType()
 {
-/* 	if (this->_type != "")
+	if (_type != "")
 	{
-		this->_contentType = this->_type;
+		_contentType = _type;
 		return ;
-	} */
+	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
+	this->cgiType = trim(this->_type, "\n\r\t ");//pl, php, py
 	this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
+	std::cout << "this->cgiType = " << this->cgiType << std::endl;
 	std::cout << "this->_type = " << this->_type << std::endl;
 	std::cout << "this->_contentType = " <<  this->_contentType << std::endl;
 }
@@ -164,23 +166,23 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 	this->_index = selectIndex();
 	std::string trimmed;
 	trimmed = trim(path, "\n\r\t ");
+
 	if (trimmed == "/favicon.ico" || trimmed == "favicon.ico")
 		this->_path = "/tests/test1/icon.png";
-	else
+
+	if (_locationRootPath != "")
+		this->_path = removeAdjacentSlashes(_locationRootPath + trimmed);
+	else if (_serverRootPath != "" && _locationRootPath == "")
+		this->_path = removeAdjacentSlashes(_serverRootPath + trimmed);
+
+	if (!pathIsFile(this->_path))//gelen path ile eşleşen bir dosya yoksa 0 döner ve içeri girer.
 	{
-		if(_locationRootPath != "")
-			this->_path = removeAdjacentSlashes(_locationRootPath + this->_index);
+		if (_locationRootPath != "")
+			this->_path = removeAdjacentSlashes(_locationRootPath + _index);
 		else if (_serverRootPath != "" && _locationRootPath == "")
-			this->_path = removeAdjacentSlashes(_serverRootPath + this->_index);
+			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
 	}
-	
-	//if (!pathIsFile(this->_path)) 
-		
-	// this->_path = "./tests/test1/bob.jpg" bu yoksa indexe bakacak
-	// this->_path = "./tests/test1/index.html";
-	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path + "/");
-	this->_cgi_pass = location->getCgiPass();
-	std::cout << YELLOW << "_cgi_pass : " << this->_cgi_pass << RESET << std::endl;
+	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 	return 0;
@@ -203,6 +205,7 @@ void Response::setAutoIndex(std::string _autoIndex)
 
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
 {
+	this->_cgi_pass = "";
 	std::cout << YELLOW << "request.getPath() : " << request->getPath() << RESET << std::endl;
 	this->statusCode = request->getReturnCode(); // statusCode 200 olarak initledik. İlk 200 olarak atanacak.
 	this->_body = request->getBody();
@@ -220,7 +223,10 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex()); // index yoksa hata mı vermeli?
 	setPaths(server, location, request->getPath());
+	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
+	if(this->cgiType == "pl" || this->cgiType == "py" || this->cgiType == "php" )
+		this->_cgi_pass = location->getCgiPass();
 	return 0;
 }
 
@@ -256,7 +262,6 @@ std::string Response::notAllowed()
 	std::string header;
 
 	_response = "";
-	setContentType();
 	this->_contentLength = "";
 	if (this->statusCode == 405)
 		header = "HTTP/1.1 405 " + _httpStatusCode.getByStatusCode(405).getValue() + "\r\n";
@@ -270,7 +275,7 @@ void Response::GET_method(Request *request, ServerScope *server)
 {
 	if (this->_cgi_pass != "")
 	{
-		std::cout << PURPLE << "cgiiiiiiget" << RESET << std::endl;
+		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
 		Cgi cgi(request, server, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
@@ -322,7 +327,7 @@ void Response::POST_method(Request *request, ServerScope *server)
 {
 	if (this->_cgi_pass != "")
 	{
-		std::cout << PURPLE << "cgiiiiiipost" << RESET << std::endl;
+		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
 		Cgi cgi(request, server, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
@@ -426,10 +431,8 @@ std::string Response::getHeader()
 {
 	std::string header;
 	
-	setContentType();
 	std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
-	setContentType();
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
 

@@ -29,6 +29,7 @@ private:
     std::string                         _locationRootPath;
     std::string                         _serverRootPath;
 	std::string					        _cgi_pass;
+    std::string                         cgiType;
     std::string					        _error_page;
     std::map<std::string, std::string>	_cgi_params;
     std::string					        _method;
