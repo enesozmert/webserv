@@ -28,6 +28,8 @@ class Cgi
         ServerScope *_serverScope;
         DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
     	std::string							_body;//HTTP istek gövdesi
+        std::map<std::string, std::string>  _query;
+
     
     public:
         Cgi();

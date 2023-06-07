@@ -37,6 +37,7 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 	// this->_request = request;
 	// this->_serverScope = serverScope;
 	// this->_response = response;
+	this->_query = _response->getCgiParam();
 
 	keywordFill();
 
@@ -164,6 +165,8 @@ void Cgi::keywordFill()
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
+	for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
+		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
 }
 
 
