@@ -56,13 +56,6 @@ std::string Response::getBody()
 {
 	return (this->_body);
 }
-
-std::string Response::getRaw()
-{
-	return (this->_raw);
-}
-
-
 std::string Response::getMethod()
 {
 	return (this->_method);
@@ -273,9 +266,8 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	return 0;
 }
 
-void Response::createResponse(Request *request, ServerScope *server, LocationScope *location, std::string raw)
+void Response::createResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-	this->_raw = raw;
 	if (setResponse(request, server, location) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 
@@ -350,7 +342,9 @@ void Response::GET_method(Request *request, ServerScope *server)
 
 void Response::DELETE_method()
 {
+	std::cout << PURPLE << "******DELETE******" << RESET << std::endl;
 	_response = "";
+	this->_path = realpath(".", NULL) + _path;
 	if (pathIsFile(_path))
 	{
 		if (remove(_path.c_str()) == 0)

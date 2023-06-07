@@ -51,7 +51,7 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 }
 
 
-std::string		Cgi::executeCgi(const std::string& scriptName) 
+std::string		Cgi::executeCgi(std::string scriptName) 
 {
 	std::cout << YELLOW << "cgi scriptName : " << scriptName << RESET << std::endl;
 
@@ -82,7 +82,8 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	int fdOut = fileno(fOut);
 
 	//if (this->_env["REQUEST_METHOD"] == "POST")
-	write(fdIn, _body.c_str(), _body.size());
+	if (write(fdIn, _body.c_str(), _body.size()) == -1)
+		std::cerr << RED << "write problem" << RESET << std::endl;
 	lseek(fdIn, 0, SEEK_SET);
 	//Daha sonra, lseek() fonksiyonu kullanılarak dosya okuma yazma konumu (offset) ayarlanır.
 	//Bu durumda, lseek(fdIn, 0, SEEK_SET) ifadesi, dosyanın okuma yazma konumunu dosyanın başına (SEEK_SET) taşır.
@@ -91,6 +92,8 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	//Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
 	//SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
 
+	std::string loc = _response->getContentLocation();
+	char *cmd[] =  {&scriptName[0], &loc[0], NULL};
 	pid_t pid = fork();
 	if (pid == -1)
 	{
@@ -101,7 +104,8 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(scriptName.c_str(), NULL, env);
+		//execve(scriptName.c_str(), _response->getContentLocation().c_str(), env);
+		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 		exit(1);

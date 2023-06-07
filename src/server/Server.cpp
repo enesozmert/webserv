@@ -124,7 +124,7 @@ void    Server::process(long socket, HttpScope* http)
         else
         {
             matchedLocation = matchedServer->getLocations().at(this->locationScopeIndex);
-            response.createResponse(request, matchedServer, matchedLocation, _requests[socket]);
+            response.createResponse(request, matchedServer, matchedLocation);
 
             // socket,request olan map yapısının requestini siliyoruz
             _requests.erase(socket);
