@@ -31,7 +31,7 @@ private:
 	std::string					        _cgi_pass;
     std::string                         cgiType;
     std::string					        _error_page;
-    std::map<std::string, std::string>	_cgi_params;
+    std::map<std::string, std::string>	_queries;
     std::string					        _method;
     std::string					        _allows;
     std::vector<std::string>		    _allow_methods;
@@ -67,7 +67,7 @@ public:
     std::string                         getBody();
     std::string                         getMethod();
     std::string                         getCgiPass();
-    std::map<std::string, std::string>  getCgiParam();
+    std::map<std::string, std::string>  getQueries();
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
     std::string                         getServerName();
@@ -76,7 +76,7 @@ public:
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
-    void                        setCgiParams();
+    void                        setQueries();
     void	                    setDate();
     void	                    setLastModified();
     void                        setAutoIndex(std::string _autoIndex);

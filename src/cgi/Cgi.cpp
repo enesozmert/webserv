@@ -37,7 +37,7 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 	// this->_request = request;
 	// this->_serverScope = serverScope;
 	// this->_response = response;
-	this->_query = _response->getCgiParam();
+	this->_query = _response->getQueries();
 
 	keywordFill();
 
@@ -51,7 +51,7 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 }
 
 
-std::string		Cgi::executeCgi(const std::string& scriptName) 
+std::string		Cgi::executeCgi(std::string scriptName) 
 {
 	std::cout << YELLOW << "cgi scriptName : " << scriptName << RESET << std::endl;
 
@@ -90,7 +90,8 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	//İkinci parametre, ayarlanacak konumun byte cinsinden belirtilen offsetidir.
 	//Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
 	//SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
-
+	std::string contentLocation = _response->getContentLocation();
+	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
 	pid_t pid = fork();
 	if (pid == -1)
 	{
@@ -101,7 +102,7 @@ std::string		Cgi::executeCgi(const std::string& scriptName)
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		execve(scriptName.c_str(), NULL, env);
+		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 		exit(1);

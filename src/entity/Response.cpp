@@ -37,9 +37,9 @@ std::string Response::getServerName()
 	return (this->_server);
 }
 
-std::map<std::string, std::string>	Response::getCgiParam()
+std::map<std::string, std::string>	Response::getQueries()
 {
-	return (this->_cgi_params);
+	return (this->_queries);
 }
 
 std::string Response::getResponse()
@@ -101,11 +101,9 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 	}
 }
 
-void Response::setCgiParams()
+void Response::setQueries()
 {
-	//fname=fatma&lname=ozturk&second=fatma2&Third=fatma3
-	std::cout << "\n_body for cgi param : " << _body << std::endl;
-
+	std::cout << "_body : " << _body << std::endl;
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -130,7 +128,7 @@ void Response::setCgiParams()
 		{
 			value = query.substr(pair_delimiter + 1);
 		}
-		this->_cgi_params[name] = value;
+		this->_queries[name] = value;
 		if (next_delimiter == std::string::npos)
 		{
 			break;
@@ -369,7 +367,7 @@ void Response::DELETE_method()
 void Response::POST_method(Request *request, ServerScope *server)
 {
 	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
-	setCgiParams();
+	setQueries();
 	if (this->_cgi_pass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;

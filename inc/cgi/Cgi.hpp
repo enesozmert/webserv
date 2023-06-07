@@ -38,7 +38,7 @@ class Cgi
     	Cgi(Request *request, ServerScope* serverScope, Response* response); // sets up env according to the request
         ~Cgi();
     
-    	std::string		executeCgi(const std::string &scriptName);	// executes cgi and returns body
+    	std::string		executeCgi(std::string scriptName);	// executes cgi and returns body
         DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();
         void setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase);
         void keywordFill();
