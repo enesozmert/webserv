@@ -9,12 +9,12 @@ Response::Response(const Response &response)
 	*this = response;
 }
 
-Response& Response::operator=(const Response &response)
+Response &Response::operator=(const Response &response)
 {
 	if (this == &response)
-        return (*this);
-    this->_response = response._response;
-    return (*this);
+		return (*this);
+	this->_response = response._response;
+	return (*this);
 }
 
 int Response::getStatusCode()
@@ -37,9 +37,9 @@ std::string Response::getServerName()
 	return (this->_server);
 }
 
-std::map<std::string, std::string>	Response::getCgiParam()
+std::map<std::string, std::string> Response::getQueries()
 {
-	return (this->_cgi_params);
+	return (this->_queries);
 }
 
 std::string Response::getResponse()
@@ -49,7 +49,7 @@ std::string Response::getResponse()
 
 std::string Response::getCgiPass()
 {
-	return (this->_cgi_pass);
+	return (this->_cgiPass);
 }
 
 std::string Response::getBody()
@@ -57,24 +57,19 @@ std::string Response::getBody()
 	return (this->_body);
 }
 
-std::string Response::getRaw()
+std::string Response::getMethodName()
 {
-	return (this->_raw);
+	return (this->_methodName);
 }
 
-
-std::string Response::getMethod()
-{
-	return (this->_method);
-}
 DataBase<Variable<std::string> > Response::getKeywordDataBase()
 {
-    return (this->_keywordDatabase);
+	return (this->_keywordDatabase);
 }
 
 void Response::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 {
-    this->_keywordDatabase = keywordDatabase;
+	this->_keywordDatabase = keywordDatabase;
 }
 
 void Response::setStaticErrorPage()
@@ -101,11 +96,9 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 	}
 }
 
-void Response::setCgiParams()
+void Response::setQueries()
 {
-	//fname=fatma&lname=ozturk&second=fatma2&Third=fatma3
-	std::cout << "\n_body for cgi param : " << _body << std::endl;
-
+	std::cout << "_body : " << _body << std::endl;
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -130,7 +123,7 @@ void Response::setCgiParams()
 		{
 			value = query.substr(pair_delimiter + 1);
 		}
-		this->_cgi_params[name] = value;
+		this->_queries[name] = value;
 		if (next_delimiter == std::string::npos)
 		{
 			break;
@@ -144,14 +137,14 @@ void Response::setContentType()
 	if (_type != "")
 	{
 		_contentType = _type;
-		return ;
+		return;
 	}
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
-	this->cgiType = trim(this->_type, "\n\r\t ");//pl, php, py
+	this->cgiType = trim(this->_type, "\n\r\t "); // pl, php, py
 	this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	std::cout << "this->cgiType = " << this->cgiType << std::endl;
 	std::cout << "this->_type = " << this->_type << std::endl;
-	std::cout << "this->_contentType = " <<  this->_contentType << std::endl;
+	std::cout << "this->_contentType = " << this->_contentType << std::endl;
 }
 
 void Response::setDate()
@@ -202,13 +195,13 @@ void Response::setLanguage(std::vector<std::pair<std::string, float> > languages
 	}
 }
 
-int Response::setPaths(ServerScope *server, LocationScope *location, std::string path)
+int Response::setPaths()
 {
-	this->_serverRootPath = server->getRoot();
-	this->_locationRootPath = location->getRoot();
+	this->_serverRootPath = _serverScope->getRoot();
+	this->_locationRootPath = _locationScope->getRoot();
 	this->_index = selectIndex();
 	std::string trimmed;
-	trimmed = trim(path, "\n\r\t ");
+	trimmed = trim(_request->getPath(), "\n\r\t ");
 
 	if (trimmed == "/favicon.ico" || trimmed == "favicon.ico")
 		this->_path = "/tests/test1/icon.png";
@@ -218,7 +211,7 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 	else if (_serverRootPath != "" && _locationRootPath == "")
 		this->_path = removeAdjacentSlashes(_serverRootPath + trimmed);
 
-	if (!pathIsFile(this->_path))//gelen path ile eşleşen bir dosya yoksa 0 döner ve içeri girer.
+	if (!pathIsFile(this->_path)) // gelen path ile eşleşen bir dosya yoksa 0 döner ve içeri girer.
 	{
 		if (_locationRootPath != "")
 			this->_path = removeAdjacentSlashes(_locationRootPath + _index);
@@ -226,7 +219,6 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
 	}
 	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
-	this->_cgi_pass = location->getCgiPass();
 	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
 	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 	return 0;
@@ -234,9 +226,9 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 
 void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 {
-	this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
-	if (this->_clientBodybufferSize == 0)
-		this->_clientBodybufferSize = 4096;
+	this->_clientBodyBufferSize = atoi(bodyBufferSize.c_str());
+	if (this->_clientBodyBufferSize == 0)
+		this->_clientBodyBufferSize = 4096;
 }
 
 void Response::setAutoIndex(std::string _autoIndex)
@@ -245,8 +237,6 @@ void Response::setAutoIndex(std::string _autoIndex)
 		this->_isAutoIndex = true;
 	else if (_autoIndex == "off")
 		this->_isAutoIndex = false;
-
-	//std::cout << "auto_index : " << _isAutoIndex << std::endl;
 }
 
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
@@ -256,48 +246,51 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_body = request->getBody();
 	this->_server = "webserv";
 	this->_error_page = location->getErrorPage();
-	this->_method = request->getHttpMethodName();
+	this->_methodName = request->getHttpMethodName();
 	this->_host = server->getHost();
 	this->_port = atoi((server->getPort()).c_str());
 	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
-	//std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
+	// std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
 	setStaticErrorPage();
 	setDate();
 	setLastModified();
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex()); // index yoksa hata mı vermeli?
-	setPaths(server, location, request->getPath());
+	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	return 0;
 }
 
-void Response::createResponse(Request *request, ServerScope *server, LocationScope *location, std::string raw)
+void Response::createResponse(Request *request, ServerScope *serverScope, LocationScope *locationScope)
 {
-	this->_raw = raw;
-	if (setResponse(request, server, location) == -1)
+	this->_request = request;
+	this->_serverScope = serverScope;
+	this->_locationScope = locationScope;
+	if (setResponse(request, serverScope, locationScope) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 
-	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_method) == _allow_methods.end())
+	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
 	{
 		this->statusCode = 405;
 		_response = notAllowed() + "\r\n";
-		return ;
+		return;
 	}
-	else if (this->_clientBodybufferSize < static_cast<int>(this->_body.size()))
+	else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
 	{
 		this->statusCode = 413;
 		_response = notAllowed() + "\r\n";
-		return ;
+		return;
 	}
 
-	if (this->statusCode == 200 && this->_method == "GET")
-		GET_method(request, server);
-	else if (this->statusCode == 200 && this->_method == "POST")
-		POST_method(request, server);
-	else if (this->statusCode == 200 && this->_method == "DELETE")
-		DELETE_method();
+	selectCgiPass();
+	if (this->statusCode == 200 && this->_methodName == "GET")
+		getMethod();
+	else if (this->statusCode == 200 && this->_methodName == "POST")
+		postMethod();
+	else if (this->statusCode == 200 && this->_methodName == "DELETE")
+		deleteMethod();
 }
 
 std::string Response::notAllowed()
@@ -314,16 +307,20 @@ std::string Response::notAllowed()
 	return (header);
 }
 
-void Response::GET_method(Request *request, ServerScope *server)
+void Response::getMethod()
 {
-	if (this->_cgi_pass != "" && request->getHttpMethodName() == "POST")
+	if (this->statusCode == 200)
+		readContent();
+	else
+		_response = this->errorHtml();
+	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
-		Cgi cgi(request, server, this);
+		Cgi cgi(_request, _serverScope, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
 
-		_response = cgi.executeCgi(this->_cgi_pass);
+		_response = cgi.executeCgi(this->_cgiPass);
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -337,18 +334,15 @@ void Response::GET_method(Request *request, ServerScope *server)
 			j -= 2;
 		_response = _response.substr(i, j - i);
 	}
-	else if (this->statusCode == 200)
-		readContent();
-	else
-		_response = this->errorHtml();
 
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
 
 	_response = getHeader() + "\r\n" + _response;
+	// this->_cgiPass = "";
 }
 
-void Response::DELETE_method()
+void Response::deleteMethod()
 {
 	_response = "";
 	if (pathIsFile(_path))
@@ -366,18 +360,19 @@ void Response::DELETE_method()
 	_response = getHeader() + "\r\n" + _response;
 }
 
-void Response::POST_method(Request *request, ServerScope *server)
+void Response::postMethod()
 {
 	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
-	setCgiParams();
-	if (this->_cgi_pass != "")
+	setQueries();
+	// this->_cgiPass = _locationScope->getCgiPass()[0];
+	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
-		Cgi cgi(request, server, this);
+		Cgi cgi(_request, _serverScope, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
 
-		_response = cgi.executeCgi(this->_cgi_pass);
+		_response = cgi.executeCgi(this->_cgiPass);
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -401,6 +396,7 @@ void Response::POST_method(Request *request, ServerScope *server)
 		_response = staticErrorPage[500];
 
 	_response = getHeader() + "\r\n" + _response;
+	// this->_cgiPass = "";
 }
 
 std::string Response::errorHtml()
@@ -446,12 +442,14 @@ void Response::readContent()
 		file.close();
 		return;
 	}
-	else if (_isAutoIndex) {
+	else if (_isAutoIndex)
+	{
 		buffer << getPage();
 		_response = buffer.str();
 		_type = "text/html";
 	}
-	else{
+	else
+	{
 		this->statusCode = 404;
 		_response = this->errorHtml();
 	}
@@ -463,7 +461,7 @@ std::string Response::writeHeader(void)
 	std::string header = "";
 	this->keywordFill();
 	std::vector<Variable<std::string> > vec1 = this->_keywordDatabase.getAllData();
-	for(std::vector<Variable<std::string> >::iterator it = vec1.begin(); it != vec1.end(); ++it)
+	for (std::vector<Variable<std::string> >::iterator it = vec1.begin(); it != vec1.end(); ++it)
 	{
 		header += it->getName() + ": " + *it->getValue() + "\n\r";
 	}
@@ -474,7 +472,7 @@ std::string Response::writeHeader(void)
 std::string Response::getHeader()
 {
 	std::string header;
-	
+
 	std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
@@ -485,14 +483,14 @@ std::string Response::getHeader()
 
 void Response::keywordFill()
 {
-    _keywordDatabase.insertData(Variable<std::string>("Allow", &this->_allows));
-    _keywordDatabase.insertData(Variable<std::string>("Content-Language", &this->_contentLanguage));
-    _keywordDatabase.insertData(Variable<std::string>("Content-Length", &this->_contentLength));
-    _keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
-    _keywordDatabase.insertData(Variable<std::string>("Content-Type", &this->_contentType));
-    _keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
-    _keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
-    _keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
+	_keywordDatabase.insertData(Variable<std::string>("Allow", &this->_allows));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Language", &this->_contentLanguage));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Length", &this->_contentLength));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Type", &this->_contentType));
+	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
+	_keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
+	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
 }
 
 std::string Response::selectIndex()
@@ -506,41 +504,65 @@ std::string Response::selectIndex()
 	return NULL;
 }
 
+void Response::selectCgiPass()
+{
+	std::string cgiExtensions[3] = {"py", "pl", "php"};
+	std::string cgiNames[3] = {"python", "perl", "php"};
+	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
+	
+	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
+	{
+		for (size_t j = 0; j < 3; j++)
+		{
+			if (_locationScope->getCgiPass()[i].find(cgiNames[j]) != std::string::npos && cgiExtension == cgiExtensions[j])
+			{
+				this->_cgiPass = _locationScope->getCgiPass()[i];
+				return;
+			}
+		}
+	}
+	this->_cgiPass = "";
+}
+
 /********->auto_index<-*******/
 
-std::string         Response::getPage()
+std::string Response::getPage()
 {
-    std::string dirName(_locationRootPath.c_str());
-    DIR *dir = opendir(_locationRootPath.c_str());
-    std::string page =\
-    "<!DOCTYPE html>\n\
+	std::string dirName(_locationRootPath.c_str());
+	DIR *dir = opendir(_locationRootPath.c_str());
+	std::string page =
+		"<!DOCTYPE html>\n\
     <html>\n\
     <head>\n\
-            <title>" + dirName + "</title>\n\
+            <title>" +
+		dirName + "</title>\n\
     </head>\n\
     <body>\n\
     <h1>INDEX</h1>\n\
     <p>\n";
 
-    if (dir == NULL) {
-        std::cerr << RED << "Error: could not open [" << _locationRootPath << "]" << RESET << std::endl;
-        return "";
-    }
-    if (dirName[0] != '/')
-        dirName = "/" + dirName;
-    for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) {
-        page += Response::getLink(std::string(dirEntry->d_name), dirName);
-    }
-    page +="\
+	if (dir == NULL)
+	{
+		std::cerr << RED << "Error: could not open [" << _locationRootPath << "]" << RESET << std::endl;
+		return "";
+	}
+	if (dirName[0] != '/')
+		dirName = "/" + dirName;
+	for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir))
+	{
+		page += Response::getLink(std::string(dirEntry->d_name), dirName);
+	}
+	page += "\
     </p>\n\
     </body>\n\
     </html>\n";
-    closedir(dir);
-    return page;
+	closedir(dir);
+	return page;
 }
 
-std::string         Response::getLink(std::string const &dirEntry, std::string const &dirName) {
-    std::stringstream   ss;
-    ss << "\t\t<p><a href=\"http://" + this->_host << dirName + dirEntry + "\">" + dirEntry + "</a></p>\n";
-    return ss.str();
+std::string Response::getLink(std::string const &dirEntry, std::string const &dirName)
+{
+	std::stringstream ss;
+	ss << "\t\t<p><a href=\"http://" + this->_host << dirName + dirEntry + "\">" + dirEntry + "</a></p>\n";
+	return ss.str();
 }
