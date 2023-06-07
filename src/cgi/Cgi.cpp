@@ -37,7 +37,7 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 	// this->_request = request;
 	// this->_serverScope = serverScope;
 	// this->_response = response;
-	this->_query = _response->getCgiParam();
+	this->_query = _response->getQueries();
 
 	keywordFill();
 
@@ -92,8 +92,9 @@ std::string		Cgi::executeCgi(std::string scriptName)
 	//Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
 	//SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
 
-	std::string loc = _response->getContentLocation();
-	char *cmd[] =  {&scriptName[0], &loc[0], NULL};
+	std::string contentLocation = _response->getContentLocation();
+	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
+
 	pid_t pid = fork();
 	if (pid == -1)
 	{
@@ -161,7 +162,7 @@ void Cgi::keywordFill()
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethod()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethodName()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
