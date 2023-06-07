@@ -36,6 +36,7 @@ class Request : public IRequest
         std::string                         _httpMethodName;
         std::string                         _authScheme;
         std::string                         _authorization;
+        std::string                         _contentDisposition;
         int                                 _returnCode;
         HttpMethod                          _httpMethod;
         DataBase<Variable<std::string> >    _keywordDatabase;
@@ -65,6 +66,7 @@ class Request : public IRequest
         std::string                                 getHttpMethodName();
         std::string                                 getAuthScheme();
         std::string                                 getAuthorization();
+        std::string                                 getContentDisposition();
         std::vector<std::pair<std::string, float> > getAcceptLanguages();
         DataBase<Variable<std::string> >            getKeywordDataBase();
 
