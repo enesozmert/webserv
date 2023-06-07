@@ -28,11 +28,11 @@ private:
     std::string					        _index;
     std::string                         _locationRootPath;
     std::string                         _serverRootPath;
-	std::string					        _cgi_pass;
+	std::string					        _cgiPass;
     std::string                         cgiType;
     std::string					        _error_page;
     std::map<std::string, std::string>	_queries;
-    std::string					        _method;
+    std::string					        _methodName;
     std::string					        _allows;
     std::vector<std::string>		    _allow_methods;
 	std::string					        _contentLanguage;
@@ -44,17 +44,16 @@ private:
 	std::string					        _server;
     std::string                         _host;
     int                                 _port;
-    int                                 _clientBodybufferSize;
+    int                                 _clientBodyBufferSize;
     std::string					        _body;
 	std::string					        _location;
-	std::string					        _retryAfter;
-	std::string					        _transferEncoding;
-	std::string                         _wwwAuthenticate;
     HttpContentType                     _httpContentType;
     HttpStatusCode                      _httpStatusCode;
     DataBase<Variable<std::string> >    _keywordDatabase;
     bool                                _isAutoIndex;
-    std::string                         _raw;
+    Request                             *_request;
+    ServerScope                         *_serverScope;
+    LocationScope                       *_locationScope;
 public:
     Response();
     ~Response();
@@ -65,14 +64,13 @@ public:
     std::string                         getHeader();
     std::string                         getPath();
     std::string                         getBody();
-    std::string                         getMethod();
+    std::string                         getMethodName();
     std::string                         getCgiPass();
     std::map<std::string, std::string>  getQueries();
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
     std::string                         getServerName();
     std::string                         getContentLocation();
-    std::string                         getRaw();
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
@@ -82,7 +80,7 @@ public:
     void                        setAutoIndex(std::string _autoIndex);
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
     void                        setStaticErrorPage();
-    int                         setPaths(ServerScope *server, LocationScope *location, std::string path);
+    int                         setPaths();
     void                        setClientBodyBufferSize(std::string bodyBufferSize);
     int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
     void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
@@ -90,16 +88,18 @@ public:
     void                        keywordFill();
 
 
-    void                        createResponse(Request *request, ServerScope *server, LocationScope *location, std::string raw);
+    void                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope);
     std::string                 notAllowed();
     std::string                 writeHeader(void);
     std::string                 errorHtml();
     void                        readContent();
     std::string                 selectIndex();
 
-    void                        GET_method(Request* request, ServerScope* server);
-    void	                    POST_method(Request* request, ServerScope* server);
-    void	                    DELETE_method();
+    void                        getMethod();
+    void	                    postMethod();
+    void	                    deleteMethod();
+
+    void                 selectCgiPass();
 
     std::string         getLink(std::string const &dirEntry, std::string const &dirName);
     std::string         getPage();

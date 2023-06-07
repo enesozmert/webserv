@@ -19,9 +19,16 @@ CgiScope &CgiScope::operator=(const CgiScope &cgiScope)
     return (*this);
 }
 
-std::string CgiScope::getCgiPass()
+std::vector<std::string> CgiScope::getCgiPass()
 {
-    return (this->_pass);
+    std::istringstream iss(this->_pass);
+    std::vector<std::string> result;
+    std::string keyword;
+
+    while (iss >> std::ws >> keyword) {
+        result.push_back(keyword);
+    }
+    return (result);
 }
 std::string CgiScope::getCgiParam()
 {
