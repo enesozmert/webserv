@@ -345,6 +345,7 @@ void Response::DELETE_method()
 	std::cout << PURPLE << "******DELETE******" << RESET << std::endl;
 	_response = "";
 	this->_path = realpath(".", NULL) + _path;
+	std::cout << PURPLE << "**path***" << _path << RESET << std::endl;
 	if (pathIsFile(_path))
 	{
 		if (remove(_path.c_str()) == 0)

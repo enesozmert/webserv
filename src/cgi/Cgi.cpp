@@ -104,7 +104,6 @@ std::string		Cgi::executeCgi(std::string scriptName)
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
-		//execve(scriptName.c_str(), _response->getContentLocation().c_str(), env);
 		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
