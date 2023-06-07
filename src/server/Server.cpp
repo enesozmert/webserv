@@ -257,7 +257,7 @@ int Server::send(long socket)
 		if (_requests[socket].size() < 1000)
 			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
 		else
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
+			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1500) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
 	}
 
     std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);

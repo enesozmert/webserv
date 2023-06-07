@@ -82,7 +82,8 @@ std::string		Cgi::executeCgi(std::string scriptName)
 	int fdOut = fileno(fOut);
 
 	//if (this->_env["REQUEST_METHOD"] == "POST")
-	write(fdIn, _body.c_str(), _body.size());
+	if (write(fdIn, _body.c_str(), _body.size()) == -1)
+		std::cerr << RED << "write problem" << RESET << std::endl;
 	lseek(fdIn, 0, SEEK_SET);
 	//Daha sonra, lseek() fonksiyonu kullanılarak dosya okuma yazma konumu (offset) ayarlanır.
 	//Bu durumda, lseek(fdIn, 0, SEEK_SET) ifadesi, dosyanın okuma yazma konumunu dosyanın başına (SEEK_SET) taşır.
@@ -90,8 +91,10 @@ std::string		Cgi::executeCgi(std::string scriptName)
 	//İkinci parametre, ayarlanacak konumun byte cinsinden belirtilen offsetidir.
 	//Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
 	//SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
+
 	std::string contentLocation = _response->getContentLocation();
 	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
+
 	pid_t pid = fork();
 	if (pid == -1)
 	{

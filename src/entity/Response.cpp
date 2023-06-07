@@ -57,6 +57,7 @@ std::string Response::getBody()
 	return (this->_body);
 }
 
+
 std::string Response::getMethodName()
 {
 	return (this->_methodName);
@@ -263,6 +264,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	return 0;
 }
 
+
 void Response::createResponse(Request *request, ServerScope *serverScope, LocationScope *locationScope)
 {
 	this->_request = request;
@@ -344,7 +346,10 @@ void Response::getMethod()
 
 void Response::deleteMethod()
 {
+	std::cout << PURPLE << "******DELETE******" << RESET << std::endl;
 	_response = "";
+	this->_path = realpath(".", NULL) + _path;
+	std::cout << PURPLE << "**path***" << _path << RESET << std::endl;
 	if (pathIsFile(_path))
 	{
 		if (remove(_path.c_str()) == 0)

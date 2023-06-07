@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dosya Yükleme Formu</title>
+    <title>Dosya Yukleme Formu</title>
 </head>
 <body>
-    <?php include 'deletefilex.php'; ?>
-    <h1>Dosya Yükleme</h1>
+    <h1>Dosya Yukleme</h1>
     
-    <form method="POST" action="" enctype="multipart/form-data">
-        <label for="file">Dosya Seçin:</label>
+    <form method="POST" action="upload.php" enctype="multipart/form-data">
+        <label for="file">Dosya Secin:</label>
         <input type="file" name="file" id="file" required>
-        <button type="submit">Yükle</button>
+        <button type="submit">Yukle</button>
     </form>
 </body>
 </html>

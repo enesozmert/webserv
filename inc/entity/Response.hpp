@@ -88,7 +88,9 @@ public:
     void                        keywordFill();
 
 
+
     void                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope);
+
     std::string                 notAllowed();
     std::string                 writeHeader(void);
     std::string                 errorHtml();
