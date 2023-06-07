@@ -67,6 +67,7 @@ public:
     std::string                         getBody();
     std::string                         getMethod();
     std::string                         getCgiPass();
+    std::map<std::string, std::string>  getCgiParam();
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
     std::string                         getServerName();
@@ -75,6 +76,7 @@ public:
 
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
+    void                        setCgiParams();
     void	                    setDate();
     void	                    setLastModified();
     void                        setAutoIndex(std::string _autoIndex);

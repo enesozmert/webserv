@@ -37,6 +37,11 @@ std::string Response::getServerName()
 	return (this->_server);
 }
 
+std::map<std::string, std::string>	Response::getCgiParam()
+{
+	return (this->_cgi_params);
+}
+
 std::string Response::getResponse()
 {
 	return (this->_response);
@@ -93,6 +98,44 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 		if (it != methods.end())
 			this->_allows += ", ";
+	}
+}
+
+void Response::setCgiParams()
+{
+	//fname=fatma&lname=ozturk&second=fatma2&Third=fatma3
+	std::cout << "\n_body for cgi param : " << _body << std::endl;
+
+	std::size_t position = 0;
+	while (position < _body.size())
+	{
+		const std::size_t next_delimiter = _body.find('&', position);
+		std::string query;
+		if (next_delimiter == std::string::npos)
+		{
+			query = _body.substr(position);
+		}
+		else
+		{
+			query = _body.substr(position, next_delimiter - position);
+		}
+		const std::size_t pair_delimiter = query.find('=');
+		const std::string name = query.substr(0, pair_delimiter);
+		if (name.empty())
+		{
+			return;
+		}
+		std::string value;
+		if (pair_delimiter != std::string::npos)
+		{
+			value = query.substr(pair_delimiter + 1);
+		}
+		this->_cgi_params[name] = value;
+		if (next_delimiter == std::string::npos)
+		{
+			break;
+		}
+		position = next_delimiter + 1;
 	}
 }
 
@@ -191,9 +234,9 @@ int Response::setPaths(ServerScope *server, LocationScope *location, std::string
 
 void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 {
-	(void)bodyBufferSize;
-	//this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
-	this->_clientBodybufferSize = 4096;
+	this->_clientBodybufferSize = atoi(bodyBufferSize.c_str());
+	if (this->_clientBodybufferSize == 0)
+		this->_clientBodybufferSize = 4096;
 }
 
 void Response::setAutoIndex(std::string _autoIndex)
@@ -326,6 +369,7 @@ void Response::DELETE_method()
 void Response::POST_method(Request *request, ServerScope *server)
 {
 	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
+	setCgiParams();
 	if (this->_cgi_pass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;

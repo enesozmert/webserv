@@ -5,6 +5,7 @@
 import cgi,os ,cgitb
 
 # Create instance of FieldStorage
+form = cgi.FieldStorage()
 
 # Get data crom fields
 fname = os.environ['fname']
