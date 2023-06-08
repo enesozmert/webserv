@@ -43,6 +43,8 @@ private:
 	std::string					        _lastModified;
 	std::string					        _server;
     std::string                         _host;
+    std::string                         _content;
+    std::string                         _contentDisposition;
     int                                 _port;
     int                                 _clientBodyBufferSize;
     std::string					        _body;
@@ -84,6 +86,7 @@ public:
     void                        setClientBodyBufferSize(std::string bodyBufferSize);
     int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
     void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
+    void                        setContentDisposition();
     void                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
     void                        keywordFill();
 

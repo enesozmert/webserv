@@ -57,7 +57,6 @@ std::string Response::getBody()
 	return (this->_body);
 }
 
-
 std::string Response::getMethodName()
 {
 	return (this->_methodName);
@@ -100,6 +99,8 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 void Response::setQueries()
 {
 	std::cout << "_body : " << _body << std::endl;
+	if (_request->getContentDisposition() != "")
+		return;
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -130,6 +131,46 @@ void Response::setQueries()
 			break;
 		}
 		position = next_delimiter + 1;
+	}
+}
+
+void Response::setContentDisposition()
+{
+	std::cout << "_body : " << _body << std::endl;
+	if (_body.find("Content-Disposition: ") != std::string::npos)
+	{
+		this->_contentDisposition = _body.substr(_body.find("Content-Disposition: ") + 26, _body.find("\r\n"));
+		std::size_t pos = _contentDisposition.find_first_of(';');
+		// if (pos == std::string::npos)
+		// {
+		// 	return result; // Hatalı format, boş bir map döndür
+		// }
+
+		std::string nameValuePair = _contentDisposition.substr(pos + 2); // `name=value` kısmı
+		pos = nameValuePair.find_first_of(';');
+		std::string nameValuePair2 = nameValuePair.substr(pos + 2, nameValuePair.size());
+		nameValuePair = nameValuePair.substr(0, pos);
+		//std::cout << CYAN << "nameValuePair = " << nameValuePair << RESET << std::endl;
+		//std::cout << CYAN << "nameValuePair2 = " << nameValuePair2 << RESET << std::endl;
+		
+		std::size_t equalsPos = nameValuePair.find('=');
+		std::size_t posQuotes = nameValuePair.find('\"');
+		// if (equalsPos == std::string::npos)
+		// {
+		// 	return result; // Hatalı format, boş bir map döndür
+		// }
+		std::string key = nameValuePair.substr(0, equalsPos);
+		std::string value = nameValuePair.substr(equalsPos + 2, posQuotes - 1);
+		_queries[key] = value;
+		std::cout << CYAN << key << " " << value << RESET << std::endl;
+
+
+		equalsPos = nameValuePair2.find('=');
+		posQuotes = nameValuePair2.rfind('\"');
+		key = nameValuePair2.substr(0, equalsPos);
+		value = nameValuePair2.substr(equalsPos + 2, posQuotes - equalsPos - 2);
+		_queries[key] = value;
+		std::cout << CYAN << key << " " << value << RESET << std::endl;
 	}
 }
 
@@ -229,7 +270,7 @@ void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 {
 	this->_clientBodyBufferSize = atoi(bodyBufferSize.c_str());
 	if (this->_clientBodyBufferSize == 0)
-		this->_clientBodyBufferSize = 4096;
+		this->_clientBodyBufferSize = _request->getContentLength();
 }
 
 void Response::setAutoIndex(std::string _autoIndex)
@@ -261,9 +302,9 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
+	//setContentDisposition();
 	return 0;
 }
-
 
 void Response::createResponse(Request *request, ServerScope *serverScope, LocationScope *locationScope)
 {
@@ -478,7 +519,7 @@ std::string Response::getHeader()
 {
 	std::string header;
 
-	std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
+	//std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
@@ -496,6 +537,7 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
 	_keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
+	// _keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_server));
 }
 
 std::string Response::selectIndex()
@@ -514,7 +556,7 @@ void Response::selectCgiPass()
 	std::string cgiExtensions[3] = {"py", "pl", "php"};
 	std::string cgiNames[3] = {"python", "perl", "php"};
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
-	
+
 	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
 	{
 		for (size_t j = 0; j < 3; j++)
