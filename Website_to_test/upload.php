@@ -6,9 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo ">>>".basename($_FILES["file"]["name"])."</br>";
     // Dosyayı belirtilen dizine kaydet
     if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
-        echo "Dosya başarıyla yüklendi: " . $fileName;
+        echo "Dosya basariyla yuklendi: " . $fileName;
     } else {
-        echo "Dosya yükleme hatası.";
+        echo "Dosya yukleme hatasi.";
     }
 }
 ?>
