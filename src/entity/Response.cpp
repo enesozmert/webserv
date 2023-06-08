@@ -247,11 +247,11 @@ int Response::setPaths()
 
 	if (trimmed == "/favicon.ico" || trimmed == "favicon.ico")
 		this->_path = "/tests/test1/icon.png";
-
 	if (_locationRootPath != "")
 		this->_path = removeAdjacentSlashes(_locationRootPath + trimmed);
 	else if (_serverRootPath != "" && _locationRootPath == "")
 		this->_path = removeAdjacentSlashes(_serverRootPath + trimmed);
+
 
 	if (!pathIsFile(this->_path)) // gelen path ile eşleşen bir dosya yoksa 0 döner ve içeri girer.
 	{
