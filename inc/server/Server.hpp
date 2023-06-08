@@ -16,7 +16,7 @@
 #include "../function/ServerFunc.hpp"
 
 
-# define RECV_SIZE 65536
+# define RECV_SIZE 4096
 
 class Server {
     private:

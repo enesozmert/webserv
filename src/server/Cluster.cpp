@@ -182,30 +182,30 @@ void Cluster::run()
 	{
 		this->select_return_value = 0;
 		while (select_return_value == 0)
+		{
 			select_section();
-		// select()'ten select_return_value'e değer atandıysa. Yani okuma ya da yazma için bir fd atandı.
-		if (select_return_value > 0)
-		{
-			// ilk başta ready vector'ü boş olduğu için burayı es geçecek.
-			if (ready.size() != 0)
-				send_section();
-			// ilk başta sockets map'i boş olduğu için burayı da es geçecek.
-			else if (sockets.size() != 0)
-				recv_section();
-			else if (servers.size() != 0)
-				accept_section();
+			// select()'ten select_return_value'e değer atandıysa. Yani okuma ya da yazma için bir fd atandı.
+			if (select_return_value > 0)
+			{
+				// ilk başta ready vector'ü boş olduğu için burayı es geçecek.
+				if (ready.size() != 0)
+					send_section();
+				// ilk başta sockets map'i boş olduğu için burayı da es geçecek.
+				else if (sockets.size() != 0)
+					recv_section();
+				else if (servers.size() != 0)
+					accept_section();
+			}
 		}
-		else
-		{
-			std::cerr << "Problem with select !" << std::endl;
-			for (std::map<long, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++)
-				it->second->close(it->first);
-			sockets.clear();
-			ready.clear();
-			FD_ZERO(&fd_master);
-			for (std::map<long, Server>::iterator it = servers.begin(); it != servers.end(); it++)
-				FD_SET(it->first, &fd_master);
-		}
+
+		std::cerr << "Problem with select !" << std::endl;
+		for (std::map<long, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++)
+			it->second->close(it->first);
+		sockets.clear();
+		ready.clear();
+		FD_ZERO(&fd_master);
+		for (std::map<long, Server>::iterator it = servers.begin(); it != servers.end(); it++)
+			FD_SET(it->first, &fd_master);
 	}
 }
 
