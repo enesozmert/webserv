@@ -253,7 +253,7 @@ void Request::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("content-length", &this->_contentLength));
     _keywordDatabase.insertData(Variable<std::string>("auth-scheme", &this->_authScheme));
     _keywordDatabase.insertData(Variable<std::string>("authorization", &this->_authorization));
-    //_keywordDatabase.insertData(Variable<std::string>("content-disposition", &this->_contentDisposition));
+    _keywordDatabase.insertData(Variable<std::string>("content-disposition", &this->_contentDisposition));
 }
 Request* Request::cloneNew() const
 {
