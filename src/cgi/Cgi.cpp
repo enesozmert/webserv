@@ -159,7 +159,9 @@ void Cgi::keywordFill()
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
     //_envDatabase.insertData(CgiVariable<std::string, std::string>("QUERY_STRING", _request->getQueryString()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(this->_body.length())));
+	//std::cout << "_request->getContentType()xx :  " << _request->getContentType() << std::endl;
+	//std::cout << "std::to_string(_request->getContentLength())xx :  " << std::to_string(_request->getContentLength()) << std::endl;
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(_request->getContentLength())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethodName()));
@@ -170,7 +172,10 @@ void Cgi::keywordFill()
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
 	for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
+	{
 		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
+		//std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
+	} 
 }
 
 

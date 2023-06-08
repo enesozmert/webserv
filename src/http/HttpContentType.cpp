@@ -68,6 +68,7 @@ void    HttpContentType::keywordFill()
     _keywordDatabase.insertData(HttpVariable<std::string, std::string>("octet-stream", "application"));
     _keywordDatabase.insertData(HttpVariable<std::string, std::string>("x-www-form-urlencoded", "application"));
     _keywordDatabase.insertData(HttpVariable<std::string, std::string>("jpeg", "image"));
+    _keywordDatabase.insertData(HttpVariable<std::string, std::string>("jpg", "image"));
     _keywordDatabase.insertData(HttpVariable<std::string, std::string>("png", "image"));
     _keywordDatabase.insertData(HttpVariable<std::string, std::string>("gif", "image"));
     _keywordDatabase.insertData(HttpVariable<std::string, std::string>("bmp", "image"));
