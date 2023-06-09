@@ -58,10 +58,7 @@ std::string Request::getIp()
     std::getline(ss, ip, ':');
     return (ip);
 }
-std::string Request::getContentDisposition()
-{
-    return (this->_contentDisposition);
-}
+
 std::vector<std::pair<std::string, float> > Request::getAcceptLanguages()
 {
     std::vector<std::pair<std::string, float> > _languages;
@@ -253,7 +250,6 @@ void Request::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("content-length", &this->_contentLength));
     _keywordDatabase.insertData(Variable<std::string>("auth-scheme", &this->_authScheme));
     _keywordDatabase.insertData(Variable<std::string>("authorization", &this->_authorization));
-    _keywordDatabase.insertData(Variable<std::string>("content-disposition", &this->_contentDisposition));
 }
 Request* Request::cloneNew() const
 {

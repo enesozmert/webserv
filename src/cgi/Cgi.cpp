@@ -175,7 +175,7 @@ void Cgi::keywordFill()
 	{
 		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
 		//std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
-	} 
+	}
 }
 
 

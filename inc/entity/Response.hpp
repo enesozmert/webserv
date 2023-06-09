@@ -35,6 +35,7 @@ private:
     std::string					        _methodName;
     std::string					        _allows;
     std::vector<std::string>		    _allow_methods;
+    std::string                         _contentDisposition;
 	std::string					        _contentLanguage;
 	std::string					        _contentLength;
 	std::string					        _contentLocation;
@@ -44,7 +45,6 @@ private:
 	std::string					        _server;
     std::string                         _host;
     std::string                         _content;
-    std::string                         _contentDisposition;
     int                                 _port;
     int                                 _clientBodyBufferSize;
     std::string					        _body;
@@ -69,6 +69,7 @@ public:
     std::string                         getMethodName();
     std::string                         getCgiPass();
     std::map<std::string, std::string>  getQueries();
+    std::string                         getContentDisposition();
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
     std::string                         getServerName();

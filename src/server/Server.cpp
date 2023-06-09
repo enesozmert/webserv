@@ -269,7 +269,7 @@ int Server::send(long socket)
     while (!sended || send_data_size > 0)
     {
         sended = true;
-        std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);
+        std::string str = response.substr(sent[socket], RECV_SIZE);
         send_data_size = ::send(socket, str.c_str(), str.size(), 0);//gönderilen veri boyutu döner
         std::cout << "send_data_size : " << send_data_size << std::endl;
         sent[socket] += send_data_size;
@@ -281,14 +281,14 @@ int Server::send(long socket)
             break ;
         }
     }
-    if (sent[socket] >= response.size())
+    if (sent[socket] >= _requests[socket].size())
     {
        // _requests.erase(socket); // socketten gönderilen mesajı sileriz
         sent[socket] = 0;
-        if (response.size() < 1000)
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << response << RESET << "]\n" << std::endl;
+        if (_requests[socket].size() < 1000)
+			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
 		else
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << response.substr(0, 1500) << "..." << response.substr(response.size() - 10, 15) << RESET << "]\n" << std::endl;
+			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1500) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
         return (0);
     }
     
