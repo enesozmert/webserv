@@ -1,6 +1,6 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $targetDir = './Website_to_test/uploads/'; // Dosyanın kaydedileceği dizin
+    $targetDir = '/Website_to_test/uploads/'; // Dosyanın kaydedileceği dizin
     $fileName = $_FILES['file']['name'];
     $targetFile = $targetDir . $fileName; // Hedef dosyanın tam yolu
     

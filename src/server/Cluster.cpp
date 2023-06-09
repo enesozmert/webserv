@@ -197,17 +197,16 @@ void Cluster::run()
 					accept_section();
 			}
 		}
-
 		std::cerr << "Problem with select !" << std::endl;
-		for (std::map<long, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++)
-			it->second->close(it->first);
-		sockets.clear();
-		ready.clear();
-		FD_ZERO(&fd_master);
-		for (std::map<long, Server>::iterator it = servers.begin(); it != servers.end(); it++)
-			FD_SET(it->first, &fd_master);
+			for (std::map<long, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++)
+				it->second->close(it->first);
+			sockets.clear();
+			ready.clear();
+			FD_ZERO(&fd_master);
+			for (std::map<long, Server>::iterator it = servers.begin(); it != servers.end(); it++)
+				FD_SET(it->first, &fd_master);
+		}
 	}
-}
 
 void Cluster::cleanServers()
 {

@@ -159,7 +159,7 @@ void Response::setContentDisposition()
 		this->_contentType = _contentTypeTemp.substr(end + 14, end2 - end - 14);
 		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
 		
-		std::string sear(_body);
+		/* std::string sear(_body);
 		size_t i = sear.rfind("Content-Type:");
 		if (i != std::string::npos)
 			i = sear.find("\n", i);
@@ -171,7 +171,7 @@ void Response::setContentDisposition()
 				this->_body = std::string((sear.begin() + i + 3), sear.begin() + j - 2);
 			}
 		//std::cout << CYAN << this->_body << RESET << std::endl;
-		}
+		} */
 		
 	}
 }
@@ -342,7 +342,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	setContentDisposition();
-	setQueries();
+	//setQueries();
 	return 0;
 }
 
@@ -392,10 +392,6 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
-	if (this->statusCode == 200)
-		readContent();
-	else
-		_response = this->errorHtml();
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
@@ -417,6 +413,10 @@ void Response::getMethod()
 			j -= 2;
 		_response = _response.substr(i, j - i);
 	}
+	if (this->statusCode == 200)
+		readContent();
+	else
+		_response = this->errorHtml();
 
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
