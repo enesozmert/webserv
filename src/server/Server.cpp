@@ -264,7 +264,6 @@ int Server::send(long socket)
     bool sended = false;
     std::string response = _requests[socket];
     static std::map<long, size_t> sent;
-
     sent[socket] = 0;
     while (!sended || send_data_size > 0)
     {
@@ -276,10 +275,7 @@ int Server::send(long socket)
         std::cout << "sent[socket] : " << sent[socket] << std::endl;
         str = "";
         if (send_data_size == 0)
-        {
-            this->close(socket);
             break ;
-        }
     }
     if (sent[socket] >= _requests[socket].size())
     {
@@ -290,6 +286,11 @@ int Server::send(long socket)
 		else
 			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1500) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
         return (0);
+    }
+    if (send_data_size == 0)
+    {
+        this->close(socket);
+        _requests.erase(socket); 
     }
     
     /* if (sent.find(socket) == sent.end())
