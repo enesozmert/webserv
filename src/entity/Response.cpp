@@ -26,6 +26,10 @@ std::string Response::getContentLocation()
 {
 	return (this->_contentLocation);
 }
+std::string Response::getContentDisposition()
+{
+    return (this->_contentDisposition);
+}
 
 std::string Response::getPath()
 {
@@ -98,8 +102,7 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setQueries()
 {
-	std::cout << "_body : " << _body << std::endl;
-	if (_request->getContentDisposition() != "")
+	if (getContentDisposition() != "")
 		return;
 	std::size_t position = 0;
 	while (position < _body.size())
@@ -136,42 +139,47 @@ void Response::setQueries()
 
 void Response::setContentDisposition()
 {
-	std::cout << "_body : " << _body << std::endl;
-	if (_body.find("Content-Disposition: ") != std::string::npos)
+    //std::string token;
+	//char delimiter = ';';
+	//size_t i = this->_body.find("\r\n\r\n");
+	std::string	_contentDispositionTemp = this->_body;
+	std::string	_contentTypeTemp = this->_body;
+	if (_body.find("------WebKitFormBoundary") != std::string::npos)
 	{
-		this->_contentDisposition = _body.substr(_body.find("Content-Disposition: ") + 26, _body.find("\r\n"));
-		std::size_t pos = _contentDisposition.find_first_of(';');
-		// if (pos == std::string::npos)
-		// {
-		// 	return result; // Hatalı format, boş bir map döndür
-		// }
+		size_t start = _contentDispositionTemp.find("Content-Disposition: ") + 21;
+		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
+		size_t end2 = _contentTypeTemp.find("\r\n\r\n");
+		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
+		std::cout << CYAN << "this->_contentDisposition: " << this->_contentDisposition << RESET << std::endl;
 
-		std::string nameValuePair = _contentDisposition.substr(pos + 2); // `name=value` kısmı
-		pos = nameValuePair.find_first_of(';');
-		std::string nameValuePair2 = nameValuePair.substr(pos + 2, nameValuePair.size());
-		nameValuePair = nameValuePair.substr(0, pos);
-		//std::cout << CYAN << "nameValuePair = " << nameValuePair << RESET << std::endl;
-		//std::cout << CYAN << "nameValuePair2 = " << nameValuePair2 << RESET << std::endl;
 		
-		std::size_t equalsPos = nameValuePair.find('=');
-		std::size_t posQuotes = nameValuePair.find('\"');
-		// if (equalsPos == std::string::npos)
-		// {
-		// 	return result; // Hatalı format, boş bir map döndür
-		// }
-		std::string key = nameValuePair.substr(0, equalsPos);
-		std::string value = nameValuePair.substr(equalsPos + 2, posQuotes - 1);
-		_queries[key] = value;
-		std::cout << CYAN << key << " " << value << RESET << std::endl;
+		this->_contentType = _contentTypeTemp.substr(end + 14, end2 - end - 14);
+		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
+		
+		std::string sear(_body);
+		size_t i = sear.rfind("Content-Type:");
+		if (i != std::string::npos)
+			i = sear.find("\n", i);
+		if (i != std::string::npos)
+		{
+			size_t j = sear.find("------WebKitFormBoundary", i);
+			if (j != std::string::npos)
+			{
+				this->_body = std::string((sear.begin() + i + 3), sear.begin() + j - 2);
+			}
+		std::cout << CYAN << this->_body << RESET << std::endl;
+		}
+		//this->_body = this->_body.substr(this->_body.find("Content-Disposition: "));
+		/* std::stringstream ss(str);
+		while (std::getline(ss, token, delimiter))
+        	_contentDisposition.push_back(trim(token, " \r\n"));
 
-
-		equalsPos = nameValuePair2.find('=');
-		posQuotes = nameValuePair2.rfind('\"');
-		key = nameValuePair2.substr(0, equalsPos);
-		value = nameValuePair2.substr(equalsPos + 2, posQuotes - equalsPos - 2);
-		_queries[key] = value;
-		std::cout << CYAN << key << " " << value << RESET << std::endl;
+		for (std::vector<std::string>::const_iterator it = _contentDisposition.begin(); it != _contentDisposition.end(); ++it) {
+       		std::cout << CYAN << *it << RESET << std::endl;
+    	} */
 	}
+
+	
 }
 
 void Response::setContentType()
@@ -302,7 +310,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	//setContentDisposition();
+	setContentDisposition();
 	return 0;
 }
 
@@ -537,7 +545,7 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
 	_keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
-	// _keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_server));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
 }
 
 std::string Response::selectIndex()

@@ -29,6 +29,7 @@ class Cgi
         DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
     	std::string							_body;//HTTP istek gövdesi
         std::map<std::string, std::string>  _query;
+        std::vector<std::string>            _contentDispos;
 
     
     public:
