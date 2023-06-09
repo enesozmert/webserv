@@ -150,34 +150,12 @@ void Response::setContentDisposition()
 	{
 		size_t start = _contentDispositionTemp.find("Content-Disposition: ") + 21;
 		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
-		size_t end2 = _contentTypeTemp.find("\r\n\r\n");
 		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
-		std::cout << CYAN << "this->_contentDisposition: " << this->_contentDisposition << RESET << std::endl;
 		parseContentDisposition();
-
-		
-		this->_contentType = _contentTypeTemp.substr(end + 14, end2 - end - 14);
-		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
-		
-		std::string sear(_body);
-		size_t i = sear.rfind("Content-Type:");
-		if (i != std::string::npos)
-			i = sear.find("\n", i);
-		if (i != std::string::npos)
-		{
-			size_t j = sear.find("------WebKitFormBoundary", i);
-			if (j != std::string::npos)
-			{
-				this->_body = std::string((sear.begin() + i + 3), sear.begin() + j - 2);
-			}
-		//std::cout << CYAN << this->_body << RESET << std::endl;
-		}
-		
 	}
 }
 void Response::parseContentDisposition()
 {
-	//form-data; name="file"; filename="icon.png"
 	std::string token;
 	std::string tokenize;
 	std::string key;
@@ -256,7 +234,6 @@ void Response::setLastModified()
 
 void Response::setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex)
 {
-	//_locationIndex ve _serverIndex ayrı ayrı vector olarak al
 	for (std::vector<std::string>::iterator it = _locationIndex.begin(); it != _locationIndex.end(); it++)
 		this->_indexs.push_back(*it);
 	for (std::vector<std::string>::iterator itt = _serverIndex.begin(); itt != _serverIndex.end(); itt++)
@@ -278,10 +255,11 @@ void Response::setLanguage(std::vector<std::pair<std::string, float> > languages
 
 int Response::setPaths()
 {
+	std::string trimmed;
+	
 	this->_serverRootPath = _serverScope->getRoot();
 	this->_locationRootPath = _locationScope->getRoot();
 	this->_index = selectIndex();
-	std::string trimmed;
 	trimmed = trim(_request->getPath(), "\n\r\t ");
 
 	if (trimmed == "/favicon.ico" || trimmed == "favicon.ico")
@@ -292,7 +270,7 @@ int Response::setPaths()
 		this->_path = removeAdjacentSlashes(_serverRootPath + trimmed);
 
 
-	if (!pathIsFile(this->_path)) // gelen path ile eşleşen bir dosya yoksa 0 döner ve içeri girer.
+	if (!pathIsFile(this->_path))
 	{
 		if (_locationRootPath != "")
 			this->_path = removeAdjacentSlashes(_locationRootPath + _index);
@@ -300,8 +278,6 @@ int Response::setPaths()
 			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
 	}
 	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
-	std::cout << YELLOW << "_contentLocation : " << this->_contentLocation << RESET << std::endl;
-	std::cout << YELLOW << "_path : " << this->_path << RESET << std::endl;
 	return 0;
 }
 
@@ -323,7 +299,7 @@ void Response::setAutoIndex(std::string _autoIndex)
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
 {
 	std::cout << YELLOW << "request.getPath() : " << request->getPath() << RESET << std::endl;
-	this->statusCode = request->getReturnCode(); // statusCode 200 olarak initledik. İlk 200 olarak atanacak.
+	this->statusCode = request->getReturnCode();
 	this->_body = request->getBody();
 	this->_server = "webserv";
 	this->_error_page = location->getErrorPage();
@@ -332,12 +308,11 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_port = atoi((server->getPort()).c_str());
 	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
-	// std::cout << YELLOW << "_LANGUAGE : " << this->_contentLanguage << RESET << std::endl;
 	setStaticErrorPage();
 	setDate();
 	setLastModified();
 	setAllowMethods(location->getAllowMethods());
-	setIndexs(location->getIndex(), server->getIndex()); // index yoksa hata mı vermeli?
+	setIndexs(location->getIndex(), server->getIndex());
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
@@ -481,7 +456,6 @@ void Response::postMethod()
 		_response = staticErrorPage[500];
 
 	_response = getHeader() + "\r\n" + _response;
-	// this->_cgiPass = "";
 }
 
 std::string Response::errorHtml()
@@ -558,7 +532,6 @@ std::string Response::getHeader()
 {
 	std::string header;
 
-	//std::cout << "std::to_string(this->_response.size()) : " << std::to_string(this->_response.size()) << std::endl;
 	this->_contentLength = std::to_string(this->_response.size());
 	header = "HTTP/1.1 " + std::to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();

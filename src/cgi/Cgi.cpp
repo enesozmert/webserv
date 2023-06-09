@@ -51,96 +51,88 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 }
 
 
-std::string		Cgi::executeCgi(std::string scriptName) 
+std::string     Cgi::executeCgi(std::string scriptName)
 {
-	std::cout << YELLOW << "cgi scriptName : " << scriptName << RESET << std::endl;
-
-	int			saveStdin= dup(STDIN_FILENO);;
-	int			saveStdout = dup(STDOUT_FILENO);;
-	std::string	newBody;
-
-	char	**env = NULL;
-	try {
-		env = mapToEnvForm(this->_envDatabase.getAllData());//envleri map'ten char **str'ye çeviriyoruz.
-	}
-	catch (const std::bad_alloc& e) {
-		std::cerr << e.what() << std::endl;
-		return "Status: 500\r\n\r\n";
-	}
-
-	// SAVING STDIN AND STDOUT IN ORDER TO TURN THEM BACK TO NORMAL LATER
-	//orijinal stdin ve stdout'u burada tutuyoruz ki kaybetmeyelim.
-	//tmpfile() işlevi, geçici bir dosya oluşturur ve dosya tanımlayıcısı için bir FILE işaretçisi döndürür. 
-	//Bu işlev, geçici dosyaların oluşturulması ve yönetilmesi için kolay bir yol sağlar.
-	//tmpfile() işlevi, oluşturulan dosyanın ismini, konumunu ve boyutunu ayarlar
-	// ve dosya kapandığında otomatik olarak silinir.
-
-	FILE	*fIn = tmpfile();
-	FILE	*fOut = tmpfile();
-	//fileno() işlevi, bir FILE işaretçisine karşılık gelen dosya tanımlayıcısını döndürür.
-	int fdIn = fileno(fIn);
-	int fdOut = fileno(fOut);
-
-	//if (this->_env["REQUEST_METHOD"] == "POST")
-	if (write(fdIn, _body.c_str(), _body.size()) == -1)
-		std::cerr << RED << "write problem" << RESET << std::endl;
-	lseek(fdIn, 0, SEEK_SET);
-	//Daha sonra, lseek() fonksiyonu kullanılarak dosya okuma yazma konumu (offset) ayarlanır.
-	//Bu durumda, lseek(fdIn, 0, SEEK_SET) ifadesi, dosyanın okuma yazma konumunu dosyanın başına (SEEK_SET) taşır.
-	//Bu işlem, sonraki okuma işleminin, dosyanın başlangıcından itibaren yapılmasını sağlar.
-	//İkinci parametre, ayarlanacak konumun byte cinsinden belirtilen offsetidir.
-	//Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
-	//SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
-
-	std::string contentLocation = _response->getContentLocation();
-	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
-
-	pid_t pid = fork();
-	if (pid == -1)
-	{
-		std::cerr << "Fork crashed." << std::endl;
-		return ("Status: 500\r\n\r\n");
-	}
-	else if (!pid)
-	{
-		dup2(fdIn, STDIN_FILENO);
-		dup2(fdOut, STDOUT_FILENO);
-		execve(cmd[0], cmd, env);
-		std::cerr << "Execve crashed." << std::endl;
-		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
-		exit(1);
-	}
-	else
-	{
-		char	buffer[CGI_BUFSIZE] = {0};
-
-		waitpid(-1, NULL, 0);
-		lseek(fdOut, 0, SEEK_SET);
-
-		int ret = 1;
-		while (ret > 0)
-		{
-			memset(buffer, 0, CGI_BUFSIZE);
-			ret = read(fdOut, buffer, CGI_BUFSIZE - 1);
-			newBody += buffer;
-		}
-	}
-
-	dup2(saveStdin, STDIN_FILENO);
-	dup2(saveStdout, STDOUT_FILENO);
-	fclose(fIn);
-	fclose(fOut);
-	close(fdIn);
-	close(fdOut);
-	close(saveStdin);
-	close(saveStdout);
-
-	for (size_t i = 0; env[i]; i++)
-		delete[] env[i];
-	delete[] env;
-
-	std::cout << "********newBody*******\n" << newBody << std::endl;
-	return (newBody);
+    std::cout << YELLOW << "cgi scriptName : " << scriptName << RESET << std::endl;
+    int         saveStdin= dup(STDIN_FILENO);;
+    int         saveStdout = dup(STDOUT_FILENO);;
+    std::string newBody;
+    char    **env = NULL;
+    try {
+        env = mapToEnvForm(this->_envDatabase.getAllData());//envleri map'ten char **str'ye çeviriyoruz.
+    }
+    catch (const std::bad_alloc& e) {
+        std::cerr << e.what() << std::endl;
+        return "Status: 500\r\n\r\n";
+    }
+    // SAVING STDIN AND STDOUT IN ORDER TO TURN THEM BACK TO NORMAL LATER
+    //orijinal stdin ve stdout'u burada tutuyoruz ki kaybetmeyelim.
+    //tmpfile() işlevi, geçici bir dosya oluşturur ve dosya tanımlayıcısı için bir FILE işaretçisi döndürür.
+    //Bu işlev, geçici dosyaların oluşturulması ve yönetilmesi için kolay bir yol sağlar.
+    //tmpfile() işlevi, oluşturulan dosyanın ismini, konumunu ve boyutunu ayarlar
+    // ve dosya kapandığında otomatik olarak silinir.
+    FILE    *fIn = tmpfile();
+    FILE    *fOut = tmpfile();
+    //fileno() işlevi, bir FILE işaretçisine karşılık gelen dosya tanımlayıcısını döndürür.
+    int fdIn = fileno(fIn);
+    int fdOut = fileno(fOut);
+    fcntl(fdIn, F_SETFL, O_NONBLOCK);
+    fcntl(fdOut, F_SETFL, O_NONBLOCK);
+    //if (this->_env["REQUEST_METHOD"] == "POST")
+    if (write(fdIn, _body.c_str(), _body.size()) == -1)
+        std::cerr << RED << "write problem" << RESET << std::endl;
+    lseek(fdIn, 0, SEEK_SET);
+    //Daha sonra, lseek() fonksiyonu kullanılarak dosya okuma yazma konumu (offset) ayarlanır.
+    //Bu durumda, lseek(fdIn, 0, SEEK_SET) ifadesi, dosyanın okuma yazma konumunu dosyanın başına (SEEK_SET) taşır.
+    //Bu işlem, sonraki okuma işleminin, dosyanın başlangıcından itibaren yapılmasını sağlar.
+    //İkinci parametre, ayarlanacak konumun byte cinsinden belirtilen offsetidir.
+    //Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir.
+    //SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
+    std::string contentLocation = _response->getContentLocation();
+    char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
+    pid_t pid = fork();
+    if (pid == -1)
+    {
+        std::cerr << "Fork crashed." << std::endl;
+        return ("Status: 500\r\n\r\n");
+    }
+    else if (!pid)
+    {
+        dup2(fdIn, STDIN_FILENO);
+        dup2(fdOut, STDOUT_FILENO);
+        close(fdIn);
+        close(fdOut);
+        execve(cmd[0], cmd, env);
+        std::cerr << "Execve crashed." << std::endl;
+        write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
+        exit(1);
+    }
+    else
+    {
+        char    buffer[CGI_BUFSIZE] = {0};
+        waitpid(-1, NULL, 0);
+        lseek(fdOut, 0, SEEK_SET);
+        int ret = 1;
+        while (ret > 0)
+        {
+            memset(buffer, 0, CGI_BUFSIZE);
+            ret = read(fdOut, buffer, CGI_BUFSIZE - 1);
+            newBody += buffer;
+        }
+    }
+    dup2(saveStdin, STDIN_FILENO);
+    dup2(saveStdout, STDOUT_FILENO);
+    close(saveStdout);
+    close(saveStdin);
+    fclose(fIn);
+    fclose(fOut);
+    close(fdIn);
+    close(fdOut);
+    for (size_t i = 0; env[i]; i++)
+        delete[] env[i];
+    delete[] env;
+    std::cout << "********newBody*******\n" << newBody << std::endl;
+    return (newBody);
 }
 
 DataBase<CgiVariable<std::string, std::string> > Cgi::getEnvDataBase()
@@ -157,7 +149,7 @@ void Cgi::keywordFill()
 {
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getCgiPass()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _response->getContentType()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(_request->getContentLength())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
@@ -171,8 +163,7 @@ void Cgi::keywordFill()
 	for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
 	{
 		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
-		//std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
+		std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
 	}
 }
-
 

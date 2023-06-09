@@ -285,42 +285,13 @@ int Server::send(long socket)
 			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
 		else
 			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1500) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
-        return (0);
+        // return (0);
     }
     if (send_data_size == 0)
     {
         this->close(socket);
         _requests.erase(socket); 
     }
-    
-    /* if (sent.find(socket) == sent.end())
-        sent[socket] = 0; */
-    
-/*     if (1 && sent[socket] == 0)
-	{
-		if (_requests[socket].size() < 1000)
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
-		else
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1500) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
-	} */
-
-    //std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);
-    //std::cout << PURPLE << "str = " << str << RESET << std::endl;
-    //int SentData = ::send(socket, str.c_str(), str.size(), 0);//gönderilen veri boyutu döner
-
- /*    if (send_data_size == -1)
-    {
-        this->close(socket);
-        sent[socket] = 0;
-        return (-1);
-    } */
-    //sent[socket] += send_data_size; // ret gönderilmiş veri bunu sent[socket] eklediğimizde aşağıda karşılaştırma yapabiliriz
-/*     if (sent[socket] >= _requests[socket].size())
-    {
-        _requests.erase(socket); // socketten gönderilen mesajı sileriz
-        sent[socket] = 0;
-        return (0);
-    } */
     return (-1);
 }
 
@@ -337,11 +308,6 @@ void Server::clean()
         ::close(fd);
     fd = -1;
 }
-
-
-
-/****************************************************************/
-
 
 ServerScope*        Server::getServerForRequest(t_listen& address, HttpScope* http)
 {
@@ -364,9 +330,6 @@ void  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::
     this->locationScopeIndex = 0;
 
     this->locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-   // std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
     if(this->locationScopeIndex == -1)
         std::cerr << RED << "There is no possible location" << RESET << std::endl;
-    //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
-    //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
 }

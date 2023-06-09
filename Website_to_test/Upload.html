@@ -1,16 +1,35 @@
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $targetDir = './Website_to_test/Upload/'; // Dosyanın kaydedileceği dizin
+    $fileName = $_FILES['file']['name'];
+    $targetFile = $targetDir . $fileName; // Hedef dosyanın tam yolu
+    
+    if (file_exists($targetDir))
+    {
+        echo "Valla klasor var";
+    }
+    else
+        echo "Valla klasor yok";
+
+    echo "file name : " . $fileName;
+    // Dosyayı belirtilen dizine kaydet
+    if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+        echo "Dosya basarıyla yuklendi: " . $fileName;
+    } else {
+        echo "Dosya yukleme hatasi.";
+    }
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Resim Yukleme Formu</title>
+    <title>Resim Yükle</title>
 </head>
 <body>
-    <h1>Resim Yukleme</h1>
-    
-    <form method="post" action="upload.php" enctype="multipart/form-data">
-        <label for="file">Resim Seciniz:</label>
-        <input type="file" name="file" id="file" required>
-        <button type="submit">Yukle</button>
+    <h1>Resim Yükle</h1>
+    <form action="upload.php" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Yükle">
     </form>
 </body>
 </html>
-
