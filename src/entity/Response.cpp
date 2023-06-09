@@ -31,6 +31,11 @@ std::string Response::getContentDisposition()
     return (this->_contentDisposition);
 }
 
+std::string Response::getContentType()
+{
+    return (this->_contentType);
+}
+
 std::string Response::getPath()
 {
 	return (this->_path);
@@ -139,9 +144,6 @@ void Response::setQueries()
 
 void Response::setContentDisposition()
 {
-    //std::string token;
-	//char delimiter = ';';
-	//size_t i = this->_body.find("\r\n\r\n");
 	std::string	_contentDispositionTemp = this->_body;
 	std::string	_contentTypeTemp = this->_body;
 	if (_body.find("------WebKitFormBoundary") != std::string::npos)
@@ -151,6 +153,7 @@ void Response::setContentDisposition()
 		size_t end2 = _contentTypeTemp.find("\r\n\r\n");
 		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
 		std::cout << CYAN << "this->_contentDisposition: " << this->_contentDisposition << RESET << std::endl;
+		parseContentDisposition();
 
 		
 		this->_contentType = _contentTypeTemp.substr(end + 14, end2 - end - 14);
@@ -167,19 +170,47 @@ void Response::setContentDisposition()
 			{
 				this->_body = std::string((sear.begin() + i + 3), sear.begin() + j - 2);
 			}
-		std::cout << CYAN << this->_body << RESET << std::endl;
+		//std::cout << CYAN << this->_body << RESET << std::endl;
 		}
-		//this->_body = this->_body.substr(this->_body.find("Content-Disposition: "));
-		/* std::stringstream ss(str);
-		while (std::getline(ss, token, delimiter))
-        	_contentDisposition.push_back(trim(token, " \r\n"));
-
-		for (std::vector<std::string>::const_iterator it = _contentDisposition.begin(); it != _contentDisposition.end(); ++it) {
-       		std::cout << CYAN << *it << RESET << std::endl;
-    	} */
+		
 	}
-
+}
+void Response::parseContentDisposition()
+{
+	//form-data; name="file"; filename="icon.png"
+	std::string token;
+	std::string tokenize;
+	std::string key;
+	std::string value;
+	char delimiter = ';';
+	std::string tmp = this->_contentDisposition;
+	std::stringstream ss(tmp);
+   
+    while (std::getline(ss, token, delimiter))
+    {
+        tokenize = trim(token, " \r\n");
+		std::cout << "tokenize: " << tokenize << std::endl;
+		if (tokenize.find("filename=") != std::string::npos)
+		{
+			value = tokenize.substr(tokenize.find("filename=") + 10);
+			value = trim(value, "\"");
+			_queries["filename"] = value;
+			std::cout << "filename value: " << value << std::endl;
+		}
+		else if (tokenize.find("name=") != std::string::npos)
+		{
+			value = tokenize.substr(tokenize.find("name=") + 6);
+			value = trim(value, "\"");
+			_queries["name"] = value;
+			std::cout << "name value: " << value << std::endl;
+		}
+		
+    }
 	
+	for (std::map<std::string, std::string>::const_iterator it = _queries.begin(); it != _queries.end(); it++) {
+    	std::cout << CYAN << (it)->first << "=" << (it)->second << RESET << std::endl;
+    }
+
 }
 
 void Response::setContentType()
@@ -311,6 +342,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	setContentDisposition();
+	setQueries();
 	return 0;
 }
 
@@ -417,8 +449,7 @@ void Response::deleteMethod()
 void Response::postMethod()
 {
 	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
-	setQueries();
-	// this->_cgiPass = _locationScope->getCgiPass()[0];
+	std::cout << PURPLE << "cgi_pass" << this->_cgiPass << RESET << std::endl;
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;

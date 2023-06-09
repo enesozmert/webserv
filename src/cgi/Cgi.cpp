@@ -19,7 +19,7 @@ Cgi& Cgi::operator=(const Cgi &cgi)
 
 Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _request(request), _response(response), _serverScope(serverScope), _body(response->getBody())
 {
-	std::cout << "*******old_body******\n " << _body << std::endl;
+	//std::cout << "*******old_body******\n " << _body << std::endl;
 	// this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
 	// this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
 	// this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
@@ -157,10 +157,7 @@ void Cgi::keywordFill()
 {
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getCgiPass()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
-    //_envDatabase.insertData(CgiVariable<std::string, std::string>("QUERY_STRING", _request->getQueryString()));
-	//std::cout << "_request->getContentType()xx :  " << _request->getContentType() << std::endl;
-	//std::cout << "std::to_string(_request->getContentLength())xx :  " << std::to_string(_request->getContentLength()) << std::endl;
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _response->getContentType()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(_request->getContentLength())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));

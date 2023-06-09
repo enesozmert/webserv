@@ -66,6 +66,7 @@ public:
     std::string                         getHeader();
     std::string                         getPath();
     std::string                         getBody();
+    std::string                         getContentType();
     std::string                         getMethodName();
     std::string                         getCgiPass();
     std::map<std::string, std::string>  getQueries();
@@ -100,6 +101,7 @@ public:
     std::string                 errorHtml();
     void                        readContent();
     std::string                 selectIndex();
+    void                        parseContentDisposition();
 
     void                        getMethod();
     void	                    postMethod();
