@@ -53,6 +53,106 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 
 std::string		Cgi::executeCgi(std::string scriptName) 
 {
+	// int pip[2];
+    // int ret = 0;
+    // pid_t child = 0;
+    // pid_t parent = 0;
+	// int checke_prob = 0;
+    // int fd = open("tmp", O_CREAT | O_TRUNC | O_WRONLY | O_NONBLOCK, 0777);
+
+    // int checke_Cwrite = write(fd, _body.c_str(), _body.size());
+	// if (checke_Cwrite == 0)
+	// {
+	// 	checke_prob = 0;
+	// }
+	// else if (checke_Cwrite == -1)
+	// {
+	// 	checke_prob = -1;
+	// }
+	// close(fd);
+
+
+	// char	**env = NULL;
+	// try {
+	// 	env = mapToEnvForm(this->_envDatabase.getAllData());//envleri map'ten char **str'ye çeviriyoruz.
+	// }
+	// catch (const std::bad_alloc& e) {
+	// 	std::cerr << e.what() << std::endl;
+	// 	return "Status: 500\r\n\r\n";
+	// }
+	//  for (int i = 0; env[i] != nullptr; ++i) {
+    //     std::cout << RED << env[i] << RESET << std::endl;
+    // }
+
+	// char *echo[3] = {(char *)"cat", (char *)"tmp", NULL};
+
+	// std::string contentLocation = _response->getContentLocation();
+	// std::cout << "contentLocation" << contentLocation << std::endl;
+    // char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
+    // if (pipe(pip) == -1)
+    // {
+    //     perror("CGI part : Pipe failed");
+    //     exit(1);
+    // }
+    // child = fork();
+    // int tmp = open(".tmp", O_CREAT | O_TRUNC | O_NONBLOCK | O_RDWR, 0777);
+	// if (child == -1)
+    // {
+    //     std::cerr << "Fork failed" << std::endl;
+	// 	return ("Status: 500\r\n\r\n");
+    // }
+    // else if (!child)
+    // {
+    //     dup2(pip[1], 1);
+    //     close(pip[0]);
+    //     ret = execvp(echo[0], echo);
+    // }
+    // else
+    // {
+    //     int status2;
+
+    //     wait(&status2);
+    //     parent = fork();
+    //     if (!parent)
+    //     {
+    //         dup2(pip[0], 0);
+    //         dup2(tmp, 1);
+    //         close(pip[1]);
+    //         ret = execve(cmd[0], cmd, env);
+    //     }
+    //     else
+    //     {
+    //         int status;
+
+    //         wait(&status);
+    //         close(pip[0]);
+    //         close(pip[1]);
+    //         close(tmp);
+
+    //         usleep(100000);
+
+    //         tmp = open(".tmp", O_NONBLOCK | O_RDONLY);
+
+    //         char buf[65535];
+    //         bzero(buf, 65535);
+    //         int checkRead = read(tmp, buf, 65535);
+	// 		if (checkRead == 0)
+	// 			checke_prob = 0;
+	// 		else if (checkRead == -1)
+	// 			checke_prob = -1;
+    //         close(tmp);
+    //         _body = std::string(buf);
+    //         remove("tmp");
+    //         remove(".tmp");
+
+    //         delete[] env;
+    //         return (_body);
+    //     }
+    // }
+
+    // delete[] env;
+    // return _body;
+
 	std::cout << YELLOW << "cgi scriptName : " << scriptName << RESET << std::endl;
 
 	int			saveStdin= dup(STDIN_FILENO);;
@@ -69,28 +169,31 @@ std::string		Cgi::executeCgi(std::string scriptName)
 	}
 
 	// SAVING STDIN AND STDOUT IN ORDER TO TURN THEM BACK TO NORMAL LATER
-	//orijinal stdin ve stdout'u burada tutuyoruz ki kaybetmeyelim.
-	//tmpfile() işlevi, geçici bir dosya oluşturur ve dosya tanımlayıcısı için bir FILE işaretçisi döndürür. 
-	//Bu işlev, geçici dosyaların oluşturulması ve yönetilmesi için kolay bir yol sağlar.
-	//tmpfile() işlevi, oluşturulan dosyanın ismini, konumunu ve boyutunu ayarlar
+	// orijinal stdin ve stdout'u burada tutuyoruz ki kaybetmeyelim.
+	// tmpfile() işlevi, geçici bir dosya oluşturur ve dosya tanımlayıcısı için bir FILE işaretçisi döndürür. 
+	// Bu işlev, geçici dosyaların oluşturulması ve yönetilmesi için kolay bir yol sağlar.
+	// tmpfile() işlevi, oluşturulan dosyanın ismini, konumunu ve boyutunu ayarlar
 	// ve dosya kapandığında otomatik olarak silinir.
 
 	FILE	*fIn = tmpfile();
 	FILE	*fOut = tmpfile();
-	//fileno() işlevi, bir FILE işaretçisine karşılık gelen dosya tanımlayıcısını döndürür.
+	// fileno() işlevi, bir FILE işaretçisine karşılık gelen dosya tanımlayıcısını döndürür.
 	int fdIn = fileno(fIn);
 	int fdOut = fileno(fOut);
+	fcntl(fdIn, F_SETFL, O_NONBLOCK);
+	fcntl(fdOut, F_SETFL, O_NONBLOCK);
+	
 
-	//if (this->_env["REQUEST_METHOD"] == "POST")
+	// if (this->_env["REQUEST_METHOD"] == "POST")
 	if (write(fdIn, _body.c_str(), _body.size()) == -1)
 		std::cerr << RED << "write problem" << RESET << std::endl;
 	lseek(fdIn, 0, SEEK_SET);
-	//Daha sonra, lseek() fonksiyonu kullanılarak dosya okuma yazma konumu (offset) ayarlanır.
-	//Bu durumda, lseek(fdIn, 0, SEEK_SET) ifadesi, dosyanın okuma yazma konumunu dosyanın başına (SEEK_SET) taşır.
-	//Bu işlem, sonraki okuma işleminin, dosyanın başlangıcından itibaren yapılmasını sağlar.
-	//İkinci parametre, ayarlanacak konumun byte cinsinden belirtilen offsetidir.
-	//Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
-	//SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
+	// Daha sonra, lseek() fonksiyonu kullanılarak dosya okuma yazma konumu (offset) ayarlanır.
+	// Bu durumda, lseek(fdIn, 0, SEEK_SET) ifadesi, dosyanın okuma yazma konumunu dosyanın başına (SEEK_SET) taşır.
+	// Bu işlem, sonraki okuma işleminin, dosyanın başlangıcından itibaren yapılmasını sağlar.
+	// İkinci parametre, ayarlanacak konumun byte cinsinden belirtilen offsetidir.
+	// Üçüncü parametre ise, offsetin nereye göre belirleneceğini belirten bir sabittir. 
+	// SEEK_SET, offsetin dosyanın başından itibaren belirlendiğini gösterir.
 
 	std::string contentLocation = _response->getContentLocation();
 	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
@@ -105,6 +208,8 @@ std::string		Cgi::executeCgi(std::string scriptName)
 	{
 		dup2(fdIn, STDIN_FILENO);
 		dup2(fdOut, STDOUT_FILENO);
+		close(fdIn);
+		close(fdOut);
 		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
@@ -128,12 +233,12 @@ std::string		Cgi::executeCgi(std::string scriptName)
 
 	dup2(saveStdin, STDIN_FILENO);
 	dup2(saveStdout, STDOUT_FILENO);
+	close(saveStdout);
+	close(saveStdin);
 	fclose(fIn);
 	fclose(fOut);
 	close(fdIn);
 	close(fdOut);
-	close(saveStdin);
-	close(saveStdout);
 
 	for (size_t i = 0; env[i]; i++)
 		delete[] env[i];

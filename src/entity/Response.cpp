@@ -194,14 +194,14 @@ void Response::parseContentDisposition()
 		{
 			value = tokenize.substr(tokenize.find("filename=") + 10);
 			value = trim(value, "\"");
-			_queries["filename"] = value;
+			_queries.insert(std::pair<std::string, std::string>("filename",value));
 			std::cout << "filename value: " << value << std::endl;
 		}
 		else if (tokenize.find("name=") != std::string::npos)
 		{
 			value = tokenize.substr(tokenize.find("name=") + 6);
 			value = trim(value, "\"");
-			_queries["name"] = value;
+			_queries.insert(std::pair<std::string, std::string>("name",value));
 			std::cout << "name value: " << value << std::endl;
 		}
 		
@@ -342,7 +342,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	setContentDisposition();
-	//setQueries();
+	setQueries();
 	return 0;
 }
 
