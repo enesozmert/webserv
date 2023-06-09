@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #include "../entity/CgiVariable.hpp"
 #include "../entity/HttpScope.hpp"

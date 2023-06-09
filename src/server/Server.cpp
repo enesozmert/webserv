@@ -84,7 +84,10 @@ long Server::accept(void)
 
     client_fd = ::accept(fd, NULL, NULL); // client_fd üzerinden iletişim kurulabilir.
     if (client_fd == -1)
+    {
         std::cerr << RED << "Could not create socket. " << RESET << std::endl;
+        return(-1);
+    }
     fcntl(client_fd, F_SETFL, O_NONBLOCK); // socket ayarlarını bloklanmamış olarak değiştiriyoruz.
     _requests.insert(std::make_pair(client_fd, ""));
     return (client_fd);
@@ -103,7 +106,7 @@ void    Server::process(long socket, HttpScope* http)
     if (_requests[socket].size() < 1000)//request ekrana basıyoruz
         std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << RESET << std::endl;
     else
-        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << "]" << RESET << std::endl;
+        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << "]" << RESET << std::endl;
 
     if (_requests[socket] != "")
     {
@@ -199,10 +202,8 @@ int Server::recv(long socket)
 {
     std::cout << YELLOW <<  "\nReceiving..." << RESET << std::endl;
     int recieved_data_size = 0;
-    size_t len = 0;
     bool received = false;
     char buffer[RECV_SIZE] = {0};
-    //recieved_data_size = ::recv(socket, buffer, RECV_SIZE - 1, 0); // Recieved alınan veri boyutu
 
     while(!received || recieved_data_size > 0)
     {
@@ -214,36 +215,7 @@ int Server::recv(long socket)
         memset(buffer, 0, sizeof(buffer));
         if (recieved_data_size < RECV_SIZE - 1)
             break;
-    }
-    std::cout << "_requests size total : " << _requests[socket].length() << std::endl;
-    //_requests[socket] += std::string(buffer); // bufferda tutulan alınmış veriyi _requests[socket] değeri olarak ekliyoruz.
-
-    size_t i = _requests[socket].find("\r\n\r\n"); //"\\r\\n\\r\\n" (HTTP istek başlığı ve gövdesi arasındaki ayırıcı) bu konumun indeksi i
-    if (i != std::string::npos)                   // std::string::npos olmayan bir i değişkeni, _requests[socket] öğesinde "\\r\\n\\r\\n" ifadesinin bulunduğu konumu temsil eder
-    {
-        if (_requests[socket].find("Content-Length: ") == std::string::npos) //"Content-Length: " bulunduysa
-        {
-            if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos) //"Transfer-Encoding: chunked" bulunmadıysa
-            {
-                if (_requests[socket].compare(_requests[socket].length() - 5, 5, "0\r\n\r\n") == 0)
-                    return (0);
-                else
-                    return (1);
-            }
-            else
-                return (0);
-        }
-        // content-length başladığı yere indeks döndürürsek oradan karşılık gelen değeri substr ile çekiyoruz.
-        len = std::atoi(_requests[socket].substr(_requests[socket].find("Content-Length: ") + 16, 10).c_str());
-        // i-->istek başlığı uzunluğu
-        // len-->istek gövdesi uzunluğu
-        //"\\r\\n\\r\\n"-->4 seperator bunları toplayıp isteğin hepsi elimize ulaştı mı kontrol ederiz
-        if (_requests[socket].size() >= len + i + 4)
-            return (0);
-        else
-            return (1);
-    }
-
+    } 
     if (recieved_data_size == 0 || recieved_data_size == -1)
     {
         this->close(socket);
@@ -253,8 +225,7 @@ int Server::recv(long socket)
             std::cout << RED << "\rRead error, closing connection.\n" << RESET << std::endl;
         return (-1);
     }
-
-    return (1);
+    return (0);
 }
 
 int Server::send(long socket)
@@ -269,59 +240,29 @@ int Server::send(long socket)
     {
         sended = true;
         std::string str = response.substr(sent[socket], RECV_SIZE);
-        send_data_size = ::send(socket, str.c_str(), str.size(), 0);//gönderilen veri boyutu döner
+        send_data_size = ::send(socket, str.c_str(), str.size(), 0);
+        if (send_data_size == -1)
+            return (-1);
         std::cout << "send_data_size : " << send_data_size << std::endl;
         sent[socket] += send_data_size;
         std::cout << "sent[socket] : " << sent[socket] << std::endl;
         str = "";
-        if (send_data_size == 0)
+        if (send_data_size == 0 || send_data_size == -1)
             break ;
     }
     if (sent[socket] >= _requests[socket].size())
     {
-       // _requests.erase(socket); // socketten gönderilen mesajı sileriz
-        sent[socket] = 0;
-        if (_requests[socket].size() < 1000)
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
+        if (_requests[socket].size() < 500)
+			std::cout << GREEN << "\rResponse :                " << std::endl << "[" << _requests[socket] << RESET << "]\n" << RESET << std::endl;
 		else
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1500) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
-        return (0);
+			std::cout << GREEN << "\rResponse :                " << std::endl << "[" << _requests[socket].substr(0, 500) << "..." << "]\n" << RESET << std::endl;
     }
-    if (send_data_size == 0)
-    {
-        this->close(socket);
-        _requests.erase(socket); 
-    }
-    
-    /* if (sent.find(socket) == sent.end())
-        sent[socket] = 0; */
-    
-/*     if (1 && sent[socket] == 0)
-	{
-		if (_requests[socket].size() < 1000)
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
-		else
-			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1500) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
-	} */
-
-    //std::string str = _requests[socket].substr(sent[socket], RECV_SIZE);
-    //std::cout << PURPLE << "str = " << str << RESET << std::endl;
-    //int SentData = ::send(socket, str.c_str(), str.size(), 0);//gönderilen veri boyutu döner
-
- /*    if (send_data_size == -1)
-    {
-        this->close(socket);
-        sent[socket] = 0;
+    sent[socket] = 0;
+    this->close(socket);
+    _requests.erase(socket); 
+    if (send_data_size == -1)
         return (-1);
-    } */
-    //sent[socket] += send_data_size; // ret gönderilmiş veri bunu sent[socket] eklediğimizde aşağıda karşılaştırma yapabiliriz
-/*     if (sent[socket] >= _requests[socket].size())
-    {
-        _requests.erase(socket); // socketten gönderilen mesajı sileriz
-        sent[socket] = 0;
-        return (0);
-    } */
-    return (-1);
+    return 0;
 }
 
 void Server::close(int socket)
