@@ -152,6 +152,25 @@ void Response::setContentDisposition()
 		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
 		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
 		parseContentDisposition();
+
+		
+		this->_contentType = _contentTypeTemp.substr(end + 14, end2 - end - 14);
+		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
+		
+		/* std::string sear(_body);
+		size_t i = sear.rfind("Content-Type:");
+		if (i != std::string::npos)
+			i = sear.find("\n", i);
+		if (i != std::string::npos)
+		{
+			size_t j = sear.find("------WebKitFormBoundary", i);
+			if (j != std::string::npos)
+			{
+				this->_body = std::string((sear.begin() + i + 3), sear.begin() + j - 2);
+			}
+		//std::cout << CYAN << this->_body << RESET << std::endl;
+		} */
+		
 	}
 }
 void Response::parseContentDisposition()
@@ -172,14 +191,14 @@ void Response::parseContentDisposition()
 		{
 			value = tokenize.substr(tokenize.find("filename=") + 10);
 			value = trim(value, "\"");
-			_queries["filename"] = value;
+			_queries.insert(std::pair<std::string, std::string>("filename",value));
 			std::cout << "filename value: " << value << std::endl;
 		}
 		else if (tokenize.find("name=") != std::string::npos)
 		{
 			value = tokenize.substr(tokenize.find("name=") + 6);
 			value = trim(value, "\"");
-			_queries["name"] = value;
+			_queries.insert(std::pair<std::string, std::string>("name",value));
 			std::cout << "name value: " << value << std::endl;
 		}
 		
@@ -367,10 +386,6 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
-	if (this->statusCode == 200)
-		readContent();
-	else
-		_response = this->errorHtml();
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
@@ -392,6 +407,10 @@ void Response::getMethod()
 			j -= 2;
 		_response = _response.substr(i, j - i);
 	}
+	if (this->statusCode == 200)
+		readContent();
+	else
+		_response = this->errorHtml();
 
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];

@@ -26,10 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Resim Yükle</title>
 </head>
 <body>
+<<<<<<< HEAD
     <h1>Resim Yükle</h1>
     <form action="upload.php" method="post" enctype="multipart/form-data">
         <input type="file" name="file">
         <input type="submit" value="Yükle">
+=======
+    <h1>Resim Yukleme</h1>
+    
+    <form method="POST" action="upload.php" enctype="multipart/form-data">
+        <label for="file">Resim Seciniz:</label>
+        <input type="file" name="file" id="file" required>
+        <button type="submit">Yukle</button>
+>>>>>>> 298ec2cc5de078592769621638fb8c598b7de997
     </form>
 </body>
 </html>
