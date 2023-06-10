@@ -263,7 +263,7 @@ void Cgi::keywordFill()
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getCgiPass()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(_request->getContentLength())));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(_request->getContentLength())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethodName()));

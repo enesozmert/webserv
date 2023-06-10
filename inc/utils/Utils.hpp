@@ -156,8 +156,15 @@ inline std::string getPwd()
 	char cwd[256];
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
     {
-        perror("getcwd() error");
         exit(1);
     }
 	return (std::string(cwd));
+}
+
+template <typename T>
+std::string to_string(const T& value)
+{
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
 }
