@@ -107,8 +107,6 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setQueries()
 {
-	if (getContentDisposition() != "")
-		return;
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -151,25 +149,9 @@ void Response::setContentDisposition()
 		size_t start = _contentDispositionTemp.find("Content-Disposition: ") + 21;
 		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
 		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
-		parseContentDisposition();
-
-		
+		this->_contentType = "multipart/form-data";
+		// parseContentDisposition();
 		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
-		
-		/* std::string sear(_body);
-		size_t i = sear.rfind("Content-Type:");
-		if (i != std::string::npos)
-			i = sear.find("\n", i);
-		if (i != std::string::npos)
-		{
-			size_t j = sear.find("------WebKitFormBoundary", i);
-			if (j != std::string::npos)
-			{
-				this->_body = std::string((sear.begin() + i + 3), sear.begin() + j - 2);
-			}
-		//std::cout << CYAN << this->_body << RESET << std::endl;
-		} */
-		
 	}
 }
 void Response::parseContentDisposition()
