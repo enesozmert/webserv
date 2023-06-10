@@ -154,7 +154,6 @@ void Response::setContentDisposition()
 		parseContentDisposition();
 
 		
-		this->_contentType = _contentTypeTemp.substr(end + 14, end2 - end - 14);
 		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
 		
 		/* std::string sear(_body);
