@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Resim Yukleme Formu</title>
+  <title>Veri Gönderme Formu</title>
 </head>
 <body>
-    <h1>Resim Yukleme</h1>
-    
-    <form method="POST" action="upload.php" enctype="multipart/form-data">
-        <label for="file">Resim Seciniz:</label>
-        <input type="file" name="file" id="file" required>
-        <button type="submit">Yukle</button>
-    </form>
+  <form action="upload.php" method="post">
+    <label for="say">Sayı:</label>
+    <input type="text" name="say" id="say"><br>
+
+    <label for="to">Hedef:</label>
+    <input type="text" name="to" id="to"><br>
+
+    <input type="submit" value="Gönder">
+  </form>
 </body>
 </html>
-

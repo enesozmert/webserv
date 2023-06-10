@@ -279,11 +279,6 @@ void Server::clean()
     fd = -1;
 }
 
-
-
-/****************************************************************/
-
-
 ServerScope*        Server::getServerForRequest(t_listen& address, HttpScope* http)
 {
     std::vector<ServerScope *>  serverScope;
@@ -305,9 +300,6 @@ void  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::
     this->locationScopeIndex = 0;
 
     this->locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-   // std::cout << "locationScopeIndex : " << locationScopeIndex << std::endl;
     if(this->locationScopeIndex == -1)
         std::cerr << RED << "There is no possible location" << RESET << std::endl;
-    //locationScopeIndex = getDefaultLocationPathIndex(matchedServerScope);
-    //locationScopeIndex = getLongestLocationPathIndex(matchedServerScope);
 }

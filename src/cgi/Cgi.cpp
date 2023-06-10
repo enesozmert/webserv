@@ -51,7 +51,7 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 }
 
 
-std::string		Cgi::executeCgi(std::string scriptName) 
+std::string     Cgi::executeCgi(std::string scriptName)
 {
 	// int pip[2];
     // int ret = 0;
@@ -262,7 +262,7 @@ void Cgi::keywordFill()
 {
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getCgiPass()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getCgiPass()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _response->getContentType()));
+    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", std::to_string(_request->getContentLength())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
@@ -276,8 +276,7 @@ void Cgi::keywordFill()
 	for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
 	{
 		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
-		//std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
+		std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
 	}
 }
-
 
