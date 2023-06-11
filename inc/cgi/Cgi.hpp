@@ -18,6 +18,7 @@
 #include "../entity/Response.hpp"
 #include "../utils/Utils.hpp"
 #include <fcntl.h>
+#include <unistd.h>
 
 class Request;
 class Response;
