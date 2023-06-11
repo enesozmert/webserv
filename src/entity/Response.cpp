@@ -367,8 +367,10 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
+	bool cgiopen =false;
 	if (this->_cgiPass != "")
 	{
+		cgiopen =true;
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
 		Cgi cgi(_request, _serverScope, this);
 		size_t i = 0;
@@ -388,10 +390,10 @@ void Response::getMethod()
 			j -= 2;
 		_response = _response.substr(i, j - i);
 	}
-	if (this->statusCode == 200)
+	if (this->statusCode == 200 && !cgiopen)
 		readContent();
-	else
-		_response = this->errorHtml();
+	// else
+	// 	_response = this->errorHtml();
 
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
