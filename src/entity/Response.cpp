@@ -549,9 +549,9 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
 	_keywordDatabase.insertData(Variable<std::string>("Content-Type", &this->_contentType));
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
-	_keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
+	// _keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
-	_keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
+	// _keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
 }
 
 std::string Response::selectIndex()

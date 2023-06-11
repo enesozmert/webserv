@@ -1,9 +1,9 @@
 <?php 
 echo "hello"; 
-if (isset($_POST))
+// if (isset($_POST))
 	print_r($_POST);
 
-if (isset($_POST['try']))
+// if (isset($_POST['try']))
 	echo $_POST['try'];
 
 ?>
@@ -15,8 +15,8 @@ if (isset($_POST['try']))
 	<title>Document</title>
 </head>
 <body>
-	<form method="POST" action="#">
-	<input name="try" type="text">
+	<form method="post" action="#">
+	<input name="try" id="try" type="text">
 	<input type="submit" value="send">
 	</form>
 </body>
