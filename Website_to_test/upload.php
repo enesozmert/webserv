@@ -1,30 +1,23 @@
+<?php 
+echo "hello"; 
+if (isset($_POST))
+	print_r($_POST);
+
+if (isset($_POST['try']))
+	echo $_POST['try'];
+
+?>
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-  <title>Veri Gönderme Formu</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
 </head>
 <body>
-  <form action="#" method="post">
-    <label for="say">Sayı:</label>
-    <input type="text" name="say" id="say"><br>
-
-    <label for="to">Hedef:</label>
-    <input type="text" name="to" id="to"><br>
-
-    <input type="submit" value="Gönder">
-  </form>
-
-  <?php
-  if(isset($_POST['say'])){
-    $say = htmlspecialchars($_POST['say']);
-    $to = htmlspecialchars($_POST['to']);
-    // $say = $_ENV['say'];
-    // $to = $_ENV['to'];
-
-    echo '>>>>' . $say . " " . $to;
-  }
-  ?>
-
+	<form method="POST" action="#">
+	<input name="try" type="text">
+	<input type="submit" value="send">
+	</form>
 </body>
 </html>
-
