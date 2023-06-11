@@ -17,7 +17,8 @@
 #include "../entity/Request.hpp"
 #include "../entity/Response.hpp"
 #include "../utils/Utils.hpp"
-;
+#include <fcntl.h>
+
 class Request;
 class Response;
 class ServerScope;
