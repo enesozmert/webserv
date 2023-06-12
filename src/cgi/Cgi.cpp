@@ -58,8 +58,9 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		if (writeResult == -1) {
 			std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
 		}
-		fcntl(request_body_pipe[0], F_SETFL, O_NONBLOCK);
+		//fcntl(request_body_pipe[0], F_SETFL, O_NONBLOCK);
 	}
+	close(request_body_pipe[1]);
 
 	std::string contentLocation = _response->getContentLocation();
 	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
@@ -72,11 +73,12 @@ std::string     Cgi::executeCgi(std::string scriptName)
 	}
 	else if (!pid)
 	{
-        dup2(cgi_result_pipe[1], STDOUT_FILENO);
-		dup2(request_body_pipe[0], STDIN_FILENO);
-		close(request_body_pipe[1]);
-		close(cgi_result_pipe[0]);
+		if (_request->getHttpMethodName().find("POST") != std::string::npos) {
+			dup2(request_body_pipe[0], STDIN_FILENO);
+		}
 		close(request_body_pipe[0]);
+        dup2(cgi_result_pipe[1], STDOUT_FILENO);
+		close(cgi_result_pipe[0]);
 		close(cgi_result_pipe[1]);
 		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
@@ -89,6 +91,8 @@ std::string     Cgi::executeCgi(std::string scriptName)
 
 		waitpid(pid, NULL, 0);
 
+		close(request_body_pipe[0]);
+		close(cgi_result_pipe[1]);
 		lseek(cgi_result_pipe[0], 0, SEEK_SET);
 		int ret = 1;
 		while (ret > 0)
@@ -97,9 +101,6 @@ std::string     Cgi::executeCgi(std::string scriptName)
 			ret = read(cgi_result_pipe[0], buffer, CGI_BUFSIZE - 1);
 			newBody += buffer;
 		}
-		close(request_body_pipe[0]);
-		close(cgi_result_pipe[1]);
-		close(request_body_pipe[1]);
 		close(cgi_result_pipe[0]);
 		dup2(saveStdin, STDIN_FILENO);
 		dup2(saveStdout, STDOUT_FILENO);
