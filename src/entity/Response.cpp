@@ -107,11 +107,11 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setQueries()
 {
-	const std::size_t pair_delimiter = _body.find('=');
+	/* const std::size_t pair_delimiter = _body.find('=');
 	const std::string key = _body.substr(0, pair_delimiter);
 	std::string value = _body.substr(pair_delimiter + 1, _body.length() - (pair_delimiter + 1));
-	this->_queries[key] = value;
-/* 	std::size_t position = 0;
+	this->_queries[key] = value; */
+	std::size_t position = 0;
 	while (position < _body.size())
 	{
 		const std::size_t next_delimiter = _body.find('&', position);
@@ -141,7 +141,7 @@ void Response::setQueries()
 			break;
 		}
 		position = next_delimiter + 1;
-	} */
+	}
 }
 
 void Response::setContentDisposition()
@@ -347,6 +347,7 @@ void Response::createResponse(Request *request, ServerScope *serverScope, Locati
 	}
 
 	selectCgiPass();
+	//this->_cgiPass = "php-cgi";
 	if (this->statusCode == 200 && this->_methodName == "GET")
 		getMethod();
 	else if (this->statusCode == 200 && this->_methodName == "POST")
@@ -371,6 +372,8 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
+	std::cout << PURPLE << "******GET*****" << RESET << std::endl;
+	std::cout << PURPLE << "cgi_pass : " << this->_cgiPass << RESET << std::endl;
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "***Cgi_GET***" << RESET << std::endl;
