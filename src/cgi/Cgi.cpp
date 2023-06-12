@@ -80,7 +80,6 @@ std::string Cgi::executeCgi(std::string scriptName)
     }
 
 	close(pipeFd[1]);
-	std::cout << "scriptName : " << scriptName << std::cout;
 	std::string contentLocation = _response->getContentLocation();
 	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
 	if (!fork())
@@ -111,7 +110,6 @@ std::string Cgi::executeCgi(std::string scriptName)
 	return (std::string(output, readed));
 }
 
-
 DataBase<CgiVariable<std::string, std::string> > Cgi::getEnvDataBase()
 {
     return (this->_envDatabase);
@@ -124,11 +122,7 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 
 void Cgi::keywordFill()
 {
-    // _envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getContentLocation()));
-	std::string res = "Website_to_test/";
-	std::string res1 = "upload.php";
-	std::string abc = res + res1;
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", abc));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getContentLocation()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(_request->getContentLength())));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
