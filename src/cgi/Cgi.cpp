@@ -25,10 +25,12 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 
 std::string     Cgi::executeCgi(std::string scriptName)
 {
+	int saveStdin = dup(STDIN_FILENO);
+	int saveStdout = dup(STDOUT_FILENO);
 	std::cout << PURPLE << "CGI" << RESET << std::endl;
 	std::cout << PURPLE << "oldBody" << RESET << "\n" << _body << std::endl;
-	int			saveStdin= dup(STDIN_FILENO);
-	int			saveStdout = dup(STDOUT_FILENO);
+	int request_body_pipe[2];
+	int cgi_result_pipe[2];
 	std::string	newBody;
 
 	char	**env = NULL;
@@ -40,21 +42,23 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		return "Status: 500\r\n\r\n";
 	}
 
-	int fd[2];
-	if (pipe(fd) < 0) {
+	if (pipe(request_body_pipe) < 0) {
 		std::cerr << RED << "pipe problem" << RESET << std::endl;
 	}
+	fcntl(request_body_pipe[1], F_SETFL, O_NONBLOCK);
 
-	fcntl(fd[0], F_SETFL, O_NONBLOCK);
-	fcntl(fd[1], F_SETFL, O_NONBLOCK);
+	if (pipe(cgi_result_pipe) < 0) {
+		std::cerr << RED << "pipe problem" << RESET << std::endl;
+	}
+	fcntl(cgi_result_pipe[0], F_SETFL, O_NONBLOCK);
 
 
 	if (_request->getHttpMethodName().find("POST") != std::string::npos) {
-		ssize_t writeResult = write(fd[1], _body.c_str(), _body.length());
+		ssize_t writeResult = write(request_body_pipe[1], _body.c_str(), _body.length());
 		if (writeResult == -1) {
 			std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
 		}
-		lseek(fd[1], 0, SEEK_SET);
+		fcntl(request_body_pipe[0], F_SETFL, O_NONBLOCK);
 	}
 
 	std::string contentLocation = _response->getContentLocation();
@@ -68,13 +72,12 @@ std::string     Cgi::executeCgi(std::string scriptName)
 	}
 	else if (!pid)
 	{
-		if (_request->getHttpMethodName().find("POST") != std::string::npos)
-		{
-            dup2(fd[1], 0);
-			close(fd[1]);
-		}
-		dup2(fd[0], 1);
-		close(fd[0]);
+        dup2(cgi_result_pipe[1], STDOUT_FILENO);
+		dup2(request_body_pipe[0], STDIN_FILENO);
+		close(request_body_pipe[1]);
+		close(cgi_result_pipe[0]);
+		close(request_body_pipe[0]);
+		close(cgi_result_pipe[1]);
 		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
@@ -85,22 +88,24 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		char	buffer[CGI_BUFSIZE] = {0};
 
 		waitpid(pid, NULL, 0);
-		lseek(fd[0], 0, SEEK_SET);
 
+		lseek(cgi_result_pipe[0], 0, SEEK_SET);
 		int ret = 1;
 		while (ret > 0)
 		{
 			memset(buffer, 0, CGI_BUFSIZE);
-			ret = read(fd[0], buffer, CGI_BUFSIZE - 1);
+			ret = read(cgi_result_pipe[0], buffer, CGI_BUFSIZE - 1);
 			newBody += buffer;
 		}
+		close(request_body_pipe[0]);
+		close(cgi_result_pipe[1]);
+		close(request_body_pipe[1]);
+		close(cgi_result_pipe[0]);
+		dup2(saveStdin, STDIN_FILENO);
+		dup2(saveStdout, STDOUT_FILENO);
+		close(saveStdout);
+		close(saveStdin);
 	}
-	dup2(saveStdin, STDIN_FILENO);
-	dup2(saveStdout, STDOUT_FILENO);
-	close(saveStdout);
-	close(saveStdin);
-	close(fd[0]);
-	close(fd[1]);
 
 	for (size_t i = 0; env[i]; i++)
 		delete[] env[i];
@@ -135,6 +140,7 @@ void Cgi::keywordFill()
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("UPLOAD_PATH", "/Website_to_test/uploads/"));
 	for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
 	{
 		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));

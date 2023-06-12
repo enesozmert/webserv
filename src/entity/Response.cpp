@@ -367,19 +367,14 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
-	int cgiState = 0;
-	std::cout << "omerdebug!= " << this->_cgiPass <<  " location = " << this->_location <<std::endl;
-
 	if (this->_cgiPass != "")
 	{
-		cgiState = 1;
 		std::cout << PURPLE << "***Cgi_GET***" << RESET << std::endl;
 		Cgi cgi(_request, _serverScope, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
 
 		_response = cgi.executeCgi(this->_cgiPass);
-		std::cout << "cgi dan cikan != " << _response << std::endl;
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -393,18 +388,15 @@ void Response::getMethod()
 			j -= 2;
 		_response = _response.substr(i, j - i);
 	}
-	if (this->statusCode == 200 && cgiState == 0)
+	if (this->statusCode == 200)
 		readContent();
-	//else
-	//	_response = this->errorHtml();
+	else
+		_response = this->errorHtml();
 
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
 
 	_response = getHeader() + "\r\n" + _response;
-
-	std::cout << "omerdebug!= " << _response << std::endl;
-	// this->_cgiPass = "";
 }
 
 void Response::deleteMethod()
@@ -431,7 +423,7 @@ void Response::deleteMethod()
 void Response::postMethod()
 {
 	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
-	std::cout << PURPLE << "cgi_pass" << this->_cgiPass << RESET << std::endl;
+	std::cout << PURPLE << "cgi_pass : " << this->_cgiPass << RESET << std::endl;
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
