@@ -347,7 +347,6 @@ void Response::createResponse(Request *request, ServerScope *serverScope, Locati
 	}
 
 	selectCgiPass();
-	//this->_cgiPass = "php-cgi";
 	if (this->statusCode == 200 && this->_methodName == "GET")
 		getMethod();
 	else if (this->statusCode == 200 && this->_methodName == "POST")
