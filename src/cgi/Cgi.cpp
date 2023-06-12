@@ -25,6 +25,8 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 
 std::string     Cgi::executeCgi(std::string scriptName)
 {
+	std::cout << PURPLE << "CGI" << RESET << std::endl;
+	std::cout << PURPLE << "oldBody" << RESET << "\n" << _body << std::endl;
 	int			saveStdin= dup(STDIN_FILENO);
 	int			saveStdout = dup(STDOUT_FILENO);
 	std::string	newBody;
@@ -104,6 +106,7 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		delete[] env[i];
 	delete[] env;
 
+	std::cout << PURPLE << "newBody" << RESET << "\n" << newBody << std::endl;
 	return (newBody);
 }
 
