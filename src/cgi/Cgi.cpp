@@ -25,15 +25,78 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 
 std::string     Cgi::executeCgi(std::string scriptName)
 {
+	std::string newBody;
+    int		readed;
+	char	output[4096];
+    int pipeFd[2];
+    int pipeo[2];
+    char **env = NULL;
+
+    try {
+        env = mapToEnvForm(this->_envDatabase.getAllData());
+    }
+    catch (const std::bad_alloc &e) {
+        std::cerr << e.what() << std::endl;
+        return "Status: 500\r\n\r\n";
+    }
+
+    if (pipe(pipeFd) == -1)
+        return "Status: 500\r\n\r\n";
+    if (pipe(pipeo) == -1)
+        return "Status: 500\r\n\r\n";
+
+    if (_request->getHttpMethodName().find("POST") != std::string::npos) {
+        if (write(pipeFd[1], _body.c_str(), _body.size()) == -1) {
+            std::cerr << RED << "Write problem" << RESET << std::endl;
+        }
+    }
+
+	close(pipeFd[1]);
+	std::cout << "scriptName : " << scriptName << std::cout;
+	std::string contentLocation = _response->getContentLocation();
+	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
+	if (!fork())
+	{
+
+		close(pipeo[0]);
+		dup2(pipeo[1], 1);
+		close(pipeo[1]);
+
+		if (_request->getHttpMethodName().find("POST") != std::string::npos)
+			dup2(pipeFd[0], 0);
+		close(pipeFd[0]);
+
+		execve(cmd[0], cmd, env);
+		std::cout << "Execv Err!" << std::endl << std::flush;
+		exit(-1);
+	}
+	//wait(NULL);
+	close(pipeFd[0]);
+	close(pipeo[1]);
+
+	readed = read(pipeo[0], output, 4096);
+	if (readed == 0)
+		std::cout << "Cgi Read Fail!" << std::endl << std::flush;
+	close(pipeo[0]);
+	output[readed] = 0;
+	std::cout << "std::string(output, readed) : " << std::string(output, readed) << std::endl;
+	return (std::string(output, readed));
+}
+
+/* std::string     Cgi::executeCgi(std::string scriptName)
+{
 	int saveStdin = dup(STDIN_FILENO);
 	int saveStdout = dup(STDOUT_FILENO);
+	char	buffer[CGI_BUFSIZE] = {0};
+
 	std::cout << PURPLE << "CGI" << RESET << std::endl;
 	std::cout << PURPLE << "oldBody" << RESET << "\n" << _body << std::endl;
+
 	int request_body_pipe[2];
 	int cgi_result_pipe[2];
 	std::string	newBody;
-
 	char	**env = NULL;
+
 	try {
 		env = mapToEnvForm(this->_envDatabase.getAllData());
 	}
@@ -58,7 +121,7 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		if (writeResult == -1) {
 			std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
 		}
-		//fcntl(request_body_pipe[0], F_SETFL, O_NONBLOCK);
+		fcntl(request_body_pipe[0], F_SETFL, O_NONBLOCK);
 	}
 	close(request_body_pipe[1]);
 
@@ -85,36 +148,31 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 		exit(1);
 	}
-	else
+	//waitpid(-1, NULL, WUNTRACED);
+
+	close(request_body_pipe[0]);
+	close(cgi_result_pipe[1]);
+	lseek(cgi_result_pipe[0], 0, SEEK_SET);
+	int ret = 1;
+	while (ret > 0)
 	{
-		char	buffer[CGI_BUFSIZE] = {0};
-
-		waitpid(pid, NULL, 0);
-
-		close(request_body_pipe[0]);
-		close(cgi_result_pipe[1]);
-		lseek(cgi_result_pipe[0], 0, SEEK_SET);
-		int ret = 1;
-		while (ret > 0)
-		{
-			memset(buffer, 0, CGI_BUFSIZE);
-			ret = read(cgi_result_pipe[0], buffer, CGI_BUFSIZE - 1);
-			newBody += buffer;
-		}
-		close(cgi_result_pipe[0]);
-		dup2(saveStdin, STDIN_FILENO);
-		dup2(saveStdout, STDOUT_FILENO);
-		close(saveStdout);
-		close(saveStdin);
+		memset(buffer, 0, CGI_BUFSIZE);
+		ret = read(cgi_result_pipe[0], buffer, CGI_BUFSIZE - 1);
+		newBody += buffer;
 	}
+	close(cgi_result_pipe[0]);
+	dup2(saveStdin, STDIN_FILENO);
+	dup2(saveStdout, STDOUT_FILENO);
+	close(saveStdout);
+	close(saveStdin);
 
 	for (size_t i = 0; env[i]; i++)
 		delete[] env[i];
 	delete[] env;
 
 	std::cout << PURPLE << "newBody" << RESET << "\n" << newBody << std::endl;
-	return (newBody);
-}
+	return (std::string(newBody));
+} */
 
 DataBase<CgiVariable<std::string, std::string> > Cgi::getEnvDataBase()
 {
