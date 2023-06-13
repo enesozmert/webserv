@@ -19,41 +19,22 @@ Cgi& Cgi::operator=(const Cgi &cgi)
 
 Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _request(request), _response(response), _serverScope(serverScope), _body(response->getBody())
 {
-	//std::cout << "*******old_body******\n " << _body << std::endl;
-	// this->_env.insert(std::make_pair("REDIRECT_STATUS", "200")); //Security needed to execute php-cgi
-	// this->_env.insert(std::make_pair("GATEWAY_INTERFACE", "CGI/1.1"));
-	// this->_env.insert(std::make_pair("SCRIPT_FILENAME", response->getCgiPass()));//CGI script'in tam dosya yolunu
-	// this->_env.insert(std::make_pair("REQUEST_METHOD", response->getMethod()));
-	// this->_env.insert(std::make_pair("CONTENT_LENGTH", std::to_string(this->_body.length())));
-	// this->_env.insert(std::make_pair("CONTENT_TYPE", request->getContentType()));
-	// this->_env.insert(std::make_pair("PATH_INFO", request->getPath()));//CGI script'in ek bilgileri veya parametreleri içeren yol bilgisi(cgi_param)
-	// this->_env.insert(std::make_pair("REQUEST_URI", request->getPath()));
-	// this->_env.insert(std::make_pair("REMOTEaddr", serverScope->getHost()));
-    // this->_env.insert(std::make_pair("SERVER_PORT", serverScope->getPort()));
-	// this->_env.insert(std::make_pair("SERVER_PROTOCOL", "HTTP/1.1"));
-	// this->_env.insert(std::make_pair("SERVER_SOFTWARE", "nginx/webserv"));
-
-
-	// this->_request = request;
-	// this->_serverScope = serverScope;
-	// this->_response = response;
 	this->_query = _response->getQueries();
-
 	keywordFill();
 
-	// std::cout << YELLOW << "CONTENT_LENGTH = " << this->_env["CONTENT_LENGTH"] << RESET << std::endl;
-	// std::cout << YELLOW << "SCRIPT_NAME = " << this->_env["SCRIPT_NAME"] << RESET << std::endl;
-	// std::cout << YELLOW << "SCRIPT_FILENAME = " << this->_env["SCRIPT_FILENAME"] << RESET << std::endl;
-	// std::cout << YELLOW << "CONTENT_TYPE = " << this->_env["CONTENT_TYPE"] << RESET << std::endl;
-	// std::cout << YELLOW << "PATH_INFO = " << this->_env["PATH_INFO"] << RESET << std::endl;
-	// std::cout << YELLOW << "REQUEST_URI = " << this->_env["REQUEST_URI"] << RESET << std::endl;
-	// std::cout << YELLOW << "_body = " << this->_body << RESET << std::endl;
+
+	try {
+		env = mapToEnvForm(this->_envDatabase.getAllData());
+	}
+	catch (const std::bad_alloc& e) {
+		std::cerr << e.what() << std::endl;
+		//return "Status: 500\r\n\r\n";
+	}
 }
 
-
-std::string Cgi::executeCgi(std::string scriptName)
+/* std::string     Cgi::executeCgi(std::string scriptName)
 {
-    std::string newBody;
+	std::string newBody;
     int		readed;
 	char	output[4096];
     int pipeFd[2];
@@ -98,7 +79,7 @@ std::string Cgi::executeCgi(std::string scriptName)
 		std::cout << "Execv Err!" << std::endl << std::flush;
 		exit(-1);
 	}
-	wait(NULL);
+	//wait(NULL);
 	close(pipeFd[0]);
 	close(pipeo[1]);
 
@@ -109,6 +90,94 @@ std::string Cgi::executeCgi(std::string scriptName)
 	output[readed] = 0;
 	std::cout << "std::string(output, readed) : " << std::string(output, readed) << std::endl;
 	return (std::string(output, readed));
+} */
+
+std::string     Cgi::executeCgi(std::string scriptName)
+{
+	char	buffer[CGI_BUFSIZE] = {0};
+
+	std::cout << PURPLE << "CGI" << RESET << std::endl;
+	std::cout << PURPLE << "oldBody" << RESET << "\n" << _body << std::endl;
+
+	if (pipe(request_body_pipe) < 0)
+		std::cerr << RED << "pipe problem" << RESET << std::endl;
+
+	if (pipe(cgi_result_pipe) < 0)
+		std::cerr << RED << "pipe problem" << RESET << std::endl;
+
+
+	if (_request->getHttpMethodName().find("POST") != std::string::npos) {
+		ssize_t writeResult = write(request_body_pipe[1], _body.c_str(), _body.length());
+		if (writeResult == -1) {
+			std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
+		}
+	}
+	close(request_body_pipe[1]);
+
+	std::string contentLocation = _response->getContentLocation();
+	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
+	std::cout << PURPLE << "contentLocation[0] " << RESET << &contentLocation[0] << std::endl;
+	std::cout << PURPLE << "&scriptName[0] " << RESET << &scriptName[0] << std::endl;
+
+	pid_t pid = fork();
+	if (pid == -1)
+	{
+		std::cerr << "Fork crashed." << std::endl;
+		return ("Status: 500\r\n\r\n");
+	}
+	else if (!pid)
+	{
+		close(cgi_result_pipe[0]);
+        dup2(cgi_result_pipe[1], STDOUT_FILENO);
+		close(cgi_result_pipe[1]);
+		if (_request->getHttpMethodName().find("POST") != std::string::npos) {
+			dup2(request_body_pipe[0], STDIN_FILENO);
+		}
+		close(request_body_pipe[0]);
+	
+		execve(cmd[0], cmd, env);
+		std::cerr << "Execve crashed." << std::endl;
+		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
+		exit(1);
+	}
+	int status;
+
+    if (waitpid(pid, &status, 0) == -1)
+      return "Status: 500\r\n\r\n";
+    if (WIFEXITED(status) && WEXITSTATUS(status))
+      return ("Status: 502\r\n\r\n");
+
+	close(request_body_pipe[0]);
+	close(cgi_result_pipe[1]);
+	int ret = 1;
+	while (ret > 0)
+	{
+		memset(buffer, 0, CGI_BUFSIZE);
+		ret = read(cgi_result_pipe[0], buffer, CGI_BUFSIZE - 1);
+		newBody += std::string(buffer);
+	}
+	close(cgi_result_pipe[0]);
+
+	if(_query.count("filename"))
+		upload();
+
+	for (size_t i = 0; env[i]; i++)
+		delete[] env[i];
+	delete[] env;
+
+	std::cout << PURPLE << "newBody" << RESET << "\n" << newBody << std::endl;
+	return (std::string(newBody));
+}
+
+void Cgi::upload()
+{
+	std::string upload_path = "/Website_to_test/uploads/" + _query["filename"];
+	int fd;
+	fd = open(upload_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
+	int check = write(fd, newBody.c_str(), newBody.length());
+	if (check == -1)
+		std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
+	close(fd);
 }
 
 
@@ -140,11 +209,12 @@ void Cgi::keywordFill()
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
     _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("HTTP_HOST", "200"));
-	// for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
-	// {
-	// 	_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
-	// 	std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
-	// }
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("UPLOAD_PATH", "/Website_to_test/uploads/"));
+  _envDatabase.insertData(CgiVariable<std::string, std::string>("HTTP_HOST", "200"));
+	for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
+	{
+		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
+		std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
+	}  
 }
 

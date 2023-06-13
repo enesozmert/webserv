@@ -107,6 +107,10 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setQueries()
 {
+	/* const std::size_t pair_delimiter = _body.find('=');
+	const std::string key = _body.substr(0, pair_delimiter);
+	std::string value = _body.substr(pair_delimiter + 1, _body.length() - (pair_delimiter + 1));
+	this->_queries[key] = value; */
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -394,12 +398,10 @@ void Response::getMethod()
 		readContent();
 	// else
 	// 	_response = this->errorHtml();
-
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
 
 	_response = getHeader() + "\r\n" + _response;
-	// this->_cgiPass = "";
 }
 
 void Response::deleteMethod()
@@ -426,7 +428,7 @@ void Response::deleteMethod()
 void Response::postMethod()
 {
 	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
-	std::cout << PURPLE << "cgi_pass" << this->_cgiPass << RESET << std::endl;
+	std::cout << PURPLE << "cgi_pass : " << this->_cgiPass << RESET << std::endl;
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
