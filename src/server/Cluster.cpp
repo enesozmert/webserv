@@ -1,31 +1,32 @@
 #include "../inc/server/Cluster.hpp"
 
-Cluster::Cluster() {
-	FD_ZERO(&fd_master);
-	FD_ZERO(&writing_set);
-	FD_ZERO(&reading_set);
-}
+Cluster::Cluster() {}
 
-Cluster::~Cluster()
-{
-	std::cout << YELLOW << "Cluster destruct" << RESET << std::endl;
-	cleanAll();
-}
+Cluster::~Cluster() {}
 
 Cluster::Cluster(const Cluster &cluster)
 {
-	*this = cluster;
+		if (this != &cluster) {
+		*this = cluster;
+	}
 }
 
-// Cluster& Cluster::operator=(const Cluster &cluster)
-// {
-// 	if (this == &cluster)
-//         return (*this);
-// 	this->servers = cluster.servers;
-// 	this->sockets= cluster.sockets;
-//     return (*this);
-// }
+Cluster & Cluster::operator=(const Cluster & cluster)
+{
+	httpScope = cluster.httpScope;
+	servers = cluster.servers;
+	sockets = cluster.sockets;
+	ready = cluster.ready;
+	fd_master = cluster.fd_master;
+	max_fd = cluster.max_fd;
+	reading_set = cluster.reading_set;
+	writing_set = cluster.writing_set;
+	timeout = cluster.timeout;
+	select_return_value = cluster.select_return_value;
+	return (*this);
+}
 
+// setUp-->run-->select-->accept-->recv-->send
 int Cluster::setUpCluster(HttpScope *http)
 {
 	this->httpScope = http;
@@ -36,6 +37,7 @@ int Cluster::setUpCluster(HttpScope *http)
 	// olası hataları önlemek için bütün fd'ler 0'a eşitlenir.
 	FD_ZERO(&fd_master);
 	max_fd = 0;
+	this->select_return_value = 0;
 
 	for (std::vector<t_listen>::const_iterator it = listens.begin(); it != listens.end(); it++)
 	{
@@ -43,7 +45,6 @@ int Cluster::setUpCluster(HttpScope *http)
 		Server server(*it); // setUpSocket de burada çalışacak
 		long fd;			// server içinde oluşturulacak socket fd'si
 
-		fd = -1;
 		// vector içinde gezip sırayla socket fd'lerini fd_master setine ,serverları da servers mapine ekleyecek.
 		if (server.setUpSocket() != -1)
 		{
@@ -70,6 +71,7 @@ void Cluster::select_section()
 	this->timeout.tv_sec = 1;
 	this->timeout.tv_usec = 0;
 	// ilk başta fd_master setindeki bütün socket fdleri reading set kümesine ekliyoruz.
+	FD_ZERO(&reading_set);
 	memcpy(&reading_set, &fd_master, sizeof(fd_master));
 	// writing_set kullanmadan sıfırlıyoruz.
 	FD_ZERO(&writing_set);
@@ -78,7 +80,11 @@ void Cluster::select_section()
 	// ready ilk başta boş, sonradan dolacak
 	// ready içindeki (yani reading sette olup processe gidecek socketler) writing sete ekliyoruz.
 	// socket send için hazır demektir
-	std::cout << YELLOW << "\rWaiting on a connection..." << RESET << std::flush;
+	std::cout << YELLOW << "\rWaiting on a connection" << RESET << std::flush;
+	/* std::cout << YELLOW << "\rWaiting on a connection" << dot[n++] << RESET << std::flush;
+	if (n == 3)
+		n = 0; */
+	
 	// select işlevi kullanılarak takip edilen soketler için okuma ve yazma işlemleri için hazırlık yapılır.
 	// Bu döngüde, select işlevi sonucu select_return_value değişkenine değer atanana kadar çalışmaya devam eder.
 	// timeout olursa sıfır döner. select_return_value'e değer atanana kadar while döner.
@@ -94,11 +100,11 @@ void Cluster::send_section()
 	{
 		if (FD_ISSET(*it, &writing_set)) // Eğer soket, (writing_set) içinde bulunuyorsa, bunu select_section'da eklemiştik.
 		{
-			long ret2 = sockets[*it]->send(*it); // send işlevi kullanılarak veriler(response) gönderilir.
+			long ret = sockets[*it]->send(*it); // send işlevi kullanılarak veriler(response) gönderilir.
 
-			if (ret2 == 0) // Gönderme işlemi başarılı olursa, o soket ready vektöründen silinir.
+			if (ret == 0) // Gönderme işlemi başarılı olursa, o soket ready vektöründen silinir.
 				ready.erase(it);
-			else if (ret2 == -1)
+			else if (ret == -1)
 			{
 				// Eğer sokete yazma işlemi yaparken bir hata oluşursa,
 				// ilgili soket silinir ve sockets haritasından çıkarılır.
@@ -107,7 +113,7 @@ void Cluster::send_section()
 				sockets.erase(*it);
 				ready.erase(it);
 			}
-			select_return_value = 0;
+			ret = 0;
 			break;
 		}
 	}
@@ -118,31 +124,31 @@ void Cluster::recv_section()
 	// server, client_fd'den gelen verileri alıyor.
 	for (std::map<long, Server *>::iterator it = sockets.begin(); this->select_return_value && it != sockets.end(); it++)
 	{
-		long client_fd = it->first;
+		long socket = it->first;
 
-		if (FD_ISSET(client_fd, &reading_set))
+		if (FD_ISSET(socket, &reading_set))
 		{
-			long ret = it->second->recv(client_fd);
+			long ret = it->second->recv(socket);
 			// 0: recv() fonksiyonu, bağlantı kapatıldığında 0 değerini döndürür.
 			// Bu durumda, alınacak veri kalmamıştır ve fonksiyon çağrısı sonlanır.
 			if (ret == 0)
 			{
 				// request ayrıştırılması, işlenmesi ve response oluşturulması için gerekli işlemler yapılır.
-				it->second->process(client_fd, this->httpScope);
+				it->second->process(socket, this->httpScope);
 				// client_fd ready map'ine eklenir. Daha sonra writing_set eklenmek ve response gönderilmek üzere.
-				ready.push_back(client_fd);
+				ready.push_back(socket);
 			}
 			else if (ret == -1)
 			{
 				// hata durumunda socket sockets map'inden silinir
 				// client_fd kayıtlı fd setlerinden çıkarılır.
 				// iterator sockets mapin başına çekilir
-				FD_CLR(client_fd, &fd_master);
-				FD_CLR(client_fd, &reading_set);
-				sockets.erase(client_fd);
+				FD_CLR(socket, &fd_master);
+				FD_CLR(socket, &reading_set);
+				sockets.erase(socket);
 				it = sockets.begin();
 			}
-			select_return_value = 0;
+			ret = 0;
 			break;
 		}
 	}
@@ -159,16 +165,16 @@ void Cluster::accept_section()
 			// eğer server socket fd reading set içindeyse yeni bir socket(yeni bir client fd alınır) oluşturulur
 			// ve client'a hizmet etmek üzere hazır olduğunu belirtir
 			// accept oluşturulan socketin fd'sini döner.
-			long client_fd = it->second.accept(); // client_fd oluşturuldu. server bu fd'den gelecek verileri kabul edecek.
-			if (client_fd != -1)
+			long socket = it->second.accept(); // client_fd oluşturuldu. server bu fd'den gelecek verileri kabul edecek.
+			if (socket != -1)
 			{
 				// client_fd fd_master kümesine eklenir
 				// soketin gelen veri için bekleyen soketler arasında olduğunu belirler ve ana döngüde işlenmesine olanak tanır.
-				FD_SET(client_fd, &fd_master);
-				sockets.insert(std::make_pair(client_fd, &(it->second)));
+				FD_SET(socket, &fd_master);
+				sockets.insert(std::make_pair(socket, &(it->second)));
 				// veri kabul edilecek soketler arasına eklenir.
-				if (client_fd > max_fd)
-					max_fd = client_fd;
+				if (socket > max_fd)
+					max_fd = socket;
 			}
 			this->select_return_value = 0;
 			break;
@@ -182,41 +188,42 @@ void Cluster::run()
 	{
 		this->select_return_value = 0;
 		while (select_return_value == 0)
+			select_section();// select()'ten select_return_value'e değer atandıysa. Yani okuma ya da yazma için bir fd atandı.
+		if (select_return_value > 0)
 		{
-			select_section();
-			// select()'ten select_return_value'e değer atandıysa. Yani okuma ya da yazma için bir fd atandı.
-			if (select_return_value > 0)
-			{
-				// ilk başta ready vector'ü boş olduğu için burayı es geçecek.
-				if (ready.size() != 0)
-					send_section();
-				// ilk başta sockets map'i boş olduğu için burayı da es geçecek.
-				else if (sockets.size() != 0)
-					recv_section();
-				else if (servers.size() != 0)
-					accept_section();
-			}
+			// ilk başta ready vector'ü boş olduğu için burayı es geçecek.
+			if (ready.size() != 0)
+				send_section();
+			// ilk başta sockets map'i boş olduğu için burayı da es geçecek.
+			else if (sockets.size() != 0)
+				recv_section();
+			else if (servers.size() != 0)
+				accept_section();
 		}
-		for (std::map<long, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++)
-			it->second->close(it->first);
-		sockets.clear();
-		ready.clear();
-		FD_ZERO(&fd_master);
-		for (std::map<long, Server>::iterator it = servers.begin(); it != servers.end(); it++)
-			FD_SET(it->first, &fd_master);
+		else
+		{
+			std::cerr << RED << "\nSelect Error code: " << errno << "\nError message: " << strerror(errno) << RESET << std::endl;
+			for (std::map<long, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++)
+				close(it->first);
+			sockets.clear();
+			ready.clear();
+			FD_ZERO(&fd_master);
+			for (std::map<long, Server>::iterator it = servers.begin(); it != servers.end(); it++)
+				FD_SET(it->first, &fd_master);
+		}
 	}
 }
 
 void Cluster::cleanServers()
 {
 	for (std::map<long, Server>::iterator it = servers.begin(); it != servers.end(); it++)
-		it->second.clean();
+		close(it->first);
 	servers.clear();
 }
 void Cluster::cleanSockets()
 {
 	for (std::map<long, Server *>::iterator it = sockets.begin(); it != sockets.end(); it++)
-		it->second->close(it->first);
+		close(it->first);
 	sockets.clear();
 }
 void Cluster::cleanReady()
@@ -230,8 +237,6 @@ void Cluster::cleanReady()
 void Cluster::cleanAll()
 {
 	FD_ZERO(&fd_master);
-	FD_ZERO(&writing_set);
-	FD_ZERO(&reading_set);
 	this->cleanServers();
 	this->cleanSockets();
 	this->cleanReady();

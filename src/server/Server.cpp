@@ -208,11 +208,11 @@ int Server::recv(long socket)
     while(!received || recieved_data_size > 0)
     {
         received = true;
+        memset(buffer, 0, sizeof(buffer));
         recieved_data_size = ::recv(socket, buffer, RECV_SIZE - 1, 0);
         std::cout << "recieved_data_size : " << recieved_data_size << std::endl;
         _requests[socket] += std::string(buffer, recieved_data_size);
         std::cout << "_requests size : " << _requests[socket].length() << std::endl;
-        memset(buffer, 0, sizeof(buffer));
         if (recieved_data_size < RECV_SIZE - 1)
             break;
     } 
@@ -225,7 +225,20 @@ int Server::recv(long socket)
             std::cout << RED << "\rRead error, closing connection.\n" << RESET << std::endl;
         return (-1);
     }
-    return (0);
+    size_t	i = _requests[socket].find("\r\n\r\n");
+	if (i != std::string::npos)
+	{
+		if (_requests[socket].find("Content-Length: ") != std::string::npos)
+		{
+			size_t	len = std::atoi(_requests[socket].substr(_requests[socket].find("Content-Length: ") + 16, 10).c_str());
+		    if (_requests[socket].size() >= len + i + 4)
+			    return (0);
+		    else
+			    return (1);
+		}
+        return (0);
+	}
+	return (1);
 }
 
 int Server::send(long socket)
@@ -241,14 +254,12 @@ int Server::send(long socket)
         sended = true;
         std::string str = response.substr(sent[socket], RECV_SIZE);
         send_data_size = ::send(socket, str.c_str(), str.size(), 0);
-        if (send_data_size == -1)
-            return (-1);
+        if (send_data_size == 0 || send_data_size == -1)
+            break ;
         std::cout << "send_data_size : " << send_data_size << std::endl;
         sent[socket] += send_data_size;
         std::cout << "sent[socket] : " << sent[socket] << std::endl;
         str = "";
-        if (send_data_size == 0 || send_data_size == -1)
-            break ;
     }
     if (sent[socket] >= _requests[socket].size())
     {
@@ -256,13 +267,18 @@ int Server::send(long socket)
 			std::cout << GREEN << "\rResponse :                " << std::endl << "[" << _requests[socket] << RESET << "]\n" << RESET << std::endl;
 		else
 			std::cout << GREEN << "\rResponse :                " << std::endl << "[" << _requests[socket].substr(0, 500) << "..." << "]\n" << RESET << std::endl;
+        
+        _requests.erase(socket);
+		sent[socket] = 0;
+        return (0);
     }
-    sent[socket] = 0;
-    this->close(socket);
-    _requests.erase(socket); 
-    if (send_data_size == -1)
+    else 
+    {
+        this->close(socket);
+        _requests.erase(socket);
+		sent[socket] = 0;
         return (-1);
-    return 0;
+    }
 }
 
 void Server::close(int socket)

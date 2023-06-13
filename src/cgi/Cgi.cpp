@@ -97,6 +97,7 @@ std::string Cgi::executeCgi(std::string scriptName)
 {
 	char buffer[CGI_BUFSIZE] = {0};
 	int ret = 1;
+	int ret_sum = 0;
 
 	std::cout << PURPLE << "CGI" << RESET << std::endl;
 	std::cout << PURPLE << "oldBody" << RESET << "\n"
@@ -155,11 +156,13 @@ std::string Cgi::executeCgi(std::string scriptName)
 
 		close(request_body_pipe[0]);
 		close(cgi_result_pipe[1]);
+		
 		while (ret > 0)
 		{
 			memset(buffer, 0, CGI_BUFSIZE);
 			ret = read(cgi_result_pipe[0], buffer, CGI_BUFSIZE - 1);
-			newBody += std::string(buffer, ret);
+			ret_sum += ret;
+			newBody += std::string(buffer);
 		}
 		close(cgi_result_pipe[0]);
 
@@ -168,9 +171,8 @@ std::string Cgi::executeCgi(std::string scriptName)
 		delete[] env;
 	}
 
-	std::cout << PURPLE << "newBody" << RESET << "\n"
-			  << newBody << std::endl;
-	return (std::string(newBody));
+	std::cout << PURPLE << "newBody" << RESET << "\n" << newBody << std::endl;
+	return (std::string(newBody, ret_sum));
 }
 
 void Cgi::upload()
@@ -213,7 +215,7 @@ void Cgi::keywordFill()
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("UPLOAD_PATH", "/Website_to_test/uploads/"));
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("HTTP_HOST", "200"));
+	//_envDatabase.insertData(CgiVariable<std::string, std::string>("HTTP_HOST", "200"));
 	for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
 	{
 		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
