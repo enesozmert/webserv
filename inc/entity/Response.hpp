@@ -70,7 +70,6 @@ public:
     std::string                         getMethodName();
     std::string                         getCgiPass();
     std::map<std::string, std::string>  getQueries();
-    std::string                         getContentDisposition();
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
     std::string                         getServerName();
@@ -88,7 +87,6 @@ public:
     void                        setClientBodyBufferSize(std::string bodyBufferSize);
     int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
     void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
-    void                        setContentDisposition();
     void                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
     void                        keywordFill();
 
@@ -101,7 +99,6 @@ public:
     std::string                 errorHtml();
     void                        readContent();
     std::string                 selectIndex();
-    void                        parseContentDisposition();
 
     void                        getMethod();
     void	                    postMethod();

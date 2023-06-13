@@ -32,12 +32,7 @@ class Cgi
         DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
     	std::string							_body;//HTTP istek gövdesi
         std::map<std::string, std::string>  _query;
-        std::vector<std::string>            _contentDispos;
         char	**env;
-        std::string	newBody;
-        int request_body_pipe[2];
-	    int cgi_result_pipe[2];
-
     
     public:
         Cgi();
