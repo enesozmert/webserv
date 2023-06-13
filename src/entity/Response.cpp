@@ -371,11 +371,11 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
-	std::cout << PURPLE << "******GET*****" << RESET << std::endl;
-	std::cout << PURPLE << "cgi_pass : " << this->_cgiPass << RESET << std::endl;
+	bool cgiopen =false;
 	if (this->_cgiPass != "")
 	{
-		std::cout << PURPLE << "***Cgi_GET***" << RESET << std::endl;
+		cgiopen =true;
+		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
 		Cgi cgi(_request, _serverScope, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
@@ -393,12 +393,11 @@ void Response::getMethod()
 		while (_response.find("\r\n", j) == j)
 			j -= 2;
 		_response = _response.substr(i, j - i);
-	} 
-	if (this->statusCode == 200)
+	}
+	if (this->statusCode == 200 && !cgiopen)
 		readContent();
-	else
-		_response = this->errorHtml();
-
+	// else
+	// 	_response = this->errorHtml();
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
 
@@ -552,9 +551,9 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
 	_keywordDatabase.insertData(Variable<std::string>("Content-Type", &this->_contentType));
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
-	_keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
+	// _keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
-	_keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
+	// _keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
 }
 
 std::string Response::selectIndex()

@@ -1,17 +1,10 @@
-<?php
+<?php 
+echo "hello"; 
+// if (isset($_POST))
+	print_r($_POST);
 
-// Get data from fields
-$fname = $_SERVER['QUERY_STRING']['fname'];
-
-echo '<!DOCTYPE html>';
-echo '<html>';
-echo '<head>';
-echo '<title>Hello GET - CGI Program</title>';
-echo '</head>';
-echo '<body>';
-echo '<h2>Hello ' . str_replace('+', ' ', $fname) . ' ' . str_replace('+', ' ', $lname) . ' ' . str_replace('+', ' ', $second) . ' ' . str_replace('+', ' ', $Third) . '</h2>';
-echo '</body>';
-echo '</html>';
+// if (isset($_POST['try']))
+	echo $_POST['try'];
 
 ?>
 <!DOCTYPE html>
@@ -22,10 +15,9 @@ echo '</html>';
 	<title>Document</title>
 </head>
 <body>
-	<form method="post" action="">
+	<form method="post" action="#">
 	<input name="try" id="try" type="text">
 	<input type="submit" value="send">
 	</form>
 </body>
 </html>
-
