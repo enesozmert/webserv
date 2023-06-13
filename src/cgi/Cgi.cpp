@@ -172,8 +172,6 @@ std::string Cgi::executeCgi(std::string scriptName)
 	return (std::string(newBody));
 }
 
-<<<<<<< HEAD
-=======
 void Cgi::upload()
 {
 	std::string upload_path = "/Website_to_test/uploads/" + _query["filename"];
@@ -185,7 +183,6 @@ void Cgi::upload()
 	close(fd);
 }
 
->>>>>>> 1baa8f2a609b4ceb5a66d025d860038925618613
 DataBase<CgiVariable<std::string, std::string> > Cgi::getEnvDataBase()
 {
 	return (this->_envDatabase);
@@ -198,26 +195,6 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 
 void Cgi::keywordFill()
 {
-<<<<<<< HEAD
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _response->getContentLocation()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(_request->getContentLength())));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethodName()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", _response->getContentLocation()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
-    _envDatabase.insertData(CgiVariable<std::string, std::string>("HTTP_HOST", "200"));
-	// for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
-	// {
-	// 	_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
-	// 	std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
-	// }
-=======
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getContentLocation()));
 	// std::string res = "Website_to_test/";
 	// std::string res1 = "upload.php";
@@ -241,5 +218,4 @@ void Cgi::keywordFill()
 		_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
 		std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
 	}
->>>>>>> 1baa8f2a609b4ceb5a66d025d860038925618613
 }
