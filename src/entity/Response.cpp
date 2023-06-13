@@ -154,7 +154,7 @@ void Response::setContentDisposition()
 		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
 		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
 		this->_contentType = "multipart/form-data";
-		parseContentDisposition();
+		//parseContentDisposition();
 		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
 	}
 }
@@ -320,7 +320,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	setContentDisposition();
+	//setContentDisposition();
 	//setQueries();
 	return 0;
 }
