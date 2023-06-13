@@ -273,18 +273,18 @@ void Response::createResponse(Request *request, ServerScope *serverScope, Locati
 	if (setResponse(request, serverScope, locationScope) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 
-	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
-	{
-		this->statusCode = 405;
-		_response = notAllowed() + "\r\n";
-		return;
-	}
-	else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
-	{
-		this->statusCode = 413;
-		_response = notAllowed() + "\r\n";
-		return;
-	}
+	// if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
+	// {
+	// 	this->statusCode = 405;
+	// 	_response = notAllowed() + "\r\n";
+	// 	return;
+	// }
+	// else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
+	// {
+	// 	this->statusCode = 413;
+	// 	_response = notAllowed() + "\r\n";
+	// 	return;
+	// }
 
 	selectCgiPass();
 	if (this->statusCode == 200 && this->_methodName == "GET")
@@ -316,7 +316,7 @@ void Response::getMethod()
 	{
 		cgiopen =true;
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
-		Cgi cgi(_request, _serverScope, this);
+		Cgi cgi(_request, this, _serverScope, _locationScope);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
 
@@ -373,7 +373,7 @@ void Response::postMethod()
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
-		Cgi cgi(_request, _serverScope, this);
+		Cgi cgi(_request, this, _serverScope, _locationScope);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
 

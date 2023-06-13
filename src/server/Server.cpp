@@ -1,18 +1,14 @@
 #include "../inc/server/Server.hpp"
 
-Server::Server() {
-    fd = -1;
-}
+Server::Server():_fd(-1) {}
 
 Server::~Server() {}
 
-Server::Server(const t_listen &listen)
+Server::Server(const t_listen &listen) :_fd(-1), _listen(listen)
 {
-    this->_listen = listen;
-    fd = -1;
-    addr.sin_family = 0;
-    addr.sin_port = 0;
-    addr.sin_addr.s_addr = 0;
+    _addr.sin_family = 0;
+    _addr.sin_port = 0;
+    _addr.sin_addr.s_addr = 0;
 }
 
 Server::Server(const Server &server)
@@ -20,18 +16,9 @@ Server::Server(const Server &server)
 	*this = server;
 }
 
-/* Server& Server::operator=(const Server &server)
-{
-	if (this == &server)
-        return (*this);
-    this->_requests = server._requests;
-    this->_listen = server._listen;
-    return (*this);
-}
- */
 long Server::getFd(void) const
 {
-    return (fd);
+    return (_fd);
 }
 
 t_listen   Server::getListen() const
@@ -41,48 +28,48 @@ t_listen   Server::getListen() const
 
 void Server::setAddr(void)
 {
-    memset((char *)&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(_listen.port);
-    addr.sin_addr.s_addr = htonl(_listen.host);//127.0.0.1--->2130706433
+    memset((char *)&_addr, 0, sizeof(_addr));
+    _addr.sin_family = AF_INET;
+    _addr.sin_port = htons(_listen.port);
+    _addr.sin_addr.s_addr = htonl(_listen.host);
 }
 
 int Server::setUpSocket()
 {
     int opt = 1;
-    fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
-    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+    _fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
     {
         std::cerr << RED << "Could not re addr." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
         return (-1);
     }
-    if (fd == -1)
+    if (_fd == -1)
     {
         std::cerr << RED << "Could not create server." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
         return -1;
     }
     this->setAddr();
-    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
+    if (bind(_fd, (struct sockaddr *)&_addr, sizeof(_addr)) < 0) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
     {
-        ::close(fd);
+        ::close(_fd);
         std::cerr << RED << "Could not bind port " << _listen.port << "." << RESET << std::endl;
         return -1;
     }
-    if (listen(fd, 4096) == -1) // aynı anda max 10 bağlantı kabul etmeye hazır
+    if (listen(_fd, 4096) == -1)
     {
-        ::close(fd);
+        ::close(_fd);
         std::cerr << RED << "Could not listen." << RESET << std::endl;
         return -1;
     }
     return (0);
 }
 
-long Server::accept(void)
+long Server::accept()
 {
     std::cout << YELLOW << "\nAccepting..." << RESET << std::endl;
     long client_fd;
 
-    client_fd = ::accept(fd, NULL, NULL); // client_fd üzerinden iletişim kurulabilir.
+    client_fd = ::accept(_fd, NULL, NULL); // client_fd üzerinden iletişim kurulabilir.
     if (client_fd == -1)
     {
         std::cerr << RED << "Could not create socket. " << RESET << std::endl;
@@ -103,7 +90,7 @@ void    Server::process(long socket, HttpScope* http)
     if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos && _requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
         this->processChunk(socket);
 
-    if (_requests[socket].size() < 1000)//request ekrana basıyoruz
+    if (_requests[socket].size() < 1000)
         std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << RESET << std::endl;
     else
         std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << "]" << RESET << std::endl;
@@ -118,7 +105,7 @@ void    Server::process(long socket, HttpScope* http)
 
         matchedServer = this->getServerForRequest(this->_listen, http);
         this->getLocationForRequest(matchedServer, request->getPath());
-        if (matchedServer == NULL || this->locationScopeIndex == -1)
+        if (matchedServer == NULL || this->_locationScopeIndex == -1)
         {
             _requests.erase(socket);
             _requests.insert(std::make_pair(socket, ""));
@@ -126,50 +113,16 @@ void    Server::process(long socket, HttpScope* http)
         }
         else
         {
-            matchedLocation = matchedServer->getLocations().at(this->locationScopeIndex);
+            matchedLocation = matchedServer->getLocations().at(this->_locationScopeIndex);
             response.createResponse(request, matchedServer, matchedLocation);
-
             // socket,request olan map yapısının requestini siliyoruz
             _requests.erase(socket);
             // requeste cevap oluşturup map içinde socket,response şeklinde tutuyoruz.
             _requests.insert(std::make_pair(socket, response.getResponse()));
         }
-        //not:
-        //www.google.com:80
-        //192.282.23.2:
-        //192.80.808.1:8080
     }
 }
 
-//Chunked request, HTTP protokolünde kullanılan bir veri transfer yöntemidir.
-//Bu yöntemde, gönderilecek veri belirli boyutlarda parçalara ayrılır ve her bir parça ayrı bir "chunk" olarak gönderilir. 
-//Bu sayede, verinin tamamı gönderilmeden önce tüm parçaların bir arada toplanması beklenmez,
-//böylece büyük boyutlu verilerin transferi daha verimli bir şekilde gerçekleştirilebilir.
-//Veri gönderimi tamamlandığında, son "chunk" gönderildikten sonra bir "terminator" chunk eklenir 
-//ve böylece alıcı taraf, verinin tamamının gönderildiğini anlar.
-//body kısmı çok uzunsa bu şekilde parçalı olarak alıp sonra birleştiririz.
-/* void Server::processChunk(long socket)
-{
-    std::string head = _requests[socket].substr(0, _requests[socket].find("\r\n\r\n"));
-    std::string chunks = _requests[socket].substr(_requests[socket].find("\r\n\r\n") + 4, _requests[socket].size() - 1);
-    std::string subchunk = chunks.substr(0, 100);
-    std::string body = "";
-    int chunksize = strtol(subchunk.c_str(), NULL, 16);
-    size_t i = 0;
-
-    while (chunksize)
-    {
-        i = chunks.find("\r\n", i) + 2;
-        body += chunks.substr(i, chunksize);
-        i += chunksize + 2;
-        subchunk = chunks.substr(i, 100);
-        chunksize = strtol(subchunk.c_str(), NULL, 16);
-    }
-
-    _requests[socket] = head + "\r\n\r\n" + body + "\r\n\r\n";
-} */
-
-//chatgpt
 void Server::processChunk(long socket)
 {
     const std::string& request = _requests[socket];
@@ -209,12 +162,15 @@ int Server::recv(long socket)
     {
         received = true;
         recieved_data_size = ::recv(socket, buffer, RECV_SIZE - 1, 0);
-        std::cout << "recieved_data_size : " << recieved_data_size << std::endl;
         _requests[socket] += std::string(buffer, recieved_data_size);
-        std::cout << "_requests size : " << _requests[socket].length() << std::endl;
         memset(buffer, 0, sizeof(buffer));
         if (recieved_data_size < RECV_SIZE - 1)
+        {
+            _requests[socket] += std::string(buffer, recieved_data_size);
+            memset(buffer, 0, sizeof(buffer));
+            received = false;
             break;
+        }
     } 
     if (recieved_data_size == 0 || recieved_data_size == -1)
     {
@@ -243,9 +199,7 @@ int Server::send(long socket)
         send_data_size = ::send(socket, str.c_str(), str.size(), 0);
         if (send_data_size == -1)
             return (-1);
-        std::cout << "send_data_size : " << send_data_size << std::endl;
         sent[socket] += send_data_size;
-        std::cout << "sent[socket] : " << sent[socket] << std::endl;
         str = "";
         if (send_data_size == 0 || send_data_size == -1)
             break ;
@@ -274,9 +228,9 @@ void Server::close(int socket)
 
 void Server::clean()
 {
-    if (fd > 0)
-        ::close(fd);
-    fd = -1;
+    if (_fd > 0)
+        ::close(_fd);
+    _fd = -1;
 }
 
 ServerScope*        Server::getServerForRequest(t_listen& address, HttpScope* http)
@@ -293,13 +247,11 @@ ServerScope*        Server::getServerForRequest(t_listen& address, HttpScope* ht
     return NULL;
 }
 
-
-//benim yazdığım daha basic olan
 void  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::string& path) 
 {
-    this->locationScopeIndex = 0;
+    this->_locationScopeIndex = 0;
 
-    this->locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
-    if(this->locationScopeIndex == -1)
+    this->_locationScopeIndex = getMatchLocationPathIndex(matchedServerScope, path);
+    if (this->_locationScopeIndex == -1)
         std::cerr << RED << "There is no possible location" << RESET << std::endl;
 }

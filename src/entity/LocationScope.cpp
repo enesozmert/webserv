@@ -120,7 +120,3 @@ std::string LocationScope::getName() const
 
 LocationScope* LocationScope::cloneNew() const { return new LocationScope(); }
 LocationScope* LocationScope::clone() const { return new LocationScope(*this); }
-
-bool LocationScope::usesLongestMatch() const {
-    return longestMatch;
-}

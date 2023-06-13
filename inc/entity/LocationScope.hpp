@@ -21,8 +21,6 @@ class LocationScope : public IScope, public CgiScope, public ErrorPage, public R
         std::string                         _index;
         std::string                         _allowMethods;
         std::string                         _clientBodyBufferSize;
-        bool                                longestMatch;
-        //bool                                regex;
         DataBase<Variable<std::string> >    _keywordDatabase;
 
     public:
@@ -47,7 +45,6 @@ class LocationScope : public IScope, public CgiScope, public ErrorPage, public R
         void    setPath(std::string path);
 
         void            keywordFill();
-        bool            usesLongestMatch() const;
         LocationScope*  clone() const;
         LocationScope*  cloneNew() const;
         std::string     getName() const;
