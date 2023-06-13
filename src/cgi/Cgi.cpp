@@ -21,9 +21,17 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 {
 	this->_query = _response->getQueries();
 	keywordFill();
+
+	try {
+		env = mapToEnvForm(this->_envDatabase.getAllData());
+	}
+	catch (const std::bad_alloc& e) {
+		std::cerr << e.what() << std::endl;
+		//return "Status: 500\r\n\r\n";
+	}
 }
 
-std::string     Cgi::executeCgi(std::string scriptName)
+/* std::string     Cgi::executeCgi(std::string scriptName)
 {
 	std::string newBody;
     int		readed;
@@ -81,39 +89,22 @@ std::string     Cgi::executeCgi(std::string scriptName)
 	output[readed] = 0;
 	std::cout << "std::string(output, readed) : " << std::string(output, readed) << std::endl;
 	return (std::string(output, readed));
-}
+} */
 
-/* std::string     Cgi::executeCgi(std::string scriptName)
+std::string     Cgi::executeCgi(std::string scriptName)
 {
-	int saveStdin = dup(STDIN_FILENO);
-	int saveStdout = dup(STDOUT_FILENO);
+	//int saveStdin = dup(STDIN_FILENO);
+	//int saveStdout = dup(STDOUT_FILENO);
 	char	buffer[CGI_BUFSIZE] = {0};
 
 	std::cout << PURPLE << "CGI" << RESET << std::endl;
 	std::cout << PURPLE << "oldBody" << RESET << "\n" << _body << std::endl;
 
-	int request_body_pipe[2];
-	int cgi_result_pipe[2];
-	std::string	newBody;
-	char	**env = NULL;
-
-	try {
-		env = mapToEnvForm(this->_envDatabase.getAllData());
-	}
-	catch (const std::bad_alloc& e) {
-		std::cerr << e.what() << std::endl;
-		return "Status: 500\r\n\r\n";
-	}
-
-	if (pipe(request_body_pipe) < 0) {
+	if (pipe(request_body_pipe) < 0)
 		std::cerr << RED << "pipe problem" << RESET << std::endl;
-	}
-	fcntl(request_body_pipe[1], F_SETFL, O_NONBLOCK);
 
-	if (pipe(cgi_result_pipe) < 0) {
+	if (pipe(cgi_result_pipe) < 0)
 		std::cerr << RED << "pipe problem" << RESET << std::endl;
-	}
-	fcntl(cgi_result_pipe[0], F_SETFL, O_NONBLOCK);
 
 
 	if (_request->getHttpMethodName().find("POST") != std::string::npos) {
@@ -121,12 +112,13 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		if (writeResult == -1) {
 			std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
 		}
-		fcntl(request_body_pipe[0], F_SETFL, O_NONBLOCK);
 	}
 	close(request_body_pipe[1]);
 
 	std::string contentLocation = _response->getContentLocation();
 	char *cmd[] =  {&scriptName[0], &contentLocation[0], NULL};
+	std::cout << PURPLE << "contentLocation[0] " << RESET << &contentLocation[0] << std::endl;
+	std::cout << PURPLE << "&scriptName[0] " << RESET << &scriptName[0] << std::endl;
 
 	pid_t pid = fork();
 	if (pid == -1)
@@ -136,23 +128,30 @@ std::string     Cgi::executeCgi(std::string scriptName)
 	}
 	else if (!pid)
 	{
+		close(cgi_result_pipe[0]);
 		if (_request->getHttpMethodName().find("POST") != std::string::npos) {
 			dup2(request_body_pipe[0], STDIN_FILENO);
 		}
 		close(request_body_pipe[0]);
         dup2(cgi_result_pipe[1], STDOUT_FILENO);
-		close(cgi_result_pipe[0]);
 		close(cgi_result_pipe[1]);
+	
 		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
 		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 		exit(1);
 	}
+	int status;
+
+    if (waitpid(pid, &status, 0) == -1)
+      return "Status: 500\r\n\r\n";
+    if (WIFEXITED(status) && WEXITSTATUS(status))
+      return ("Status: 502\r\n\r\n");
 	//waitpid(-1, NULL, WUNTRACED);
 
 	close(request_body_pipe[0]);
 	close(cgi_result_pipe[1]);
-	lseek(cgi_result_pipe[0], 0, SEEK_SET);
+	//lseek(cgi_result_pipe[0], 0, SEEK_SET);
 	int ret = 1;
 	while (ret > 0)
 	{
@@ -161,10 +160,13 @@ std::string     Cgi::executeCgi(std::string scriptName)
 		newBody += buffer;
 	}
 	close(cgi_result_pipe[0]);
-	dup2(saveStdin, STDIN_FILENO);
-	dup2(saveStdout, STDOUT_FILENO);
-	close(saveStdout);
-	close(saveStdin);
+	//dup2(saveStdin, STDIN_FILENO);
+	//dup2(saveStdout, STDOUT_FILENO);
+	//close(saveStdout);
+	//close(saveStdin);
+
+	if(_query.count("filename"))
+		upload();
 
 	for (size_t i = 0; env[i]; i++)
 		delete[] env[i];
@@ -172,7 +174,18 @@ std::string     Cgi::executeCgi(std::string scriptName)
 
 	std::cout << PURPLE << "newBody" << RESET << "\n" << newBody << std::endl;
 	return (std::string(newBody));
-} */
+}
+
+void Cgi::upload()
+{
+	std::string upload_path = "/Website_to_test/uploads/" + _query["filename"];
+	int fd;
+	fd = open(upload_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0777);
+	int check = write(fd, newBody.c_str(), newBody.length());
+	if (check == -1)
+		std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
+	close(fd);
+}
 
 DataBase<CgiVariable<std::string, std::string> > Cgi::getEnvDataBase()
 {
