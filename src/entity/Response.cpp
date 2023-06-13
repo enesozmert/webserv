@@ -107,6 +107,10 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setQueries()
 {
+	/* const std::size_t pair_delimiter = _body.find('=');
+	const std::string key = _body.substr(0, pair_delimiter);
+	std::string value = _body.substr(pair_delimiter + 1, _body.length() - (pair_delimiter + 1));
+	this->_queries[key] = value; */
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -150,7 +154,7 @@ void Response::setContentDisposition()
 		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
 		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
 		this->_contentType = "multipart/form-data";
-		// parseContentDisposition();
+		parseContentDisposition();
 		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
 	}
 }
@@ -317,7 +321,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	setContentDisposition();
-	setQueries();
+	//setQueries();
 	return 0;
 }
 
@@ -392,14 +396,13 @@ void Response::getMethod()
 	}
 	if (this->statusCode == 200 && !cgiopen)
 		readContent();
-	// else
-	// 	_response = this->errorHtml();
-
+	//else
+		//_response = this->errorHtml();
+	
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
 
 	_response = getHeader() + "\r\n" + _response;
-	// this->_cgiPass = "";
 }
 
 void Response::deleteMethod()
@@ -426,7 +429,7 @@ void Response::deleteMethod()
 void Response::postMethod()
 {
 	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
-	std::cout << PURPLE << "cgi_pass" << this->_cgiPass << RESET << std::endl;
+	std::cout << PURPLE << "cgi_pass : " << this->_cgiPass << RESET << std::endl;
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
@@ -551,7 +554,7 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
 	// _keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
-	// _keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
 }
 
 std::string Response::selectIndex()
@@ -578,6 +581,7 @@ void Response::selectCgiPass()
 			if (_locationScope->getCgiPass()[i].find(cgiNames[j]) != std::string::npos && cgiExtension == cgiExtensions[j])
 			{
 				this->_cgiPass = _locationScope->getCgiPass()[i];
+				std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl;
 				return;
 			}
 		}
