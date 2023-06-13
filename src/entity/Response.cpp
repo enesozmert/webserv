@@ -202,9 +202,14 @@ void Response::setContentType()
 		_contentType = _type;
 		return;
 	}
+	if (_body.find("------WebKitFormBoundary") != std::string::npos)
+	{
+		this->_contentType = "multipart/form-data";
+	}
+	else
+		this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 	this->cgiType = trim(this->_type, "\n\r\t "); // pl, php, py
-	this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	std::cout << "this->cgiType = " << this->cgiType << std::endl;
 	std::cout << "this->_type = " << this->_type << std::endl;
 	std::cout << "this->_contentType = " << this->_contentType << std::endl;
@@ -554,7 +559,7 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
 	// _keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
-	_keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
+	//_keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
 }
 
 std::string Response::selectIndex()
