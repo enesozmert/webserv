@@ -209,7 +209,7 @@ void Response::setContentType()
 	else
 		this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
-	this->cgiType = trim(this->_type, "\n\r\t "); // pl, php, py
+	//this->cgiType = trim(this->_type, "\n\r\t "); // pl, php, py
 	std::cout << "this->cgiType = " << this->cgiType << std::endl;
 	std::cout << "this->_type = " << this->_type << std::endl;
 	std::cout << "this->_contentType = " << this->_contentType << std::endl;
@@ -579,6 +579,15 @@ void Response::selectCgiPass()
 	std::string cgiNames[3] = {"python", "perl", "php"};
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
 
+	/* if (cgiExtension == "php")
+		this->_cgiPass = "/opt/homebrew/bin/php";
+	else if (cgiExtension == "pl")
+		this->_cgiPass = "/usr/bin/perl";
+	else if (cgiExtension == "py")
+		this->_cgiPass = "/usr/bin/python3";
+	else 
+		this->_cgiPass = "";
+	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl; */
 	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
 	{
 		for (size_t j = 0; j < 3; j++)
