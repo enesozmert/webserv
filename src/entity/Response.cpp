@@ -373,7 +373,7 @@ void Response::getMethod()
 {
 	std::cout << PURPLE << "******GET*****" << RESET << std::endl;
 	std::cout << PURPLE << "cgi_pass : " << this->_cgiPass << RESET << std::endl;
-	/* if (this->_cgiPass != "")
+	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "***Cgi_GET***" << RESET << std::endl;
 		Cgi cgi(_request, _serverScope, this);
@@ -393,7 +393,7 @@ void Response::getMethod()
 		while (_response.find("\r\n", j) == j)
 			j -= 2;
 		_response = _response.substr(i, j - i);
-	} */
+	} 
 	if (this->statusCode == 200)
 		readContent();
 	else

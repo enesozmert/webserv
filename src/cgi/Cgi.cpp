@@ -93,8 +93,6 @@ Cgi::Cgi(Request *request, ServerScope* serverScope, Response *response): _reque
 
 std::string     Cgi::executeCgi(std::string scriptName)
 {
-	//int saveStdin = dup(STDIN_FILENO);
-	//int saveStdout = dup(STDOUT_FILENO);
 	char	buffer[CGI_BUFSIZE] = {0};
 
 	std::cout << PURPLE << "CGI" << RESET << std::endl;
@@ -129,12 +127,12 @@ std::string     Cgi::executeCgi(std::string scriptName)
 	else if (!pid)
 	{
 		close(cgi_result_pipe[0]);
+        dup2(cgi_result_pipe[1], STDOUT_FILENO);
+		close(cgi_result_pipe[1]);
 		if (_request->getHttpMethodName().find("POST") != std::string::npos) {
 			dup2(request_body_pipe[0], STDIN_FILENO);
 		}
 		close(request_body_pipe[0]);
-        dup2(cgi_result_pipe[1], STDOUT_FILENO);
-		close(cgi_result_pipe[1]);
 	
 		execve(cmd[0], cmd, env);
 		std::cerr << "Execve crashed." << std::endl;
@@ -147,23 +145,17 @@ std::string     Cgi::executeCgi(std::string scriptName)
       return "Status: 500\r\n\r\n";
     if (WIFEXITED(status) && WEXITSTATUS(status))
       return ("Status: 502\r\n\r\n");
-	//waitpid(-1, NULL, WUNTRACED);
 
 	close(request_body_pipe[0]);
 	close(cgi_result_pipe[1]);
-	//lseek(cgi_result_pipe[0], 0, SEEK_SET);
 	int ret = 1;
 	while (ret > 0)
 	{
 		memset(buffer, 0, CGI_BUFSIZE);
 		ret = read(cgi_result_pipe[0], buffer, CGI_BUFSIZE - 1);
-		newBody += buffer;
+		newBody += std::string(buffer);
 	}
 	close(cgi_result_pipe[0]);
-	//dup2(saveStdin, STDIN_FILENO);
-	//dup2(saveStdout, STDOUT_FILENO);
-	//close(saveStdout);
-	//close(saveStdin);
 
 	if(_query.count("filename"))
 		upload();
