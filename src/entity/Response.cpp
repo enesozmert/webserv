@@ -598,12 +598,8 @@ void Response::selectCgiPass()
 	std::string cgiNames[3] = {"python", "perl", "php"};
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
 
-	if (cgiExtension == "php")
-		this->_cgiPass = "/usr/bin/php";
-	else if (cgiExtension == "pl")
-		this->_cgiPass = "/Users/faozturk/Desktop/webserv/cgi_tester";
-	else if (cgiExtension == "py")
-		this->_cgiPass = "/Users/faozturk/Desktop/webserv/cgi_tester";
+	if (cgiExtension == "php" || cgiExtension == "pl" || cgiExtension == "py")
+		this->_cgiPass = getPwd() + "/" + "cgi_tester";
 	else 
 		this->_cgiPass = "";
 	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl;
