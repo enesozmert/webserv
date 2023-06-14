@@ -91,7 +91,8 @@ public:
     void                        setContentDisposition();
     void                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
     void                        keywordFill();
-
+    void                        handleCgi();
+    void                        handleMethods();
 
 
     void                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope);

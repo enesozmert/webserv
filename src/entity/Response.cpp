@@ -84,6 +84,7 @@ void Response::setKeywordDatabase(DataBase<Variable<std::string> > keywordDataba
 void Response::setStaticErrorPage()
 {
 	this->staticErrorPage.clear();
+	this->staticErrorPage[204] = "<!DOCTYPE html>\n<html><title>204</title><body>request has succeeded, but that the client doesn't need to navigate away from its current page</body></html>\n";
 	this->staticErrorPage[403] = "<!DOCTYPE html>\n<html><title>403</title><body>This request cannot be authorized (invalid permissions or credentials)</body></html>\n";
 	this->staticErrorPage[404] = "<!DOCTYPE html>\n<html><title>404</title><body>There was an error finding your error page</body></html>\n";
 	this->staticErrorPage[500] = "<!DOCTYPE html>\n<html><title>500</title><body>Server couldn't handle your request. Still, you won't kill it so easily !</body></html>\n";
@@ -144,57 +145,6 @@ void Response::setQueries()
 	}
 }
 
-void Response::setContentDisposition()
-{
-	std::string	_contentDispositionTemp = this->_body;
-	std::string	_contentTypeTemp = this->_body;
-	if (_body.find("------WebKitFormBoundary") != std::string::npos)
-	{
-		size_t start = _contentDispositionTemp.find("Content-Disposition: ") + 21;
-		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
-		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
-		this->_contentType = "multipart/form-data";
-		//parseContentDisposition();
-		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
-	}
-}
-void Response::parseContentDisposition()
-{
-	std::string token;
-	std::string tokenize;
-	std::string key;
-	std::string value;
-	char delimiter = ';';
-	std::string tmp = this->_contentDisposition;
-	std::stringstream ss(tmp);
-   
-    while (std::getline(ss, token, delimiter))
-    {
-        tokenize = trim(token, " \r\n");
-		std::cout << "tokenize: " << tokenize << std::endl;
-		if (tokenize.find("filename=") != std::string::npos)
-		{
-			value = tokenize.substr(tokenize.find("filename=") + 10);
-			value = trim(value, "\"");
-			_queries.insert(std::pair<std::string, std::string>("filename",value));
-			std::cout << "filename value: " << value << std::endl;
-		}
-		else if (tokenize.find("name=") != std::string::npos)
-		{
-			value = tokenize.substr(tokenize.find("name=") + 6);
-			value = trim(value, "\"");
-			_queries.insert(std::pair<std::string, std::string>("name",value));
-			std::cout << "name value: " << value << std::endl;
-		}
-		
-    }
-	
-	for (std::map<std::string, std::string>::const_iterator it = _queries.begin(); it != _queries.end(); it++) {
-    	std::cout << CYAN << (it)->first << "=" << (it)->second << RESET << std::endl;
-    }
-
-}
-
 void Response::setContentType()
 {
 /* 	if (_body.find("PNG") != std::string::npos)
@@ -208,12 +158,11 @@ void Response::setContentType()
 		return;
 	}
 	else
+	{
+		this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 		this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
-	//this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
-	//this->cgiType = trim(this->_type, "\n\r\t "); // pl, php, py
-	std::cout << "this->cgiType = " << this->cgiType << std::endl;
-	std::cout << "this->_type = " << this->_type << std::endl;
-	std::cout << "this->_contentType = " << this->_contentType << std::endl;
+	}
+
 }
 
 void Response::setDate()
@@ -324,10 +273,9 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex());
 	setPaths();
-	//setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	//setContentDisposition();
-	//setQueries();
+	if(this->_methodName == "GET")
+		setQueries();
 	return 0;
 }
 
@@ -353,12 +301,8 @@ void Response::createResponse(Request *request, ServerScope *serverScope, Locati
 	}
 
 	selectCgiPass();
-	if (this->statusCode == 200 && this->_methodName == "GET")
-		getMethod();
-	else if (this->statusCode == 200 && this->_methodName == "POST")
-		postMethod();
-	else if (this->statusCode == 200 && this->_methodName == "DELETE")
-		deleteMethod();
+	handleMethods();
+	_response = getHeader() + "\r\n" + _response;
 }
 
 std::string Response::notAllowed()
@@ -375,13 +319,10 @@ std::string Response::notAllowed()
 	return (header);
 }
 
-void Response::getMethod()
+void Response::handleCgi()
 {
-	bool cgiopen = false;
 	if (this->_cgiPass != "")
 	{
-		cgiopen = true;
-		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
 		Cgi cgi(_request, _serverScope, this);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
@@ -400,15 +341,38 @@ void Response::getMethod()
 			j -= 2;
 		_response = _response.substr(i, j - i);
 	}
-	if (this->statusCode == 200 && !cgiopen)
+}
+
+void Response::handleMethods()
+{
+	if (this->_methodName == "DELETE" || this->_methodName == "OPTIONS")
+	{
+		if (this->_methodName == "DELETE")
+			deleteMethod();
+		else if (this->_methodName == "OPTIONS")
+			readContent();
+		return ;
+	}
+	if (this->_cgiPass != "" &&(this->_methodName == "POST" || this->_methodName == "GET"))
+	{
+		handleCgi();
+		if (_response.find("------WEB") != std::string::npos)
+		{
+			int k = _response.find("------WEB");
+			_response = _response.substr(0, k);
+		}
+		std::cout << CYAN << "___response : \n" << _response << RESET << std::endl;
+	}
+	else if(this->_cgiPass == "" && this->_methodName == "POST")
+	{
+		this->statusCode = 204;
+		_response = this->errorHtml();
+	}
+	else if (this->_cgiPass == "" && this->_methodName == "GET")
 		readContent();
 	else
 		_response = this->errorHtml();
-	
-	if (this->statusCode == 500)
-		_response = staticErrorPage[500];
 
-	_response = getHeader() + "\r\n" + _response;
 }
 
 void Response::deleteMethod()
@@ -426,64 +390,10 @@ void Response::deleteMethod()
 	}
 	else
 		this->statusCode = 404;
-	if (this->statusCode == 403 || this->statusCode == 404)
+	
+	if (this->statusCode == 403 || this->statusCode == 404 || this->statusCode == 204)
 		_response = this->errorHtml();
 
-	_response = getHeader() + "\r\n" + _response;
-}
-
-void Response::postMethod()
-{
-	std::cout << PURPLE << "******POST*****" << RESET << std::endl;
-	std::cout << PURPLE << "cgi_pass : " << this->_cgiPass << RESET << std::endl;
-	if (this->_cgiPass != "")
-	{
-		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
-		Cgi cgi(_request, _serverScope, this);
-		size_t i = 0;
-		size_t j = _response.size() - 2;
-
-		_response = cgi.executeCgi(this->_cgiPass);
-		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-		{
-			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
-			std::cout << PURPLE << "str : " << str << RESET << std::endl;
-			if (str.find("Status: ") == 0)
-			{
-				this->statusCode = std::atoi(str.substr(8, 3).c_str());
-				std::cout << PURPLE << "CGIthis->statusCode : " << this->statusCode << RESET << std::endl;
-			}
-			else if (str.find("Content-Type: ") == 0)
-			{
-				this->_type = str.substr(14, str.size());
-				std::cout << PURPLE << "CGIthis->_type : " << this->_type << RESET << std::endl;
-			}
-			i += str.size() + 2;
-		}
-		//std::cout << PURPLE << "___response : \n" << _response << RESET << std::endl;
-		/* while (_response.find("\r\n", j) == j)
-			j -= 2;
-		size_t k = _response.find("\r\n\r\n") + 4;
-		_response = _response.substr(k, j - k); */
-		while (_response.find("\r\n", j) == j)
-			j -= 2;
-		_response = _response.substr(i, j - i);
-		if (_response.find("------WEB") != std::string::npos)
-		{
-			int k = _response.find("------WEB");
-			_response = _response.substr(0, k);
-		}
-		std::cout << CYAN << "___response : \n" << _response << RESET << std::endl;
-	}
-	else
-	{
-		this->statusCode = 204;
-		_response = "";
-	}
-	if (this->statusCode == 500)
-		_response = staticErrorPage[500];
-
-	_response = getHeader() + "\r\n" + _response;
 }
 
 std::string Response::errorHtml()
@@ -493,6 +403,10 @@ std::string Response::errorHtml()
 
 	if (this->statusCode == 403)
 		return (staticErrorPage[403]);
+	else if (this->statusCode == 500)
+		return (staticErrorPage[500]);
+	else if (this->statusCode == 204)
+		return (staticErrorPage[204]);
 
 	if (pathIsFile(this->_error_page))
 	{
@@ -603,7 +517,7 @@ void Response::selectCgiPass()
 	else 
 		this->_cgiPass = "";
 	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl;
-/* 	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
+	/* for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
 	{
 		for (size_t j = 0; j < 3; j++)
 		{

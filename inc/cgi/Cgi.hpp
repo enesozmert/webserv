@@ -50,5 +50,4 @@ class Cgi
         DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();
         void setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase);
         void keywordFill();
-        void upload();
 };

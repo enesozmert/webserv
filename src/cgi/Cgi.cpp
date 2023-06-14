@@ -133,7 +133,7 @@ void Cgi::keywordFill()
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "webserv"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("UPLOAD_PATH", "/Users/faozturk/Desktop/webserv/Website_to_test/uploads"));
 	//_envDatabase.insertData(CgiVariable<std::string, std::string>("HTTP_HOST", "200"));
