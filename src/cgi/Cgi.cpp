@@ -123,9 +123,8 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 
 void Cgi::keywordFill()
 {
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getContentLocation()));
-	//_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", "image/png"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getContentLocation()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(_request->getContentLength())));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
