@@ -197,9 +197,9 @@ void Response::parseContentDisposition()
 
 void Response::setContentType()
 {
-/* 	if (_body.find("------WebKitFormBoundary") != std::string::npos)
+/* 	if (_body.find("PNG") != std::string::npos)
 	{
-		this->_contentType = "multipart/form-data";
+		this->_contentType = "image/png";
 		return;
 	} */
 	if (_type != "")
@@ -461,10 +461,18 @@ void Response::postMethod()
 			i += str.size() + 2;
 		}
 		//std::cout << PURPLE << "___response : \n" << _response << RESET << std::endl;
-		while (_response.find("\r\n", j) == j)
+		/* while (_response.find("\r\n", j) == j)
 			j -= 2;
 		size_t k = _response.find("\r\n\r\n") + 4;
-		_response = _response.substr(k, j - k);
+		_response = _response.substr(k, j - k); */
+		while (_response.find("\r\n", j) == j)
+			j -= 2;
+		_response = _response.substr(i, j - i);
+		if (_response.find("------WEB") != std::string::npos)
+		{
+			int k = _response.find("------WEB");
+			_response = _response.substr(0, k);
+		}
 		std::cout << CYAN << "___response : \n" << _response << RESET << std::endl;
 	}
 	else
@@ -591,7 +599,7 @@ void Response::selectCgiPass()
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
 
 	if (cgiExtension == "php")
-		this->_cgiPass = "/Users/faozturk/Desktop/webserv/cgi_tester";
+		this->_cgiPass = "/usr/bin/php";
 	else if (cgiExtension == "pl")
 		this->_cgiPass = "/Users/faozturk/Desktop/webserv/cgi_tester";
 	else if (cgiExtension == "py")
