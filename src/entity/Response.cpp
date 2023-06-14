@@ -197,18 +197,19 @@ void Response::parseContentDisposition()
 
 void Response::setContentType()
 {
+/* 	if (_body.find("------WebKitFormBoundary") != std::string::npos)
+	{
+		this->_contentType = "multipart/form-data";
+		return;
+	} */
 	if (_type != "")
 	{
 		_contentType = _type;
 		return;
 	}
-	if (_body.find("------WebKitFormBoundary") != std::string::npos)
-	{
-		this->_contentType = "multipart/form-data";
-	}
 	else
 		this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
-	this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
+	//this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 	//this->cgiType = trim(this->_type, "\n\r\t "); // pl, php, py
 	std::cout << "this->cgiType = " << this->cgiType << std::endl;
 	std::cout << "this->_type = " << this->_type << std::endl;
@@ -323,7 +324,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex());
 	setPaths();
-	setContentType();
+	//setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	//setContentDisposition();
 	//setQueries();
@@ -376,10 +377,10 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
-	bool cgiopen =false;
+	bool cgiopen = false;
 	if (this->_cgiPass != "")
 	{
-		cgiopen =true;
+		cgiopen = true;
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
 		Cgi cgi(_request, _serverScope, this);
 		size_t i = 0;
@@ -401,8 +402,8 @@ void Response::getMethod()
 	}
 	if (this->statusCode == 200 && !cgiopen)
 		readContent();
-	//else
-		//_response = this->errorHtml();
+	else
+		_response = this->errorHtml();
 	
 	if (this->statusCode == 500)
 		_response = staticErrorPage[500];
@@ -447,9 +448,16 @@ void Response::postMethod()
 		{
 			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
 			if (str.find("Status: ") == 0)
+			{
 				this->statusCode = std::atoi(str.substr(8, 3).c_str());
+				std::cout << PURPLE << "CGIthis->statusCode : " << this->statusCode << RESET << std::endl;
+			}
 			else if (str.find("Content-Type: ") == 0)
-				this->_type = str.substr(14, str.size());
+			{
+				int semicolon = str.find(';');
+				this->_type = str.substr(14, semicolon - 14);
+				std::cout << PURPLE << "CGIthis->_type : " << this->_type << RESET << std::endl;
+			}
 			i += str.size() + 2;
 		}
 		while (_response.find("\r\n", j) == j)
@@ -541,7 +549,8 @@ std::string Response::writeHeader(void)
 std::string Response::getHeader()
 {
 	std::string header;
-
+	setContentType();
+	std::cout << PURPLE << "this->_contentType = " << this->_contentType << RESET << std::endl;
 	this->_contentLength = to_string(this->_response.size());
 	header = "HTTP/1.1 " + to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
@@ -579,16 +588,16 @@ void Response::selectCgiPass()
 	std::string cgiNames[3] = {"python", "perl", "php"};
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
 
-	/* if (cgiExtension == "php")
-		this->_cgiPass = "/opt/homebrew/bin/php";
+	if (cgiExtension == "php")
+		this->_cgiPass = "/Users/faozturk/Desktop/webserv/cgi_tester";
 	else if (cgiExtension == "pl")
-		this->_cgiPass = "/usr/bin/perl";
+		this->_cgiPass = "/Users/faozturk/Desktop/webserv/cgi_tester";
 	else if (cgiExtension == "py")
-		this->_cgiPass = "/usr/bin/python3";
+		this->_cgiPass = "/Users/faozturk/Desktop/webserv/cgi_tester";
 	else 
 		this->_cgiPass = "";
-	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl; */
-	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
+	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl;
+/* 	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
 	{
 		for (size_t j = 0; j < 3; j++)
 		{
@@ -600,7 +609,7 @@ void Response::selectCgiPass()
 			}
 		}
 	}
-	this->_cgiPass = "";
+	this->_cgiPass = ""; */
 }
 
 /********->auto_index<-*******/

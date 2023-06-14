@@ -1,6 +1,6 @@
 #pragma once
 
-# define CGI_BUFSIZE 4096
+# define CGI_BUFSIZE 65536
 
 #include <map>
 #include <string>
