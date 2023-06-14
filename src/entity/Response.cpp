@@ -454,8 +454,7 @@ void Response::postMethod()
 			}
 			else if (str.find("Content-Type: ") == 0)
 			{
-				int semicolon = str.find(';');
-				this->_type = str.substr(14, semicolon - 14);
+				this->_type = str.substr(14, str.size());
 				std::cout << PURPLE << "CGIthis->_type : " << this->_type << RESET << std::endl;
 			}
 			i += str.size() + 2;
