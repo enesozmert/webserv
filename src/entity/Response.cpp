@@ -447,6 +447,7 @@ void Response::postMethod()
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
+			std::cout << PURPLE << "str : " << str << RESET << std::endl;
 			if (str.find("Status: ") == 0)
 			{
 				this->statusCode = std::atoi(str.substr(8, 3).c_str());
@@ -459,10 +460,12 @@ void Response::postMethod()
 			}
 			i += str.size() + 2;
 		}
+		//std::cout << PURPLE << "___response : \n" << _response << RESET << std::endl;
 		while (_response.find("\r\n", j) == j)
 			j -= 2;
-
-		_response = _response.substr(i, j - i);
+		size_t k = _response.find("\r\n\r\n") + 4;
+		_response = _response.substr(k, j - k);
+		std::cout << CYAN << "___response : \n" << _response << RESET << std::endl;
 	}
 	else
 	{
