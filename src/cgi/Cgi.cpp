@@ -47,14 +47,14 @@ std::string Cgi::executeCgi(std::string scriptName)
 	if (pipe(cgi_result_pipe) < 0)
 		std::cerr << RED << "pipe problem" << RESET << std::endl;
 
-	if (_request->getHttpMethodName().find("POST") != std::string::npos)
-	{
+	//if (_request->getHttpMethodName().find("POST") != std::string::npos)
+	//{
 		ssize_t writeResult = write(request_body_pipe[1], _body.c_str(), _body.length());
 		if (writeResult == -1)
 		{
 			std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
 		}
-	}
+	//}
 	close(request_body_pipe[1]);
 
 	std::string contentLocation = _response->getContentLocation();
@@ -74,10 +74,10 @@ std::string Cgi::executeCgi(std::string scriptName)
 		close(cgi_result_pipe[0]);
 		dup2(cgi_result_pipe[1], STDOUT_FILENO);
 		close(cgi_result_pipe[1]);
-		if (_request->getHttpMethodName().find("POST") != std::string::npos)
-		{
+		//if (_request->getHttpMethodName().find("POST") != std::string::npos)
+		//{
 			dup2(request_body_pipe[0], STDIN_FILENO);
-		}
+		//}
 		close(request_body_pipe[0]);
 
 		execve(cmd[0], cmd, env);
@@ -123,7 +123,12 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 
 void Cgi::keywordFill()
 {
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
+	std::cout << CYAN << "_response->getContentType() " << _response->getContentType() << RESET << std::endl;
+	std::cout << CYAN << "_request->getContentType() " << _request->getContentType() << RESET << std::endl;
+	if (_request->getContentType() ==	"")
+		_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _response->getContentType()));
+	else
+		_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getContentLocation()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(_request->getContentLength())));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));

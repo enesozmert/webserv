@@ -20,6 +20,7 @@ class Response
 private:
     std::string                         _response;
     int                                 statusCode;
+    std::string					        cgi_return_type;
     std::string					        _type;
     std::map<int, std::string>	        staticErrorPage;
     std::map<int, std::string>	        _errors;

@@ -152,9 +152,9 @@ void Response::setContentType()
 		this->_contentType = "image/png";
 		return;
 	} */
-	if (_type != "")
+	if (cgi_return_type != "")
 	{
-		_contentType = _type;
+		_contentType = cgi_return_type;
 		return;
 	}
 	else
@@ -273,6 +273,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex());
 	setPaths();
+	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	if(this->_methodName == "GET")
 		setQueries();
@@ -334,7 +335,7 @@ void Response::handleCgi()
 			if (str.find("Status: ") == 0)
 				this->statusCode = std::atoi(str.substr(8, 3).c_str());
 			else if (str.find("Content-type: ") == 0)
-				this->_type = str.substr(14, str.size());
+				this->cgi_return_type = str.substr(14, str.size());
 			i += str.size() + 2;
 		}
 		while (_response.find("\r\n", j) == j)
@@ -356,6 +357,8 @@ void Response::handleMethods()
 	if (this->_cgiPass != "" &&(this->_methodName == "POST" || this->_methodName == "GET"))
 	{
 		handleCgi();
+		if (this->_methodName == "GET")
+			readContent();
 		if (_response.find("------WEB") != std::string::npos)
 		{
 			int k = _response.find("------WEB");
@@ -511,12 +514,12 @@ void Response::selectCgiPass()
 	std::string cgiExtensions[3] = {"py", "pl", "php"};
 	std::string cgiNames[3] = {"python", "perl", "php"};
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
-
-	if (cgiExtension == "php" || cgiExtension == "pl" || cgiExtension == "py")
+	this->_cgiPass = getPwd() + "/" + "cgi_tester";
+	/* if (cgiExtension == "php" || cgiExtension == "pl" || cgiExtension == "py")
 		this->_cgiPass = getPwd() + "/" + "cgi_tester";
 	else 
 		this->_cgiPass = "";
-	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl;
+	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl; */
 	/* for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
 	{
 		for (size_t j = 0; j < 3; j++)
