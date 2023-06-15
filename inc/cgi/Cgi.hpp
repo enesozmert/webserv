@@ -27,14 +27,13 @@ class LocationScope;
 class Cgi
 {
     private:
-        Request *_request;
-        Response *_response;
-        ServerScope *_serverScope;
-        LocationScope *_locationScope;
-        DataBase<CgiVariable<std::string, std::string> > _envDatabase;
-    	std::string							_body;
-        std::map<std::string, std::string>  _query;
-        char	**env;
+        Request                                             *_request;
+        Response                                            *_response;
+        ServerScope                                         *_serverScope;
+        LocationScope                                       *_locationScope;
+        DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
+    	std::string                                         _body;
+        std::map<std::string, std::string>                  _query;
     
     public:
         Cgi();
