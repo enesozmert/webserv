@@ -350,9 +350,12 @@ void Response::handleMethods()
 			readContent();
 		return;
 	}
-	if (this->_cgiPass != "" &&(this->_methodName == "POST"))
+	if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET"))
 	{
 		handleCgi();
+		isCgi = true;
+		std::cout << CYAN << "___response : \n"
+				  << _response << RESET << std::endl;
 	}
 	else if (this->statusCode == 200 && !isCgi)
 		readContent();
@@ -361,10 +364,10 @@ void Response::handleMethods()
 		this->statusCode = 204;
 		_response = this->errorHtml();
 	}
-	else if (this->_methodName == "GET")
-		readContent();
-	else
+	else{
+		this->statusCode = 204;
 		_response = this->errorHtml();
+	}
 
 }
 
