@@ -106,7 +106,7 @@ void    Server::process(long socket, HttpScope* http)
     if (_requests[socket].size() < 1000)//request ekrana basıyoruz
         std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket] << "]" << RESET << std::endl;
     else
-        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1000) << "..." << "]" << RESET << std::endl;
+        std::cout << RED << "\nRequest :" << std::endl << "[" << _requests[socket].substr(0, 1500) << "..." << "]" << RESET << std::endl;
 
     if (_requests[socket] != "")
     {

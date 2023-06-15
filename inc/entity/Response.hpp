@@ -20,6 +20,7 @@ class Response
 private:
     std::string                         _response;
     int                                 statusCode;
+    std::string					        cgi_return_type;
     std::string					        _type;
     std::map<int, std::string>	        staticErrorPage;
     std::map<int, std::string>	        _errors;
@@ -91,7 +92,8 @@ public:
     void                        setContentDisposition();
     void                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
     void                        keywordFill();
-
+    void                        handleCgi();
+    void                        handleMethods();
 
 
     void                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope);
