@@ -35,8 +35,8 @@ class Cgi
         std::map<std::string, std::string>  _query;
         std::vector<std::string>            _contentDispos;
         char	**env;
-        int request_body_pipe[2];
-	    int cgi_result_pipe[2];
+        //int request_body_pipe[2];
+	    //int cgi_result_pipe[2];
 
     
     public:

@@ -51,6 +51,9 @@ int Server::setUpSocket()
 {
     int opt = 1;
     fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET-->ipv4   SOCK_STREAM-->TCP
+    fcntl(fd, F_SETFL, O_NONBLOCK);
+    this->setAddr();
+    //inet_pton(fd, "127.0.0.1", &addr);
     if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
     {
         std::cerr << RED << "Could not re addr." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
@@ -61,7 +64,6 @@ int Server::setUpSocket()
         std::cerr << RED << "Could not create server." << RESET << std::endl; //hatalar ortak bir yerden yönetilecek
         return -1;
     }
-    this->setAddr();
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) // ip:port (192.168.1.1:443) (host)ip ve port arasındaki bağlantıyı kurar
     {
         ::close(fd);
@@ -88,7 +90,7 @@ long Server::accept(void)
         std::cerr << RED << "Could not create socket. " << RESET << std::endl;
         return(-1);
     }
-    fcntl(client_fd, F_SETFL, O_NONBLOCK); // socket ayarlarını bloklanmamış olarak değiştiriyoruz.
+    //fcntl(client_fd, F_SETFL, O_NONBLOCK); // socket ayarlarını bloklanmamış olarak değiştiriyoruz.
     _requests.insert(std::make_pair(client_fd, ""));
     return (client_fd);
 }

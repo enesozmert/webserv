@@ -147,11 +147,11 @@ void Response::setQueries()
 
 void Response::setContentType()
 {
-	/* 	if (_body.find("PNG") != std::string::npos)
-		{
-			this->_contentType = "image/png";
-			return;
-		} */
+/* 	if (_body.find("Content-Type: ") != std::string::npos)
+	{
+		_contentType = "image/png";
+		return ;
+	} */
 	if (cgi_return_type != "")
 	{
 		_contentType = cgi_return_type;
@@ -162,6 +162,7 @@ void Response::setContentType()
 		this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 		this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	}
+	std::cout << "Content-Type: " << _contentType << std::endl;
 }
 
 void Response::setDate()
@@ -218,23 +219,28 @@ int Response::setPaths()
 	this->_serverRootPath = _serverScope->getRoot();
 	this->_locationRootPath = _locationScope->getRoot();
 	this->_index = selectIndex();
-	trimmed = trim(_request->getPath(), "\n\r\t ");
 
-	if (trimmed == "/favicon.ico" || trimmed == "favicon.ico")
-		this->_path = "/tests/test1/icon.png";
+	if (_request->getPath() == "/favicon.ico" || _request->getPath() == "favicon.ico")
+	{
+		this->_path = _locationRootPath + "icon.png";
+		this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
+		return 0;
+	}
+
 	if (_locationRootPath != "")
-		this->_path = removeAdjacentSlashes(_locationRootPath + trimmed);
+		this->_path = removeAdjacentSlashes(getPwd() + "/" + _locationRootPath + _request->getPath());
 	else if (_serverRootPath != "" && _locationRootPath == "")
-		this->_path = removeAdjacentSlashes(_serverRootPath + trimmed);
+		this->_path = removeAdjacentSlashes(getPwd() + "/" + _serverRootPath + _request->getPath());
 
 	if (!pathIsFile(this->_path))
 	{
 		if (_locationRootPath != "")
-			this->_path = removeAdjacentSlashes(_locationRootPath + _index);
+			this->_path = removeAdjacentSlashes(getPwd() + "/" + _locationRootPath + _index);
 		else if (_serverRootPath != "" && _locationRootPath == "")
-			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
+			this->_path = removeAdjacentSlashes(getPwd() + "/" + _serverRootPath + _index);
 	}
-	this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
+	this->_contentLocation = this->_path;
+	std::cout << "this->_contentLocation " << this->_contentLocation << std::endl;
 	return 0;
 }
 
@@ -271,7 +277,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex());
 	setPaths();
-	// setContentType();
+	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
 	if (this->_methodName == "GET")
 		setQueries();
@@ -354,8 +360,6 @@ void Response::handleMethods()
 	{
 		handleCgi();
 		isCgi = true;
-		std::cout << CYAN << "___response : \n"
-				  << _response << RESET << std::endl;
 	}
 	else if (this->statusCode == 200 && !isCgi)
 		readContent();
@@ -470,7 +474,6 @@ std::string Response::getHeader()
 	std::string header;
 
 	setContentType();
-	std::cout << PURPLE << "this->_contentType = " << this->_contentType << RESET << std::endl;
 	this->_contentLength = to_string(this->_response.size());
 	header = "HTTP/1.1 " + to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
