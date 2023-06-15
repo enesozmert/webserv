@@ -359,11 +359,7 @@ void Response::handleMethods()
 		handleCgi();
 		if (this->_methodName == "GET")
 			readContent();
-		if (_response.find("------WEB") != std::string::npos)
-		{
-			int k = _response.find("------WEB");
-			_response = _response.substr(0, k);
-		}
+	
 		std::cout << CYAN << "___response : \n" << _response << RESET << std::endl;
 	}
 	else if(this->_cgiPass == "" && this->_methodName == "POST")

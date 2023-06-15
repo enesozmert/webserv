@@ -128,7 +128,15 @@ void Cgi::keywordFill()
 	if (_request->getContentType() ==	"")
 		_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _response->getContentType()));
 	else
-		_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
+	{
+		if(_request->getContentType() == "image/png")
+		{
+			std::cout << CYAN << "buraya girdi " << RESET << std::endl;
+			_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", "multipart/form-data; boundary=----WebKitFormBoundarydDBq81dpDu1l59Zk"));
+		}
+		else
+			_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _response->getContentType()));
+	}
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _response->getContentLocation()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(_request->getContentLength())));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _response->getContentLocation()));
