@@ -21,16 +21,15 @@
 class Server {
     private:
         std::map<long, std::string>	_requests;
-    	t_listen					_listen;//host and port
-    	long						fd;
-    	struct sockaddr_in			addr;//host ve port ayarlanacak
-        int                         locationScopeIndex;
+    	long						_fd;
+    	t_listen					_listen;
+    	struct sockaddr_in			_addr;
+        int                         _locationScopeIndex;
 
     public:
         Server();
         Server(const t_listen &listen);
         Server(const Server &server);
-        //Server &operator=(const Server &server);
         ~Server();
 
         long            getFd() const;

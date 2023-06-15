@@ -26,10 +26,6 @@ std::string Response::getContentLocation()
 {
 	return (this->_contentLocation);
 }
-std::string Response::getContentDisposition()
-{
-    return (this->_contentDisposition);
-}
 
 std::string Response::getContentType()
 {
@@ -107,10 +103,6 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setQueries()
 {
-	/* const std::size_t pair_delimiter = _body.find('=');
-	const std::string key = _body.substr(0, pair_delimiter);
-	std::string value = _body.substr(pair_delimiter + 1, _body.length() - (pair_delimiter + 1));
-	this->_queries[key] = value; */
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -142,57 +134,6 @@ void Response::setQueries()
 		}
 		position = next_delimiter + 1;
 	}
-}
-
-void Response::setContentDisposition()
-{
-	std::string	_contentDispositionTemp = this->_body;
-	std::string	_contentTypeTemp = this->_body;
-	if (_body.find("------WebKitFormBoundary") != std::string::npos)
-	{
-		size_t start = _contentDispositionTemp.find("Content-Disposition: ") + 21;
-		size_t end = _contentDispositionTemp.find("Content-Type: ") - 1;
-		this->_contentDisposition = _contentDispositionTemp.substr(start, end - start);
-		this->_contentType = "multipart/form-data";
-		parseContentDisposition();
-		std::cout << CYAN << "this->_contentType: " << this->_contentType << RESET << std::endl;
-	}
-}
-void Response::parseContentDisposition()
-{
-	std::string token;
-	std::string tokenize;
-	std::string key;
-	std::string value;
-	char delimiter = ';';
-	std::string tmp = this->_contentDisposition;
-	std::stringstream ss(tmp);
-   
-    while (std::getline(ss, token, delimiter))
-    {
-        tokenize = trim(token, " \r\n");
-		std::cout << "tokenize: " << tokenize << std::endl;
-		if (tokenize.find("filename=") != std::string::npos)
-		{
-			value = tokenize.substr(tokenize.find("filename=") + 10);
-			value = trim(value, "\"");
-			_queries.insert(std::pair<std::string, std::string>("filename",value));
-			std::cout << "filename value: " << value << std::endl;
-		}
-		else if (tokenize.find("name=") != std::string::npos)
-		{
-			value = tokenize.substr(tokenize.find("name=") + 6);
-			value = trim(value, "\"");
-			_queries.insert(std::pair<std::string, std::string>("name",value));
-			std::cout << "name value: " << value << std::endl;
-		}
-		
-    }
-	
-	for (std::map<std::string, std::string>::const_iterator it = _queries.begin(); it != _queries.end(); it++) {
-    	std::cout << CYAN << (it)->first << "=" << (it)->second << RESET << std::endl;
-    }
-
 }
 
 void Response::setContentType()
@@ -320,7 +261,6 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	setContentDisposition();
 	//setQueries();
 	return 0;
 }
@@ -333,18 +273,18 @@ void Response::createResponse(Request *request, ServerScope *serverScope, Locati
 	if (setResponse(request, serverScope, locationScope) == -1)
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
 
-	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
-	{
-		this->statusCode = 405;
-		_response = notAllowed() + "\r\n";
-		return;
-	}
-	else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
-	{
-		this->statusCode = 413;
-		_response = notAllowed() + "\r\n";
-		return;
-	}
+	// if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
+	// {
+	// 	this->statusCode = 405;
+	// 	_response = notAllowed() + "\r\n";
+	// 	return;
+	// }
+	// else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
+	// {
+	// 	this->statusCode = 413;
+	// 	_response = notAllowed() + "\r\n";
+	// 	return;
+	// }
 
 	selectCgiPass();
 	if (this->statusCode == 200 && this->_methodName == "GET")
@@ -371,12 +311,12 @@ std::string Response::notAllowed()
 
 void Response::getMethod()
 {
-	bool cgiopen =false;
+	bool cgiopen = false;
 	if (this->_cgiPass != "")
 	{
 		cgiopen =true;
 		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
-		Cgi cgi(_request, _serverScope, this);
+		Cgi cgi(_request, this, _serverScope, _locationScope);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
 
@@ -433,7 +373,7 @@ void Response::postMethod()
 	if (this->_cgiPass != "")
 	{
 		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
-		Cgi cgi(_request, _serverScope, this);
+		Cgi cgi(_request, this, _serverScope, _locationScope);
 		size_t i = 0;
 		size_t j = _response.size() - 2;
 
@@ -554,7 +494,7 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
 	// _keywordDatabase.insertData(Variable<std::string>("Last-Modified", &this->_lastModified));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
-	_keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
+	// _keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
 }
 
 std::string Response::selectIndex()

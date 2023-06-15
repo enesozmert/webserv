@@ -1,23 +1,59 @@
-<?php 
-echo "hello"; 
-// if (isset($_POST))
-	print_r($_POST);
-
-// if (isset($_POST['try']))
-	echo $_POST['try'];
-
-?>
-<!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+   
 </head>
-<body>
-	<form method="post" action="#">
-	<input name="try" id="try" type="text">
-	<input type="submit" value="send">
-	</form>
+<body style="background-color: whitesmoke; color: blue;">
+
+<h1>Uploading images using PHP-CGI</h1>
+
+
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+   <form action="upload.php" method="post" enctype="multipart/form-data">
+         <input type="file" name="image" id="image" />
+         <input type="submit"/>
+      </form>
+
+
+   <?php
+   if(isset($_FILES['image']))
+   {
+      $errors= array();
+      $file_name = $_FILES['image']['name'];
+      $file_size =$_FILES['image']['size'];
+      $file_tmp = $_FILES['image']['tmp_name'];
+      $file_type= $_FILES['image']['type'];
+      $tmp = $_FILES['image']['name'];
+      $tmp = explode('.',$tmp);
+      $file_ext = strtolower(end($tmp));
+      
+      $extensions= array("jpeg","jpg","png");
+      
+      if(in_array($file_ext,$extensions) === false)
+      {
+         $errors[]="extension not allowed, please choose a JPEG or PNG file.";
+      }
+      $path = "uploads/".$file_name ;
+      move_uploaded_file($file_tmp,$path);
+      echo "Success <br/>";
+      
+
+      if(empty($errors)==true)
+      {
+         #echo '<img src="./'.$path.'" width=50% />';
+      }
+      else
+      {
+         print_r($errors);
+      }
+   }
+   else
+   {
+      echo "No file has been uploaded";
+   }
+?>
+
+
+
+</div>
 </body>
 </html>
