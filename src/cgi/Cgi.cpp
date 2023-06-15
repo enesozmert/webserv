@@ -47,14 +47,14 @@ std::string Cgi::executeCgi(std::string scriptName)
 	if (pipe(cgi_result_pipe) < 0)
 		std::cerr << RED << "pipe problem" << RESET << std::endl;
 
-	//if (_request->getHttpMethodName().find("POST") != std::string::npos)
-	//{
+	if (_request->getHttpMethodName().find("POST") != std::string::npos)
+	{
 		ssize_t writeResult = write(request_body_pipe[1], _body.c_str(), _body.length());
 		if (writeResult == -1)
 		{
 			std::cerr << RED << "write problem: " << strerror(errno) << RESET << std::endl;
 		}
-	//}
+	}
 	close(request_body_pipe[1]);
 
 	std::string contentLocation = _response->getContentLocation();
@@ -74,10 +74,10 @@ std::string Cgi::executeCgi(std::string scriptName)
 		close(cgi_result_pipe[0]);
 		dup2(cgi_result_pipe[1], STDOUT_FILENO);
 		close(cgi_result_pipe[1]);
-		//if (_request->getHttpMethodName().find("POST") != std::string::npos)
-		//{
+		if (_request->getHttpMethodName().find("POST") != std::string::npos)
+		{
 			dup2(request_body_pipe[0], STDIN_FILENO);
-		//}
+		}
 		close(request_body_pipe[0]);
 
 		execve(cmd[0], cmd, env);
