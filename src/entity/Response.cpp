@@ -28,12 +28,12 @@ std::string Response::getContentLocation()
 }
 std::string Response::getContentDisposition()
 {
-    return (this->_contentDisposition);
+	return (this->_contentDisposition);
 }
 
 std::string Response::getContentType()
 {
-    return (this->_contentType);
+	return (this->_contentType);
 }
 
 std::string Response::getPath()
@@ -147,11 +147,11 @@ void Response::setQueries()
 
 void Response::setContentType()
 {
-/* 	if (_body.find("PNG") != std::string::npos)
-	{
-		this->_contentType = "image/png";
-		return;
-	} */
+	/* 	if (_body.find("PNG") != std::string::npos)
+		{
+			this->_contentType = "image/png";
+			return;
+		} */
 	if (cgi_return_type != "")
 	{
 		_contentType = cgi_return_type;
@@ -162,7 +162,6 @@ void Response::setContentType()
 		this->_type = this->_path.substr(this->_path.rfind(".") + 1, this->_path.size() - this->_path.rfind("."));
 		this->_contentType = _httpContentType.contentTypeGenerator(trim(this->_type, "\n\r\t "));
 	}
-
 }
 
 void Response::setDate()
@@ -215,7 +214,7 @@ void Response::setLanguage(std::vector<std::pair<std::string, float> > languages
 int Response::setPaths()
 {
 	std::string trimmed;
-	
+
 	this->_serverRootPath = _serverScope->getRoot();
 	this->_locationRootPath = _locationScope->getRoot();
 	this->_index = selectIndex();
@@ -227,7 +226,6 @@ int Response::setPaths()
 		this->_path = removeAdjacentSlashes(_locationRootPath + trimmed);
 	else if (_serverRootPath != "" && _locationRootPath == "")
 		this->_path = removeAdjacentSlashes(_serverRootPath + trimmed);
-
 
 	if (!pathIsFile(this->_path))
 	{
@@ -273,9 +271,9 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex());
 	setPaths();
-	setContentType();
+	// setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	if(this->_methodName == "GET")
+	if (this->_methodName == "GET")
 		setQueries();
 	return 0;
 }
@@ -322,60 +320,53 @@ std::string Response::notAllowed()
 
 void Response::handleCgi()
 {
-	if (this->_cgiPass != "")
-	{
-		Cgi cgi(_request, _serverScope, this);
-		size_t i = 0;
-		size_t j = _response.size() - 2;
+	Cgi cgi(_request, this, _serverScope, _locationScope);
+	size_t i = 0;
+	size_t j = _response.size() - 2;
 
-		_response = cgi.executeCgi(this->_cgiPass);
-		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-		{
-			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
-			if (str.find("Status: ") == 0)
-				this->statusCode = std::atoi(str.substr(8, 3).c_str());
-			else if (str.find("Content-type: ") == 0)
-				this->cgi_return_type = str.substr(14, str.size());
-			i += str.size() + 2;
-		}
-		while (_response.find("\r\n", j) == j)
-			j -= 2;
-		_response = _response.substr(i, j - i);
+	_response = cgi.executeCgi(this->_cgiPass);
+	while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
+	{
+		std::string str = _response.substr(i, _response.find("\r\n", i) - i);
+		if (str.find("Status: ") == 0)
+			this->statusCode = std::atoi(str.substr(8, 3).c_str());
+		else if (str.find("Content-type: ") == 0)
+			this->cgi_return_type = str.substr(14, str.size());
+		i += str.size() + 2;
 	}
+	while (_response.find("\r\n", j) == j)
+		j -= 2;
+	_response = _response.substr(i, j - i);
 }
 
 void Response::handleMethods()
 {
+	bool isCgi = false;
 	if (this->_methodName == "DELETE" || this->_methodName == "OPTIONS")
 	{
 		if (this->_methodName == "DELETE")
 			deleteMethod();
 		else if (this->_methodName == "OPTIONS")
 			readContent();
-		return ;
+		return;
 	}
-	if (this->_cgiPass != "" &&(this->_methodName == "POST" || this->_methodName == "GET"))
+	if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET"))
 	{
 		handleCgi();
-		if (this->_methodName == "GET")
-			readContent();
-		if (_response.find("------WEB") != std::string::npos)
-		{
-			int k = _response.find("------WEB");
-			_response = _response.substr(0, k);
-		}
-		std::cout << CYAN << "___response : \n" << _response << RESET << std::endl;
+		isCgi = true;
+		// if (this->_methodName == "GET" && !isCgi)
+			// readContent();
+		std::cout << CYAN << "___response : \n"
+				  << _response << RESET << std::endl;
 	}
-	else if(this->_cgiPass == "" && this->_methodName == "POST")
+	else if (this->statusCode == 200 && !isCgi)
+		readContent();
+	else if (this->_cgiPass == "" && this->_methodName == "POST")
 	{
 		this->statusCode = 204;
 		_response = this->errorHtml();
 	}
-	else if (this->_cgiPass == "" && this->_methodName == "GET")
-		readContent();
-	else
-		_response = this->errorHtml();
-
+	
 }
 
 void Response::deleteMethod()
@@ -393,10 +384,9 @@ void Response::deleteMethod()
 	}
 	else
 		this->statusCode = 404;
-	
+
 	if (this->statusCode == 403 || this->statusCode == 404 || this->statusCode == 204)
 		_response = this->errorHtml();
-
 }
 
 std::string Response::errorHtml()
@@ -476,6 +466,7 @@ std::string Response::writeHeader(void)
 std::string Response::getHeader()
 {
 	std::string header;
+
 	setContentType();
 	std::cout << PURPLE << "this->_contentType = " << this->_contentType << RESET << std::endl;
 	this->_contentLength = to_string(this->_response.size());
@@ -514,13 +505,13 @@ void Response::selectCgiPass()
 	std::string cgiExtensions[3] = {"py", "pl", "php"};
 	std::string cgiNames[3] = {"python", "perl", "php"};
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
-	this->_cgiPass = getPwd() + "/" + "cgi_tester";
+	// this->_cgiPass = getPwd() + "/" + "cgi_tester";
 	/* if (cgiExtension == "php" || cgiExtension == "pl" || cgiExtension == "py")
 		this->_cgiPass = getPwd() + "/" + "cgi_tester";
-	else 
+	else
 		this->_cgiPass = "";
 	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl; */
-	/* for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
+	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
 	{
 		for (size_t j = 0; j < 3; j++)
 		{
@@ -532,7 +523,7 @@ void Response::selectCgiPass()
 			}
 		}
 	}
-	this->_cgiPass = ""; */
+	this->_cgiPass = "";
 }
 
 /********->auto_index<-*******/

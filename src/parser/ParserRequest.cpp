@@ -13,27 +13,30 @@ void ParserRequest::parse(std::string raw)
 	std::string line;
 	std::string lineTrim;
 	std::string delimiter = "\n";
+	std::string tempRaw;
 	size_t pos = 0;
 
 	if (raw == "")
 		raw = this->_raw;
+	size_t endIndex = this->_raw.find("\r\n\r\n");
+	tempRaw = raw.substr(0, endIndex);
+	tempRaw += "\n";
 
-	if ((pos = raw.find_first_of(delimiter)) != std::string::npos)
+	if ((pos = tempRaw.find_first_of(delimiter)) != std::string::npos)
     {
-        line = raw.substr(0, pos + 1);
-        raw.erase(0, pos + 1);
+        line = tempRaw.substr(0, pos + 1);
+        tempRaw.erase(0, pos + 1);
         this->_firstLine = line;
         line.clear();
     }
 
-	while ((pos = raw.find_first_of(delimiter)) != std::string::npos)
+	while ((pos = tempRaw.find_first_of(delimiter)) != std::string::npos)
 	{
-		line = raw.substr(0, pos + 1);
+		line = tempRaw.substr(0, pos + 1);
         lineTrim = trim(line, "\n\r");
         std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
         this->_lines.push_back(lineTrim);
-		//std::cout << PURPLE << "lineTrim REQUEST : " << lineTrim << RESET << std::endl;
-		raw.erase(0, pos + 1);
+		tempRaw.erase(0, pos + 1);
 	}
 	parseFirstLine();
 	parseKeyValue();
@@ -62,7 +65,7 @@ void ParserRequest::parseKeyValue()
 	std::string line;
 	std::string key;
 	std::string value;
-
+	
 	for (size_t i = 0; i < this->_lines.size(); i++)
 	{
 		line = this->_lines[i];

@@ -29,6 +29,7 @@ class Cgi
         Request *_request;
         Response *_response;
         ServerScope *_serverScope;
+        LocationScope *_locationScope;
         DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
     	std::string							_body;//HTTP istek gövdesi
         std::map<std::string, std::string>  _query;
@@ -43,7 +44,7 @@ class Cgi
         Cgi();
         Cgi(const Cgi &cgi);
         Cgi& operator=(const Cgi &cgi);
-    	Cgi(Request *request, ServerScope* serverScope, Response* response); // sets up env according to the request
+    	Cgi(Request *request, Response *response,  ServerScope *serverScope, LocationScope *locationScope);
         ~Cgi();
     
     	std::string		executeCgi(std::string scriptName);	// executes cgi and returns body
