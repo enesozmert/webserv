@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <map>
+#include <arpa/inet.h>
 
 #include "../entity/Listen.hpp"
 #include "../entity/HttpScope.hpp"

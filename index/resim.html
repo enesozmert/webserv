@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Uploading images using PHP-CGI</title>
+   <style>
+      body {
+         background-color: lightgrey;
+         color: red;
+      }
+   </style>
+</head>
+<body>
+   <h1>Uploading images using PHP-CGI</h1>
+   <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+      <form action="resim.php" method="POST" enctype="multipart/form-data">
+         <input type="file" name="image" />
+         <input type="submit" value="Upload" />
+      </form>
+   </div>
+</body>
+</html>

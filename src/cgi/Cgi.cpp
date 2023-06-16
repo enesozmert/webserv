@@ -52,6 +52,7 @@ std::string Cgi::executeCgi(std::string scriptName)
 
 	close(pipeFd[1]);
 	std::string contentLocation = _response->getContentLocation();
+	std::cout << GREEN << "contentLocation = " << contentLocation << RESET << std::endl;
 	char *cmd[] = {&scriptName[0], &contentLocation[0], NULL};
 	if (!fork())
 	{
@@ -96,21 +97,24 @@ void Cgi::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDat
 
 void Cgi::keywordFill()
 {
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", _locationScope->getRoot() + _locationScope->getIndex()[0]));
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", _locationScope->getRoot() + _locationScope->getIndex()[0]));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", removeAdjacentSlashes(getPwd() + "/" + _locationScope->getRoot() + _request->getPath())));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", removeAdjacentSlashes(getPwd() + "/" + _locationScope->getRoot() + _request->getPath())));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", _request->getContentType()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(_request->getContentLength())));
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", _locationScope->getRoot() + _locationScope->getIndex()[0]));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", removeAdjacentSlashes(_locationScope->getRoot() + _request->getPath())));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("GATEWAY_INTERFACE", "CGI/1.1"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("QUERY_STRING", ""));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_METHOD", _response->getMethodName()));
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", "/" + _locationScope->getIndex()[0]));
-	// _envDatabase.insertData(CgiVariable<std::string, std::string>("REMOTEaddr", _serverScope->getHost()));
+	if (_locationScope->getRoot() != "")
+		_envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", removeAdjacentSlashes(_locationScope->getRoot() + _request->getPath())));
+	else
+		_envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", removeAdjacentSlashes(_request->getPath())));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("REQUEST_URI", removeAdjacentSlashes(_request->getPath())));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PORT", _serverScope->getPort()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "nginx/webserv"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
-	_envDatabase.insertData(CgiVariable<std::string, std::string>("HTTP_HOST", _locationScope->getRoot() + _locationScope->getIndex()[0]));
+
 	if (_response->getMethodName() == "GET")
 	{
 		for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
