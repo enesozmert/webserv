@@ -347,7 +347,6 @@ void Response::handleCgi()
 
 void Response::handleMethods()
 {
-	bool isCgi = false;
 	if (this->_methodName == "DELETE" || this->_methodName == "OPTIONS")
 	{
 		if (this->_methodName == "DELETE")
@@ -360,17 +359,28 @@ void Response::handleMethods()
 	if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET"))
 	{
 		handleCgi();
-		isCgi = true;
+		if (this->_methodName == "POST" && this->statusCode != 200)
+		{
+			_response = this->errorHtml();
+		}
+		else if (this->_methodName == "GET")
+		{
+			if (this->statusCode != 200)
+				_response = this->errorHtml();
+			else
+				readContent();
+		}
+		return ;
 	}
-	else if (this->statusCode == 200 && this->_methodName == "GET")
-		readContent();
 	else if (this->_cgiPass == "" && this->_methodName == "POST")
 	{
 		this->statusCode = 204;
 		_response = "";
+		return ;
 	}
-	else{
-		_response = this->errorHtml();
+	else if (this->_cgiPass == "" && this->_methodName == "GET")
+	{
+		readContent();
 	}
 }
 
