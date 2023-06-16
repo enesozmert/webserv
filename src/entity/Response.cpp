@@ -350,6 +350,7 @@ void Response::handleMethods()
 			readContent();
 		return;
 	}
+
 	if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET"))
 	{
 		handleCgi();
@@ -357,18 +358,16 @@ void Response::handleMethods()
 		std::cout << CYAN << "___response : \n"
 				  << _response << RESET << std::endl;
 	}
-	else if (this->statusCode == 200 && !isCgi)
+	else if (this->statusCode == 200 && this->_methodName == "GET")
 		readContent();
 	else if (this->_cgiPass == "" && this->_methodName == "POST")
 	{
 		this->statusCode = 204;
-		_response = this->errorHtml();
+		_response = "";
 	}
 	else{
-		this->statusCode = 204;
 		_response = this->errorHtml();
 	}
-
 }
 
 void Response::deleteMethod()
@@ -507,13 +506,15 @@ void Response::selectCgiPass()
 	std::string cgiExtensions[3] = {"py", "pl", "php"};
 	std::string cgiNames[3] = {"python", "perl", "php"};
 	std::string cgiExtension = this->_path.substr(this->_path.find(".") + 1, this->_path.length());
+	//this->_cgiPass = "/usr/bin/php-cgi";
+	this->_cgiPass = getPwd() + "/" + "cgi_tester";
 	// this->_cgiPass = getPwd() + "/" + "cgi_tester";
 	/* if (cgiExtension == "php" || cgiExtension == "pl" || cgiExtension == "py")
 		this->_cgiPass = getPwd() + "/" + "cgi_tester";
 	else
 		this->_cgiPass = "";
 	std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl; */
-	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
+/* 	for (size_t i = 0; i < _locationScope->getCgiPass().size(); i++)
 	{
 		for (size_t j = 0; j < 3; j++)
 		{
@@ -525,7 +526,7 @@ void Response::selectCgiPass()
 			}
 		}
 	}
-	this->_cgiPass = "";
+	this->_cgiPass = ""; */
 }
 
 /********->auto_index<-*******/
