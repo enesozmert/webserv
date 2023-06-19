@@ -1,7 +1,6 @@
 #pragma once
 
 #include <list>
-#include <sys/time.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -80,7 +79,7 @@ public:
     void                        setAllowMethods(std::vector<std::string> methods);
     void	                    setContentType();
     void                        setQueries();
-    void	                    setDate();
+    //void	                    setDate();
     void	                    setLastModified();
     void                        setAutoIndex(std::string _autoIndex);
     void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
@@ -96,7 +95,7 @@ public:
     void                        handleMethods();
 
 
-    void                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope);
+    std::string                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope, std::string _Body);
 
     std::string                 notAllowed();
     std::string                 writeHeader(void);
@@ -113,6 +112,7 @@ public:
 
     std::string         getLink(std::string const &dirEntry, std::string const &dirName);
     std::string         getPage();
+    void                writeResponse();
 
 
 };

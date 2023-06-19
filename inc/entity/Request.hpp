@@ -36,6 +36,7 @@ class Request : public IRequest
         std::string                         _httpMethodName;
         std::string                         _authScheme;
         std::string                         _authorization;
+        int                                  _multi;
         int                                 _returnCode;
         HttpMethod                          _httpMethod;
         DataBase<Variable<std::string> >    _keywordDatabase;
@@ -46,8 +47,9 @@ class Request : public IRequest
         //Request &operator=(const Request &request);
 
         int                                         getPort();
-        int                                         getContentLength();
+        size_t                                      getContentLength();
         int                                         getReturnCode();
+        int                                         getMulti();
         std::string                                 getVersion();
         std::string                                 getPath();
         std::string                                 getBody();
@@ -90,6 +92,7 @@ class Request : public IRequest
         void                                        setAuthorization(std::string authorization);
         void                                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
         void                                        keywordFill();
+     
 
         Request*    clone() const;
         Request*    cloneNew() const;

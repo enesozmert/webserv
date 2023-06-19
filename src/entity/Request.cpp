@@ -4,6 +4,7 @@ Request::Request()
 {
     this->_returnCode = 200;
     this->keywordFill();
+    this->_body = "";
 }
 Request::~Request() {}
 /* Request::Request(const Request& request)
@@ -31,6 +32,10 @@ std::string Request::getBody()
 std::string Request::getQuery()
 {
     return (this->_query);
+}
+int Request::getMulti()
+{
+    return (this->_multi);
 }
 int Request::getPort()
 {
@@ -121,9 +126,9 @@ std::string Request::getContentType()
 {
     return (this->_contentType);
 }
-int Request::getContentLength()
+size_t Request::getContentLength()
 {
-    int numberOfContentLength = 0;
+    size_t numberOfContentLength = 0;
     std::istringstream portStream(this->_contentLength);
     portStream >> numberOfContentLength;
     return (numberOfContentLength);
@@ -163,6 +168,7 @@ void Request::setPath(std::string path)
 void Request::setBody(std::string body)
 {
     this->_body = body;
+    this->_body.push_back('\0');
 }
 void Request::setQuery(std::string query)
 {

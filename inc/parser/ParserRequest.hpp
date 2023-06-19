@@ -20,12 +20,16 @@ class ParserRequest
         std::string                 _raw;
         std::vector<std::string>    _lines;
         std::string                 _firstLine;
+        int                         status;
+        int                         _multi;
+        bool                        isPost;
+        //int                         IsFav;
     public:
         ParserRequest();
         ~ParserRequest();
         ParserRequest(std::string raw);
 
-        void parse(std::string raw = "");
+        int parse(std::string raw = "");
         void parseFirstLine();
         void parseKeyValue();
         void parseBody();
@@ -35,7 +39,11 @@ class ParserRequest
         std::string  findValue(const std::string &line);
 
         std::vector<std::string>    getLines();
+        //int                         getIsFav() const;
         std::string                 getRaw();
         Request*                    getRequest();
+        int	                        getStatus() const;
+        int	                        getMulti() const;
         void                        setRaw(std::string raw);
+        void                        writeRequest();
 };

@@ -165,18 +165,6 @@ void Response::setContentType()
 	std::cout << "Content-Type: " << _contentType << std::endl;
 }
 
-void Response::setDate()
-{
-	char buffer[100];
-	struct timeval tv;
-	struct tm *tm;
-
-	gettimeofday(&tv, NULL);
-	tm = gmtime(&tv.tv_sec);
-	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
-	_date = std::string(buffer);
-}
-
 void Response::setLastModified()
 {
 	char buffer[100];
@@ -220,13 +208,6 @@ int Response::setPaths()
 	this->_locationRootPath = _locationScope->getRoot();
 	this->_index = selectIndex();
 
-	if (_request->getPath() == "/favicon.ico" || _request->getPath() == "favicon.ico")
-	{
-		this->_path = _locationRootPath + "icon.png";
-		this->_contentLocation = removeAdjacentSlashes(getPwd() + "/" + this->_path);
-		return 0;
-	}
-
 	if (_locationRootPath != "")
 		this->_path = removeAdjacentSlashes(getPwd() + "/" + _locationRootPath + _request->getPath());
 	else if (_serverRootPath != "" && _locationRootPath == "")
@@ -261,18 +242,16 @@ void Response::setAutoIndex(std::string _autoIndex)
 
 int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
 {
-	std::cout << YELLOW << "request.getPath() : " << request->getPath() << RESET << std::endl;
-	this->statusCode = request->getReturnCode();
-	this->_body = request->getBody();
+	this->statusCode = 200;
 	this->_server = "webserv";
 	this->_error_page = location->getErrorPage();
 	this->_methodName = request->getHttpMethodName();
 	this->_host = server->getHost();
 	this->_port = atoi((server->getPort()).c_str());
 	setAutoIndex(location->getAutoindex());
-	setLanguage(request->getAcceptLanguages());
+	//setLanguage(request->getAcceptLanguages());
 	setStaticErrorPage();
-	setDate();
+	this->_date = setDate();
 	setLastModified();
 	setAllowMethods(location->getAllowMethods());
 	setIndexs(location->getIndex(), server->getIndex());
@@ -284,30 +263,39 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	return 0;
 }
 
-void Response::createResponse(Request *request, ServerScope *serverScope, LocationScope *locationScope)
+std::string Response::createResponse(Request *request, ServerScope *serverScope, LocationScope *locationScope, std::string MultiBody)
 {
 	this->_request = request;
 	this->_serverScope = serverScope;
 	this->_locationScope = locationScope;
-	if (setResponse(request, serverScope, locationScope) == -1)
-		std::cerr << RED << "Error setting response" << RESET << std::endl;
+	if (MultiBody != "")
+		this->_body = MultiBody;
+	else
+		this->_body = this->_request->getBody();
 
-	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
+	if (setResponse(request, serverScope, locationScope) == -1)
+	{
+		std::cerr << RED << "Error setting response" << RESET << std::endl;
+		return NULL;
+	}
+
+	/* if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
 	{
 		this->statusCode = 405;
 		_response = notAllowed() + "\r\n";
-		return;
+		return -1;
 	}
 	else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
 	{
 		this->statusCode = 413;
 		_response = notAllowed() + "\r\n";
-		return;
-	}
-
+		return -1;
+	} */
 	selectCgiPass();
 	handleMethods();
 	_response = getHeader() + "\r\n" + _response;
+	writeResponse();
+	return _response;
 }
 
 std::string Response::notAllowed()
@@ -347,40 +335,34 @@ void Response::handleCgi()
 
 void Response::handleMethods()
 {
-	if (this->_methodName == "DELETE" || this->_methodName == "OPTIONS")
+	if (this->_methodName == "DELETE")
 	{
 		if (this->_methodName == "DELETE")
 			deleteMethod();
-		else if (this->_methodName == "OPTIONS")
-			readContent();
 		return;
 	}
-
-	if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET"))
+	else if (this->_methodName == "GET")
+	{
+		if (this->statusCode != 200)
+			_response = this->errorHtml();
+		else
+			readContent();
+		return ;
+	}
+	else if (this->_cgiPass != "" && this->_methodName == "POST")
 	{
 		handleCgi();
 		if (this->_methodName == "POST" && this->statusCode != 200)
 		{
 			_response = this->errorHtml();
 		}
-		else if (this->_methodName == "GET")
-		{
-			if (this->statusCode != 200)
-				_response = this->errorHtml();
-			else
-				readContent();
-		}
 		return ;
 	}
-	else if (this->_cgiPass == "" && this->_methodName == "POST")
+	else
 	{
 		this->statusCode = 204;
 		_response = "";
 		return ;
-	}
-	else if (this->_cgiPass == "" && this->_methodName == "GET")
-	{
-		readContent();
 	}
 }
 
@@ -482,7 +464,8 @@ std::string Response::getHeader()
 {
 	std::string header;
 
-	setContentType();
+	//setContentType();
+	this->_contentType = "text/html";
 	this->_contentLength = to_string(this->_response.size());
 	header = "HTTP/1.1 " + to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
 	header += writeHeader();
@@ -539,7 +522,9 @@ void Response::selectCgiPass()
 			}
 		}
 	}
-	this->_cgiPass = ""; */
+	this->_cgiPass = "";
+	this->_cgiPass = "/opt/homebrew/bin/php-cgi";
+	std::cout << CYAN << "this->_cgiPass " << RESET << this->_cgiPass << std::endl;*/
 }
 
 /********->auto_index<-*******/
@@ -583,4 +568,12 @@ std::string Response::getLink(std::string const &dirEntry, std::string const &di
 	std::stringstream ss;
 	ss << "\t\t<p><a href=\"http://" + this->_host << dirName + dirEntry + "\">" + dirEntry + "</a></p>\n";
 	return ss.str();
+}
+
+void Response::writeResponse()
+{
+	if (_response.size() < 500)
+		std::cout << GREEN << "\rResponse :                " << std::endl << "[" << _response << RESET << "]\n" << RESET << std::endl;
+	else
+		std::cout << GREEN << "\rResponse :                " << std::endl << "[" << _response.substr(0, 500) << "..." << "]\n" << RESET << std::endl;
 }

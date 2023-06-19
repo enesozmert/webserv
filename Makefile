@@ -28,7 +28,7 @@ ENTITY			=	ErrorPage RedirectionUri\
 					Response Request
 PARSER			=	ParserConfig ParserRequest
 FILE			=	File
-SERVER			=	Server Cluster
+SERVER			=	Server Cluster Client
 HTTP			=	HttpMethod HttpStatusCode HttpContentType
 CGI				=	Cgi
 ERROR			=	ConfigException HandleException
