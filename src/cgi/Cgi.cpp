@@ -43,7 +43,7 @@ std::string Cgi::executeCgi(std::string scriptName)
 	if (pipe(pipeo) == -1)
 		return "Status: 500\r\n\r\n";
 
-	std::cout << RED << "_body: " << _body << std::endl;
+	//std::cout << RED << "_body: " << _body << std::endl;
 	if (write(pipeFd[1], _body.c_str(), _body.length()) == -1)
 	{
 		std::cerr << RED << "Write problem" << RESET << std::endl;
