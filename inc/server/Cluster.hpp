@@ -30,14 +30,20 @@ class Cluster
         int                         isFav;
         int                         loopControl;
         int                         status;
-        size_t                      postLen;
+        size_t                      ContentLen;
         std::map<int, Client *>     clients;
+        std::string                 method;
+        std::string                 favicon;
+        std::string                 _response;
+        std::string                 MultiBody;
+        std::string                 body;
 
     public:
         Cluster();
         ~Cluster();
+        /*
         Cluster(const Cluster &cluster);
-        Cluster &operator=(const Cluster &cluster);
+        Cluster &operator=(const Cluster &cluster); */
 
         int     setUpCluster(HttpScope *http);
         void    run();

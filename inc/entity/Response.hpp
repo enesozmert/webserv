@@ -26,6 +26,7 @@ private:
     std::vector<std::string>	        _indexs;
     std::string					        _path;
     std::string					        _index;
+    std::string					        _uri;
     std::string                         _locationRootPath;
     std::string                         _serverRootPath;
 	std::string					        _cgiPass;
@@ -45,6 +46,7 @@ private:
 	std::string					        _server;
     std::string                         _host;
     std::string                         _content;
+    std::string                         _status;
     int                                 _port;
     int                                 _clientBodyBufferSize;
     std::string					        _body;
@@ -52,15 +54,16 @@ private:
     HttpContentType                     _httpContentType;
     HttpStatusCode                      _httpStatusCode;
     DataBase<Variable<std::string> >    _keywordDatabase;
+    DataBase<CgiVariable<std::string, std::string> > _envDatabase;
     bool                                _isAutoIndex;
-    Request                             *_request;
-    ServerScope                         *_serverScope;
-    LocationScope                       *_locationScope;
+    Request*                             _request;
+    ServerScope*                         _serverScope;
+    LocationScope*                       _locationScope;
 public:
-    Response();
+    /* Response();
     ~Response();
     Response(const Response &response);
-    Response &operator=(const Response &response);
+    Response &operator=(const Response &response); */
 
     int                                 getStatusCode();
     std::string                         getHeader();
@@ -76,43 +79,39 @@ public:
     std::string                         getServerName();
     std::string                         getContentLocation();
 
-    void                        setAllowMethods(std::vector<std::string> methods);
-    void	                    setContentType();
-    void                        setQueries();
-    //void	                    setDate();
-    void	                    setLastModified();
-    void                        setAutoIndex(std::string _autoIndex);
-    void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
-    void                        setStaticErrorPage();
-    int                         setPaths();
-    void                        setClientBodyBufferSize(std::string bodyBufferSize);
-    int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
-    void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
-    void                        setContentDisposition();
-    void                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
-    void                        keywordFill();
-    void                        handleCgi();
-    void                        handleMethods();
+    void                                setAllowMethods(std::vector<std::string> methods);
+    void	                            setContentType();
+    void                                setQueries();
+    void                                setAutoIndex(std::string _autoIndex);
+    void	                            setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
+    void                                setStaticErrorPage();
+    int                                 setPaths();
+    void                                setClientBodyBufferSize(std::string bodyBufferSize);
+    int                                 setResponse(Request *request, ServerScope *server, LocationScope *location);
+    void                                setLanguage(std::vector<std::pair<std::string, float> > languages);
+    void                                setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
+    
+    void                                keywordFill();
+    void                                handleCgi();
+    void                                handleMethods();
+    std::string                         createResponse(Request *request, ServerScope *server, LocationScope *locationScope, std::string _Body);
+    std::string                         notAllowed();
+    std::string                         writeHeader(void);
+    std::string                         errorHtml();
+    void                                readContent();
+    std::string                         selectIndex();
+    void	                            deleteMethod();
+    void                                selectCgiPass();
+    std::string                         getLink(std::string const &dirEntry, std::string const &dirName);
+    std::string                         getPage();
+    void                                writeResponse();
 
 
-    std::string                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope, std::string _Body);
-
-    std::string                 notAllowed();
-    std::string                 writeHeader(void);
-    std::string                 errorHtml();
-    void                        readContent();
-    std::string                 selectIndex();
-    void                        parseContentDisposition();
-
-    void                        getMethod();
-    void	                    postMethod();
-    void	                    deleteMethod();
-
-    void                 selectCgiPass();
-
-    std::string         getLink(std::string const &dirEntry, std::string const &dirName);
-    std::string         getPage();
-    void                writeResponse();
+    //CGI
+    std::string executeCgi();
+    DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();
+    void setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase);
+    void keywordFillCgi();
 
 
 };

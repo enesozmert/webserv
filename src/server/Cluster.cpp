@@ -3,6 +3,7 @@
 Cluster::Cluster() {}
 
 Cluster::~Cluster() {}
+/*
 
 Cluster::Cluster(const Cluster &cluster)
 {
@@ -28,12 +29,18 @@ Cluster& Cluster::operator=(const Cluster & cluster)
 	this->status = cluster.status;
 	this->clients = cluster.clients;
 	this->isFav = cluster.isFav;
-	this->postLen = cluster.postLen;
+	this->ContentLen = cluster.ContentLen;
+	this->method = cluster.method;
+	this->favicon = cluster.favicon;
+	this->_response = cluster._response;
+	this->body = cluster._body;
 	return (*this);
-}
+} */
 
 int Cluster::setUpCluster(HttpScope *http)
 {
+	Server *server = NULL;
+	int socket = -1;
 	this->loopControl = 1;
 	this->httpScope = http;
 	std::vector<t_listen> listens;
@@ -41,7 +48,13 @@ int Cluster::setUpCluster(HttpScope *http)
 	this->status = 0;
 	this->isMulti = 0;
 	this->isFav = 0;
-	this->postLen = 0;
+	this->ContentLen = 0;
+	this->_response = "";
+	this->method = "";
+	this->body = "";
+	this->MultiBody = "";
+
+	this->favicon = add_headers_favicon(openNread(getPwd() + "/" + "index/sponge.png"));
 
 	FD_ZERO(&this->writeFds);
 	FD_ZERO(&this->readFds);
@@ -49,10 +62,10 @@ int Cluster::setUpCluster(HttpScope *http)
 	FD_ZERO(&this->supWriteFds);
 	max_fd = 0;
 	this->selected = 0;
+
 	for (std::vector<t_listen>::const_iterator it = listens.begin(); it != listens.end(); it++)
 	{
-		int socket = 0;
-		Server *server = new Server(this->httpScope, it->host, it->port);
+		server = new Server(it->host, it->port);
 		socket = server->getFd();
 		FD_SET(socket, &readFds);
 		servers.insert(std::pair<int, Server *>(socket, server));
@@ -73,22 +86,11 @@ void Cluster::send_section()
 	{
 		if (FD_ISSET(it->first, &supWriteFds))
 		{
-			std::string _response;
-			_response = it->second->process();
-			if(_response != "")
-			{
-				sent = send(it->first, _response.c_str(), _response.length(), 0);
-				if (sent > 0)
-				{
-					std::cout << CYAN << "Send SuccesFully!" << RESET << std::endl << std::flush;
-					close_connection(it);
-				}
-				else
-					close_connection(it);
-			}
-			else{
-				close_connection(it);
-			}
+			_response = it->second->process(this->MultiBody);
+			sent = send(it->first, _response.c_str(), _response.length(), 0);
+			if (sent > 0)
+				std::cout << CYAN << "Send Successful!" << RESET << std::endl << std::flush;
+			close_connection(it);
 			this->loopControl = 0;
 			break;
 		}
@@ -111,54 +113,65 @@ void Cluster::recv_section()
 			std::cout << YELLOW <<  "ret..." << ret << RESET << std::endl;
 			if (ret > 0)
 			{
-				std::cout << YELLOW << "this->status " << this->status << RESET << std::endl;
-				std::cout << YELLOW << "this->multi " << this->isMulti << RESET << std::endl;
-				std::cout << YELLOW << "this->isFav " << this->isFav << RESET << std::endl;
 				if (this->status == 0)
 				{
 					it->second->setParserRequest(buffer);
 					this->status = it->second->getStatus();
 					this->isMulti = it->second->getMulti();
+					this->method = it->second->getMethod();
 					this->isFav = it->second->getIsFav();
-					this->postLen = it->second->getPostLen();
-					std::cout << CYAN << "this->status " << this->status << RESET << std::endl;
-					std::cout << CYAN << "this->multi " << this->isMulti << RESET << std::endl;
-					std::cout << CYAN << "this->isFav " << this->isFav << RESET << std::endl;
-					std::cout << CYAN << "this->postLen " << this->postLen << RESET << std::endl;
+					this->ContentLen = it->second->getContentLen();
+					this->body = it->second->getBody();
 					if (this->isFav == 1)
 					{
-						std::string _body;
-						int i = 0;
-						std::string fav;
-						std::string path = removeAdjacentSlashes(getPwd() + "/" + "index/icon.png");
-						_body = openNread(path);
-						fav = add_headers_favicon(_body);
-						i = send(it->first, fav.c_str(), fav.length(), 0);
-						if (i > 0)
-						{
-							std::cout << CYAN << "Send SuccesFully!" << RESET << std::endl << std::flush;
-							std::cout << GREEN << "\rResponse :                " << std::endl << "[" << fav.substr(0, 500) << "..." << RESET << "]\n" << std::endl; 
-						}
-						FD_CLR(it->first, &this->readFds);
-						close_connection(it);
+						std::cout << YELLOW << "favicon bulundu" << RESET << std::endl;
+						if (send(it->first, this->favicon.c_str(), this->favicon.length(), 0) > 0)
+							std::cout << CYAN << "Send Successful Favicon!" << RESET << std::endl << std::flush;
 						this->loopControl = 0;
-						this->isFav = 0;
-						memset(buffer, 0, sizeof(buffer));
-						break;
+						close_connection(it);
+						break ;
 					}
-					if (this->status == 1)
+					else if (this->status == 1)
 					{
-						if (this->isMulti == 1)
+		 				/* if (this->method == "DELETE")
 						{
-							if (this->postLen == it->second->getPostLen())
-							{
-								FD_SET(it->first, &this->writeFds);
-							}
+								if (deleteHandle(it->second) == -1)
+									send(it->first, "False!" , 6, 0);
+								else
+									send(it->first, "True!" , 5, 0);
+								close_connection(it);
 						}
-						else
+						else */
 						{
-							FD_CLR(it->first, &this->readFds);
-							FD_SET(it->first, &this->writeFds);
+							if (this->isMulti == 1)
+							{
+								if (static_cast<size_t>(ret) >= this->ContentLen)
+								{
+									FD_SET(it->first, &this->writeFds);
+									this->MultiBody += std::string(buffer, ret);
+									this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
+									this->status = 0;
+									this->isMulti = 0;
+									this->method = "";
+									this->ContentLen = 0;
+								}
+								else if (this->body != "")
+								{
+									this->MultiBody += std::string(buffer, ret);
+									this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
+									std::cout << "this->MultiBody.length()body eklenince" << this->MultiBody.length() << std::endl;
+								}
+								this->body = "";
+							}
+							else
+							{
+								FD_CLR(it->first, &this->readFds);
+								FD_SET(it->first, &this->writeFds);
+								this->status = 0;
+								this->isMulti = 0;
+								this->method = "";
+								this->ContentLen = 0;
+							}
 						}
 					}
 					else
@@ -169,14 +182,20 @@ void Cluster::recv_section()
 				}
 				else if (this->status == 1 && this->isMulti == 1)
 				{
-					sup_len = it->second->postVal.length();
+					sup_len = this->MultiBody.length();
+					std::cout << "sup_len" << sup_len << std::endl;
 					if (!(sup_len + ret == std::string::npos))
 					{
-						it->second->postVal += std::string(buffer, ret);
-						std::cout << "this->postLen" << this->postLen << std::endl;
-						if (this->postLen == it->second->postVal.length())
+						this->MultiBody += std::string(buffer, ret);
+						std::cout << "this->MultiBody.length()" << this->MultiBody.length() << std::endl;
+						std::cout << "this->ContentLen" << this->ContentLen << std::endl;
+						if (this->ContentLen == this->MultiBody.length())
 						{
 							FD_SET(it->first, &this->writeFds);
+							this->status = 0;
+							this->isMulti = 0;
+							this->method = "";
+							this->ContentLen = 0;
 						}
 					}
 					else
@@ -220,7 +239,7 @@ void Cluster::accept_section()
 			if (client_fd != -1)
 			{
 				FD_SET(client_fd, &readFds);
-				client = new Client(it->second);
+				client = new Client(it->second, this->httpScope);
 				this->clients.insert(std::pair<int, Client *>(client_fd, client));
 				findMaxFd();
 			}
@@ -292,6 +311,10 @@ void	Cluster::close_connection(std::map<int, Client *>::iterator it)
 	this->status = 0;
 	this->isMulti = 0;
 	this->isFav = 0;
+	this->method = "";
+	this->ContentLen = 0;
+	this->body = "";
+	this->MultiBody = "";
 	FD_CLR(it->first, &this->readFds);
 	FD_CLR(it->first, &this->writeFds);
 	close(it->first);

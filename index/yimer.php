@@ -35,6 +35,16 @@
       $path = "upload/".$file_name ;
       move_uploaded_file($file_tmp,$path);
       echo "Success <br/>";
+      
+
+      if(empty($errors)==true)
+      {
+         #echo '<img src="./'.$path.'" width=50% />';
+      }
+      else
+      {
+         print_r($errors);
+      }
    }
    else
    {

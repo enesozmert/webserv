@@ -12,8 +12,6 @@ int	ParserRequest::getStatus() const { return status; }
 
 int	ParserRequest::getMulti() const { return this->_multi; }
 
-//int	ParserRequest::getIsFav() const { return this->IsFav; }
-
 int ParserRequest::parse(std::string raw)
 {
 	this->_raw = raw;
@@ -24,17 +22,7 @@ int ParserRequest::parse(std::string raw)
     else{
         this->_multi = 0;
 	}
-	/* if (this->_raw.find("/favicon.ico") != std::string::npos){
-        this->IsFav = 1;
-		this->status = 0;
-		std::cout << "favicooo" << std::endl;
-		return status;
-	}
-    else{
-        this->IsFav = 0;
-	} */
 	std::cout << PURPLE << "multi " << this->_multi << RESET << std::endl;
-	//std::cout << PURPLE << "isFav " << this->IsFav << RESET << std::endl;
 	this->status = 0;
 	this->isPost = false;
     std::string key;
@@ -63,7 +51,7 @@ int ParserRequest::parse(std::string raw)
 	{
 		line = tempRaw.substr(0, pos + 1);
         lineTrim = trim(line, "\n\r");
-        std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
+        //std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
         this->_lines.push_back(lineTrim);
 		tempRaw.erase(0, pos + 1);
 	}
@@ -73,7 +61,7 @@ int ParserRequest::parse(std::string raw)
 	parseRequestClone();
 	//this->status hata durumlarında -1 olarak ayarla
 	this->status = 1;
-	return status;
+	return 0;
 }
 
 void ParserRequest::parseFirstLine()
@@ -90,8 +78,8 @@ void ParserRequest::parseFirstLine()
 	this->request.setPath(path);
 	this->request.setVersion(version);
 	this->request.setHttpMethodName(method);
-	if (method == "POST")
-		this->isPost = true;
+	//if (method == "POST")
+		//this->isPost = true;
 }
 
 void ParserRequest::parseKeyValue()
@@ -114,7 +102,7 @@ void ParserRequest::parseKeyValue()
 
 void ParserRequest::parseBody()
 {
-	if (this->isPost == true && this->_multi != 1)
+	//if (this->isPost == true)
 		this->request.setBody(this->_raw.substr(this->_raw.find("\r\n\r\n") + 4));
 }
 

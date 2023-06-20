@@ -23,7 +23,6 @@ class ParserRequest
         int                         status;
         int                         _multi;
         bool                        isPost;
-        //int                         IsFav;
     public:
         ParserRequest();
         ~ParserRequest();
@@ -39,7 +38,6 @@ class ParserRequest
         std::string  findValue(const std::string &line);
 
         std::vector<std::string>    getLines();
-        //int                         getIsFav() const;
         std::string                 getRaw();
         Request*                    getRequest();
         int	                        getStatus() const;

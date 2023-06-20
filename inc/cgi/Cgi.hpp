@@ -14,41 +14,35 @@
 
 #include "../entity/CgiVariable.hpp"
 #include "../entity/HttpScope.hpp"
-#include "../entity/Request.hpp"
-#include "../entity/Response.hpp"
 #include "../utils/Utils.hpp"
 #include <fcntl.h>
 #include <unistd.h>
 
-class Request;
-class Response;
-class ServerScope;
 class Cgi
 {
     private:
-        Request *_request;
-        Response *_response;
-        ServerScope *_serverScope;
-        LocationScope *_locationScope;
         DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
-    	std::string							_body;//HTTP istek gövdesi
+    	std::string							_body;
         std::map<std::string, std::string>  _query;
-        std::vector<std::string>            _contentDispos;
-        char	**env;
+        std::string _methodName;
+        std::string _path;
+        int _port;
+        std::string _contentLenght;
+        std::string _contentType;
+        //char	**env;
         //int request_body_pipe[2];
 	    //int cgi_result_pipe[2];
 
     
     public:
-        Cgi();
-        Cgi(const Cgi &cgi);
-        Cgi& operator=(const Cgi &cgi);
-    	Cgi(Request *request, Response *response,  ServerScope *serverScope, LocationScope *locationScope);
-        ~Cgi();
+        //Cgi();
+        //Cgi(const Cgi &cgi);
+        //Cgi& operator=(const Cgi &cgi);
+    	Cgi(std::string methodName, std::string body, std::string path, int port);
+        //~Cgi();
     
     	std::string		executeCgi(std::string scriptName);	// executes cgi and returns body
         DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();
         void setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase);
         void keywordFill();
-        //std::string upload(std::string str);
 };

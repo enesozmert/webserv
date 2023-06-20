@@ -1,25 +1,24 @@
 #include "../inc/server/Client.hpp"
 
-Client::Client() {};
-
-Client::Client(Server *sv)
+Client::Client(Server *sv, HttpScope *Hscope)
 {
 	this->_response = "";
-    this->_isFav = 0;
 	this->sv = sv;
 	this->multi = 0;
 	this->status = 0;
-	this->postLen = 0;
-	this->postVal = "";
+	this->ContentLen = 0;
 	this->_parser = NULL;
 	this->_request = NULL;
-	this->_http = sv->getHttp();
+	this->_http = Hscope;
 	this->response = NULL;
 	this->locationIndex = 0;
 	this->_response = "";
 	this->_host = sv->getHost();
 	this->_port = sv->getPort();
+    this->isFav = 0;
 }
+
+/* Client::Client() {};
 
 Client::Client(const Client &client)
 {
@@ -48,13 +47,7 @@ Client& Client::operator=(const Client &client)
 	return (*this);
 }
 
-Client::~Client() {}
-
-int Client::getIsFav() const
-{
-    return this->_isFav;
-
-}
+Client::~Client() {}*/
 
 int	Client::getStatus() const
 {
@@ -66,14 +59,24 @@ int	Client::getMulti() const
 	return this->multi;
 }
 
-std::string		Client::getPostVal() const
+int	Client::getIsFav() const
 {
-	return this->postVal;
+	return this->isFav;
 }
 
-size_t			Client::getPostLen() const
+std::string		Client::getMethod() const
 {
-	return this->postLen;
+	return this->method;
+}
+
+size_t			Client::getContentLen() const
+{
+	return this->ContentLen;
+}
+
+std::string		Client::getBody() const
+{
+    return this->body;
 }
 
 void   Client::setRequest(Request *request)
@@ -81,24 +84,57 @@ void   Client::setRequest(Request *request)
     this->_request = request;
 }
 
+void   Client::setMulti(int multi)
+{
+    this->multi = multi;
+}
+
+void   Client::setStatus(int status)
+{
+    this->status = status;
+}
+
+void   Client::setMethod(std::string method)
+{
+    this->method = method;
+}
+
+void   Client::setContentLen(int ContentLen)
+{
+    this->ContentLen = ContentLen;
+}
+
+void   Client::setIsFav(int isFav)
+{
+    this->isFav = isFav;
+}
+
+void   Client::setBody(std::string body)
+{
+    this->body = body;
+}
+
+
 void   Client::setParserRequest(std::string buffer)
 {
     std::cout << RED << "setParseRequest'e girdi " << RESET << std::endl;
     this->_parser = new ParserRequest();
     this->_parser->parse(buffer);
-    this->status = this->_parser->getStatus();
-    this->multi = this->_parser->getMulti();
+    setStatus(this->_parser->getStatus());
+    setMulti(this->_parser->getMulti());
     setRequest(this->_parser->getRequest());
-    if (this->_request->getPath() == "/favicon.ico" || _request->getPath() == "favicon.ico")
+    setMethod(this->_request->getHttpMethodName());
+	setContentLen(this->_request->getContentLength());
+    setBody(this->_request->getBody());
+    if (this->_request->getPath() == "/favicon.ico")
     {
-        std::cout << "favicon geldi" << std::endl;
-        this->_isFav = 1;
+        std::cout << "favicooo" << std::endl;
+        this->isFav = 1;
     }
-	this->postLen = this->_request->getContentLength();
     delete _parser;
 }
 
-std::string    Client::process()
+std::string    Client::process(std::string multiBody)
 {
     std::cout << RED << "Processing" << RESET << std::endl;
     ServerScope     *matchedServer;
@@ -114,13 +150,15 @@ std::string    Client::process()
         return NULL;
     }
     matchedLocation = matchedServer->getLocations().at(this->locationIndex);
-    this->_response = this->response->createResponse(_request, matchedServer, matchedLocation, postVal);
+    this->_response = this->response->createResponse(_request, matchedServer, matchedLocation, multiBody);
     if (this->_response == "")
     {
         delete this->response;
+        delete this->_request;
         return NULL;
     }
     delete this->response;
+    delete this->_request;
     return _response;
 }
 

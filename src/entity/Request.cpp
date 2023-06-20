@@ -128,10 +128,10 @@ std::string Request::getContentType()
 }
 size_t Request::getContentLength()
 {
-    size_t numberOfContentLength = 0;
-    std::istringstream portStream(this->_contentLength);
-    portStream >> numberOfContentLength;
-    return (numberOfContentLength);
+    //size_t numberOfContentLength = 0;
+    //std::istringstream portStream(this->_contentLength);
+    //portStream >> numberOfContentLength;
+    return (atoi(this->_contentLength.c_str()));
 }
 
 std::string Request::getHttpMethodName()
@@ -168,7 +168,6 @@ void Request::setPath(std::string path)
 void Request::setBody(std::string body)
 {
     this->_body = body;
-    this->_body.push_back('\0');
 }
 void Request::setQuery(std::string query)
 {
@@ -176,11 +175,11 @@ void Request::setQuery(std::string query)
 }
 void Request::setPort(std::string port)
 {
-    this->_port = port;//değişebilir her an adress
+    this->_port = port;
 }
 void Request::setIp(std::string ip)
 {
-    this->_ip = ip;//değişebilir her an adress
+    this->_ip = ip;
 }
 void Request::setAcceptLanguage(std::string acceptLanguage)
 {
