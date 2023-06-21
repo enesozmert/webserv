@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Delete Test</h1>
+    <input type="text" id="filePath" placeholder="File Path">
+    <button onclick="deleteFile()">DELETE</button>
+    <div id="result"></div>
+
+    <script>
+        function deleteFile() {
+            var filePath = document.getElementById('filePath').value;
+            
+            fetch('delete_test.php', {
+                method: 'DELETE',
+                body: JSON.stringify({ filePath: filePath }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('result').innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

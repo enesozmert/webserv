@@ -190,11 +190,11 @@ int Response::setPaths()
 	this->_index = selectIndex();
 
 	if (_locationRootPath != "")
-		this->_path = removeAdjacentSlashes(_locationRootPath + _request->getPath());
+		this->_path = removeAdjacentSlashes(_locationRootPath + this->_uri);
 	else if (_serverRootPath != "" && _locationRootPath == "")
-		this->_path = removeAdjacentSlashes(_serverRootPath + _request->getPath());
-
-	if (!pathIsFile(this->_path))
+		this->_path = removeAdjacentSlashes(_serverRootPath + this->_uri);
+	this->_contentLocation = getPwd() + "/" + this->_path;
+	if (!pathIsFile(this->_contentLocation))
 	{
 		if (_locationRootPath != "")
 			this->_path = removeAdjacentSlashes(_locationRootPath + _index);
@@ -202,7 +202,7 @@ int Response::setPaths()
 			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
 	}
 	this->_contentLocation = this->_path;
-	std::cout << "this->_contentLocation " << this->_contentLocation << std::endl;
+	std::cout << "this->_contentLocation : " << this->_contentLocation << std::endl;
 	return 0;
 }
 
@@ -460,7 +460,6 @@ std::string Response::getHeader()
 	std::string header;
 
 	setContentType();
-	//this->_contentType = "text/html";
 	this->_status = "close";
 	this->_contentLength = to_string(this->_response.size());
 	header = "HTTP/1.1 " + to_string(this->statusCode) + " " + _httpStatusCode.getByStatusCode(this->statusCode).getValue() + "\r\n";
@@ -476,8 +475,8 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Content-Type", &this->_contentType));
 	_keywordDatabase.insertData(Variable<std::string>("Content-Length", &this->_contentLength));
 	_keywordDatabase.insertData(Variable<std::string>("Connection", &this->_status));
-	//_keywordDatabase.insertData(Variable<std::string>("Content-Language", &this->_contentLanguage));
-	//_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Language", &this->_contentLanguage));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
 }
 
 std::string Response::selectIndex()
@@ -570,22 +569,15 @@ void Response::writeResponse()
 
 std::string Response::executeCgi()
 {
+	std::cout << GREEN << "/*******CGI*********/" << RESET << std::endl;
 	this->keywordFillCgi();
-/* 	std::cout << std::endl;
-	int i = 0;
-	for (std::string::const_iterator it = _body.begin(); it != _body.end(); ++it) {
-        int value = static_cast<int>(static_cast<unsigned char>(*it));
-        std::cout << value << " ";
-		i++;
-    }
-    std::cout << std::endl << i << std::endl; */
 	std::cout << "body\n " << _body << std::endl;
 	std::cout << "body_len " << _body.length() << std::endl;
 
 	char	output[4096];
 	int		readed;
-	int	pipeFd[2];
-	int	pipeo[2];
+	int	body_pipe[2];
+	int	result_pipe[2];
 	std::string tmp;
 	std::string tmp2;
 	char *av1 = (char *)this->_cgiPass.c_str();
@@ -600,6 +592,8 @@ std::string Response::executeCgi()
 	tmp = (std::string)cwd + "/" + this->_path;
 	av2 = (char *)tmp.c_str();
 
+	std::cout << "tmp" << tmp << std::endl;
+
 	av[0] = av1;
 	av[1] = av2;
 
@@ -608,36 +602,36 @@ std::string Response::executeCgi()
         std::cout << env[i] << std::endl;
     }
 
-	pipe(pipeFd);
-	pipe(pipeo);
-	if (this->_methodName == "POST")
-		write(pipeFd[1], _body.c_str(), _body.length());
+	pipe(body_pipe);
+	pipe(result_pipe);
+	if (this->_methodName == "POST" || this->_methodName == "DELETE")
+		write(body_pipe[1], _body.c_str(), _body.length());
 
-	close(pipeFd[1]);
+	close(body_pipe[1]);
 
 	if (!fork())
 	{
 
-		close(pipeo[0]);
-		dup2(pipeo[1], 1);
-		close(pipeo[1]);
+		close(result_pipe[0]);
+		dup2(result_pipe[1], 1);
+		close(result_pipe[1]);
 
-		if (this->_methodName == "POST")
-			dup2(pipeFd[0], 0);
-		close(pipeFd[0]);
+		if (this->_methodName == "POST" || this->_methodName == "DELETE")
+			dup2(body_pipe[0], 0);
+		close(body_pipe[0]);
 
 		execve(av[0], av, env);
 		std::cout << "Execv Err!" << std::endl << std::flush;
 		exit(-1);
 	}
 	wait(NULL);
-	close(pipeFd[0]);
-	close(pipeo[1]);
+	close(body_pipe[0]);
+	close(result_pipe[1]);
 
-	readed = read(pipeo[0], output, 4096);
+	readed = read(result_pipe[0], output, 4096);
 	if (readed == 0)
 		std::cout << "Cgi Read Fail!" << std::endl << std::flush;
-	close(pipeo[0]);
+	close(result_pipe[0]);
 	output[readed] = 0;
 
 	for (int i = 0; env[i]; i++)
@@ -674,7 +668,6 @@ void Response::keywordFillCgi()
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "webserv"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
-	//_envDatabase.insertData(CgiVariable<std::string, std::string>("QUERY_STRING", request.getQuery()));
 
 /* 	if (_response->getMethodName() == "GET")
 	{
