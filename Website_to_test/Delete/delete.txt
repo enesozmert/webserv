@@ -1,1 +1,0 @@
-Bu dosyayı Delete methodu test için kullanabilirsin.
