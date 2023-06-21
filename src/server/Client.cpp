@@ -135,9 +135,11 @@ std::string    Client::process(std::string multiBody)
     std::cout << RED << "Processing" << RESET << std::endl;
     ServerScope     *matchedServer;
     LocationScope   *matchedLocation;
-    this->response = new Response();
+    int             matchedServerIndex;
 
-    matchedServer = this->getServerForRequest();
+    this->response = new Response();
+    matchedServerIndex = getServerForRequest();
+    matchedServer = this->_http->getServers().at(matchedServerIndex);
     this->getLocationForRequest(matchedServer, _request->getPath());
 
     if (matchedServer == NULL || this->locationIndex == -1)
@@ -158,18 +160,21 @@ std::string    Client::process(std::string multiBody)
     return _response;
 }
 
-ServerScope*        Client::getServerForRequest()
+int        Client::getServerForRequest()
 {
+    int index;
     std::vector<ServerScope *>  serverScope;
 
     serverScope = this->_http->getServers();
+    index = 0;
     for (std::vector<ServerScope *>::const_iterator it = serverScope.begin() ; it != serverScope.end(); it++)
     {
         if (this->_host == (*it)->getListen().host && this->_port == (*it)->getListen().port)
-            return(*it);
+            return(index);
+        index++;
     }
     _clientException.run(301);
-    return NULL;
+    return (-1);
 }
 
 
