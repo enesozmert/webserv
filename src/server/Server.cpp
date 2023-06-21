@@ -10,6 +10,7 @@ Server::Server(const t_listen &listen) :_fd(-1), _listen(listen)
     _addr.sin_family = 0;
     _addr.sin_port = 0;
     _addr.sin_addr.s_addr = 0;
+    memset((char *)&_addr.sin_zero, 0, sizeof(_addr.sin_zero));
 }
 
 =======
@@ -44,6 +45,7 @@ void Server::setAddr(void)
     _addr.sin_family = AF_INET;
     _addr.sin_port = htons(_listen.port);
     _addr.sin_addr.s_addr = htonl(_listen.host);
+    memset((char *)&_addr.sin_zero, 0, sizeof(_addr.sin_zero));
 }
 
 int Server::setUpSocket()
