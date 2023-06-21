@@ -52,7 +52,7 @@ class Client
 		size_t			getContentLen() const;
 		std::string		getBody() const;
 		void			getLocationForRequest(ServerScope *matchedServerScope, const std::string& path);
-		ServerScope*	getServerForRequest();
+		int				getServerForRequest();
 
 
 
