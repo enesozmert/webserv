@@ -316,7 +316,7 @@ void Response::handleCgi()
 
 void Response::handleMethods()
 {
-	if (this->_methodName == "DELETE")
+	if (this->_methodName == "DELETE" && this->_cgiPass == "")
 	{
 		if (this->_methodName == "DELETE")
 			deleteMethod();
@@ -330,10 +330,10 @@ void Response::handleMethods()
 			readContent();
 		return ;
 	}
-	else if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET"))
+	else if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET" || this->_methodName == "DELETE"))
 	{
 		handleCgi();
-		if ((this->_methodName == "GET" || this->_methodName == "POST") && this->statusCode != 200)
+		if ((this->_methodName == "GET" || this->_methodName == "POST" || this->_methodName == "DELETE") && this->statusCode != 200)
 		{
 			_response = this->errorHtml();
 		}
@@ -351,19 +351,33 @@ void Response::deleteMethod()
 {
 	std::cout << PURPLE << "******DELETE******" << RESET << std::endl;
 	_response = "";
-	this->_path = realpath(".", NULL) + _path;
-	std::cout << PURPLE << "**path***" << _path << RESET << std::endl;
-	if (pathIsFile(_path))
+	std::stringstream ss(this->_body);
+    std::string filePath = "";
+	std::string delPath = "";
+
+	std::string token;
+    while (std::getline(ss, token, ':')) {
+        size_t startPos = token.find_first_of('"');
+        size_t endPos = token.find_last_of('"');
+        if (startPos != std::string::npos && endPos != std::string::npos) {
+            filePath = token.substr(startPos + 1, endPos - startPos - 1);
+        }
+    }
+	delPath = getPwd() + "/" + this->_locationRootPath + filePath;	
+	if (pathIsFile(delPath))
 	{
-		if (remove(_path.c_str()) == 0)
-			this->statusCode = 204;
+		if (remove(delPath.c_str()) == 0)
+		{
+			this->statusCode = 200;
+			this->_response = "File Deletion Successful";
+		}
 		else
 			this->statusCode = 403;
 	}
 	else
 		this->statusCode = 404;
 
-	if (this->statusCode == 403 || this->statusCode == 404 || this->statusCode == 204)
+	if (this->statusCode == 403 || this->statusCode == 404)
 		_response = this->errorHtml();
 }
 

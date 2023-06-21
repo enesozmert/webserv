@@ -133,38 +133,27 @@ void Cluster::recv_section()
 					}
 					else if (this->status == 1)
 					{
-		 		/* 		if (this->method == "DELETE")
+						if (this->isMulti == 1)
 						{
-								if (deleteHandle(it->second) == -1)
-									send(it->first, "False!" , 6, 0);
-								else
-									send(it->first, "True!" , 5, 0);
-								close_connection(it);
-						}
-						else */
-						{
-							if (this->isMulti == 1)
-							{
-								if (static_cast<size_t>(ret) >= this->ContentLen)
-								{
-									FD_CLR(it->first, &this->readFds);
-									FD_SET(it->first, &this->writeFds);
-									this->MultiBody += std::string(buffer, ret);
-									this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
-								}
-								else if (this->body != "")
-								{
-									this->MultiBody += std::string(buffer, ret);
-									this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
-									std::cout << "this->MultiBody.length()body eklenince" << this->MultiBody.length() << std::endl;
-								}
-								this->body = "";
-							}
-							else
+							if (static_cast<size_t>(ret) >= this->ContentLen)
 							{
 								FD_CLR(it->first, &this->readFds);
 								FD_SET(it->first, &this->writeFds);
+								this->MultiBody += std::string(buffer, ret);
+								this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
 							}
+							else if (this->body != "")
+							{
+								this->MultiBody += std::string(buffer, ret);
+								this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
+								std::cout << "this->MultiBody.length()body eklenince" << this->MultiBody.length() << std::endl;
+							}
+							this->body = "";
+						}
+						else
+						{
+							FD_CLR(it->first, &this->readFds);
+							FD_SET(it->first, &this->writeFds);
 						}
 					}
 					else
