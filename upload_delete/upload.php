@@ -8,7 +8,7 @@
 
 
 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-   <form action="yimer.php" method="POST" enctype="multipart/form-data">
+   <form action="upload.php" method="POST" enctype="multipart/form-data">
          <input type="file" name="image" />
          <input type="submit"/>
       </form>
