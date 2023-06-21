@@ -26,13 +26,6 @@ std::string Response::getContentLocation()
 {
 	return (this->_contentLocation);
 }
-<<<<<<< HEAD
-=======
-std::string Response::getContentDisposition()
-{
-	return (this->_contentDisposition);
-}
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 
 std::string Response::getContentType()
 {
@@ -238,12 +231,8 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-<<<<<<< HEAD
-	//setQueries();
-=======
 	if (this->_methodName == "GET")
 		setQueries();
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 	return 0;
 }
 
@@ -262,22 +251,6 @@ std::string Response::createResponse(Request *request, ServerScope *serverScope,
 	if (setResponse(request, serverScope, locationScope) == -1)
 	{
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
-<<<<<<< HEAD
-
-	// if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
-	// {
-	// 	this->statusCode = 405;
-	// 	_response = notAllowed() + "\r\n";
-	// 	return;
-	// }
-	// else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
-	// {
-	// 	this->statusCode = 413;
-	// 	_response = notAllowed() + "\r\n";
-	// 	return;
-	// }
-
-=======
 		return NULL;
 	}
 	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
@@ -292,7 +265,6 @@ std::string Response::createResponse(Request *request, ServerScope *serverScope,
 		_response = notAllowed() + "\r\n";
 		return NULL;
 	}
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 	selectCgiPass();
 	handleMethods();
 	_response = getHeader() + _response;
@@ -316,30 +288,6 @@ std::string Response::notAllowed()
 
 void Response::handleCgi()
 {
-<<<<<<< HEAD
-	bool cgiopen = false;
-	if (this->_cgiPass != "")
-	{
-		cgiopen =true;
-		std::cout << PURPLE << "******Cgi_GET******" << RESET << std::endl;
-		Cgi cgi(_request, this, _serverScope, _locationScope);
-		size_t i = 0;
-		size_t j = _response.size() - 2;
-
-		_response = cgi.executeCgi(this->_cgiPass);
-		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-		{
-			std::string str = _response.substr(i, _response.find("\r\n", i) - i);
-			if (str.find("Status: ") == 0)
-				this->statusCode = std::atoi(str.substr(8, 3).c_str());
-			else if (str.find("Content-type: ") == 0)
-				this->_type = str.substr(14, str.size());
-			i += str.size() + 2;
-		}
-		while (_response.find("\r\n", j) == j)
-			j -= 2;
-		_response = _response.substr(i, j - i);
-=======
 	size_t i = 0;
 	size_t j = _response.size() - 2;
 
@@ -352,7 +300,6 @@ void Response::handleCgi()
 		else if (str.find("Content-type: ") == 0)
 			this->cgi_return_type = str.substr(14, str.size());
 		i += str.size() + 2;
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 	}
 	while (_response.find("\r\n", j) == j)
 		j -= 2;
@@ -377,18 +324,8 @@ void Response::handleMethods()
 	}
 	else if (this->_cgiPass != "" && (this->_methodName == "POST" || this->_methodName == "GET" || this->_methodName == "DELETE"))
 	{
-<<<<<<< HEAD
-		std::cout << PURPLE << "******Cgi_POST*****" << RESET << std::endl;
-		Cgi cgi(_request, this, _serverScope, _locationScope);
-		size_t i = 0;
-		size_t j = _response.size() - 2;
-
-		_response = cgi.executeCgi(this->_cgiPass);
-		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-=======
 		handleCgi();
 		if ((this->_methodName == "GET" || this->_methodName == "POST" || this->_methodName == "DELETE") && this->statusCode != 200)
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 		{
 			_response = this->errorHtml();
 		}
@@ -528,15 +465,11 @@ void Response::keywordFill()
 {
 	_keywordDatabase.insertData(Variable<std::string>("Date", &this->_date));
 	_keywordDatabase.insertData(Variable<std::string>("Server", &this->_server));
-<<<<<<< HEAD
-	// _keywordDatabase.insertData(Variable<std::string>("Content-Disposition", &this->_contentDisposition));
-=======
 	_keywordDatabase.insertData(Variable<std::string>("Content-Type", &this->_contentType));
 	_keywordDatabase.insertData(Variable<std::string>("Content-Length", &this->_contentLength));
 	_keywordDatabase.insertData(Variable<std::string>("Connection", &this->_status));
 	//_keywordDatabase.insertData(Variable<std::string>("Content-Language", &this->_contentLanguage));
 	//_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 }
 
 std::string Response::selectIndex()

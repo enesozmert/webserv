@@ -18,29 +18,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-<<<<<<< HEAD
-class Request;
-class Response;
-class ServerScope;
-class LocationScope;
-class Cgi
-{
-    private:
-        Request                                             *_request;
-        Response                                            *_response;
-        ServerScope                                         *_serverScope;
-        LocationScope                                       *_locationScope;
-        DataBase<CgiVariable<std::string, std::string> >    _envDatabase;
-    	std::string                                         _body;
-        std::map<std::string, std::string>                  _query;
-    
-    public:
-        Cgi();
-        Cgi(const Cgi &cgi);
-        Cgi& operator=(const Cgi &cgi);
-    	Cgi(Request *request, Response *response,  ServerScope *serverScope, LocationScope *locationScope);
-        ~Cgi();
-=======
 class Cgi
 {
     private:
@@ -63,7 +40,6 @@ class Cgi
         //Cgi& operator=(const Cgi &cgi);
     	Cgi(std::string methodName, std::string body, std::string path, int port);
         //~Cgi();
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
     
     	std::string		executeCgi(std::string scriptName);
         DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();

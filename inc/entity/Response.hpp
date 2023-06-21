@@ -78,41 +78,6 @@ public:
     std::string                         getServerName();
     std::string                         getContentLocation();
 
-<<<<<<< HEAD
-    void                        setAllowMethods(std::vector<std::string> methods);
-    void	                    setContentType();
-    void                        setQueries();
-    void	                    setDate();
-    void	                    setLastModified();
-    void                        setAutoIndex(std::string _autoIndex);
-    void	                    setIndexs(std::vector<std::string> _locationIndex, std::vector<std::string> _serverIndex);
-    void                        setStaticErrorPage();
-    int                         setPaths();
-    void                        setClientBodyBufferSize(std::string bodyBufferSize);
-    int                         setResponse(Request *request, ServerScope *server, LocationScope *location);
-    void                        setLanguage(std::vector<std::pair<std::string, float> > languages);
-    void                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
-    void                        keywordFill();
-
-
-
-    void                        createResponse(Request *request, ServerScope *server, LocationScope *locationScope);
-
-    std::string                 notAllowed();
-    std::string                 writeHeader(void);
-    std::string                 errorHtml();
-    void                        readContent();
-    std::string                 selectIndex();
-
-    void                        getMethod();
-    void	                    postMethod();
-    void	                    deleteMethod();
-
-    void                 selectCgiPass();
-
-    std::string         getLink(std::string const &dirEntry, std::string const &dirName);
-    std::string         getPage();
-=======
     void                                setAllowMethods(std::vector<std::string> methods);
     void	                            setContentType();
     void                                setQueries();
@@ -146,7 +111,6 @@ public:
     DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();
     void setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase);
     void keywordFillCgi();
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 
 
 };
