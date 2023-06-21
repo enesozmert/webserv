@@ -7,14 +7,11 @@
 #include <unistd.h>
 #include <cstring>
 #include <map>
+#include <arpa/inet.h>
 
-#include "../entity/Listen.hpp"
-#include "../entity/HttpScope.hpp"
-#include "../entity/Request.hpp"
-#include "../parser/ParserRequest.hpp"
-#include "../entity/Response.hpp"
-#include "../function/ServerFunc.hpp"
+#include "../utils/Utils.hpp"
 
+<<<<<<< HEAD
 
 # define RECV_SIZE 4096
 
@@ -25,24 +22,31 @@ class Server {
     	t_listen					_listen;
     	struct sockaddr_in			_addr;
         int                         _locationScopeIndex;
+=======
+class Server 
+{
+    protected:
+    	int					         socketfd;
+        unsigned int                _host;
+        int                         _port;
+>>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 
     public:
+        Server(unsigned int host, int port);
         Server();
+<<<<<<< HEAD
         Server(const t_listen &listen);
         Server(const Server &server);
+=======
+        //Server(const Server &server);
+        //Server &operator=(const Server &server);
+>>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
         ~Server();
 
-        long            getFd() const;
-        t_listen        getListen() const;
-        int             setUpSocket();
-        void            setAddr();
-        void            clean();
-        void            close(int socket);
-        long            accept();
-        void            process(long socket, HttpScope *httpScope);
-        void            processChunk(long socket);
-        int             send(long socket);
-        int             recv(long socket);
-        ServerScope*    getServerForRequest(t_listen& address, HttpScope* http);
-        void             getLocationForRequest(ServerScope *matchedServerScope, const std::string& path); 
+        int             getFd() const;
+        unsigned int	getHost() const;
+		int				getPort() const;
+        void            setUpServer();
+        void            setHostPort(unsigned int host, int port);
+      
 };

@@ -2,14 +2,14 @@
 <head>
    
 </head>
-<body style="background-color: whitesmoke; color: blue;">
+<body style="background-color: lightgrey; color: red;">
 
 <h1>Uploading images using PHP-CGI</h1>
 
 
 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-   <form action="upload.php" method="post" enctype="multipart/form-data">
-         <input type="file" name="image" id="image" />
+   <form action="yimer.php" method="POST" enctype="multipart/form-data">
+         <input type="file" name="image" />
          <input type="submit"/>
       </form>
 
@@ -32,12 +32,11 @@
       {
          $errors[]="extension not allowed, please choose a JPEG or PNG file.";
       }
-      $path = "uploads/".$file_name ;
+      $path = "upload/".$file_name ;
       move_uploaded_file($file_tmp,$path);
       echo "Success <br/>";
       
 
-<<<<<<< HEAD
       if(empty($errors)==true)
       {
          #echo '<img src="./'.$path.'" width=50% />';
@@ -58,6 +57,3 @@
 </div>
 </body>
 </html>
-=======
-?>
->>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61

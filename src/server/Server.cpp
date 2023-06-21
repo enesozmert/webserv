@@ -1,5 +1,6 @@
 #include "../inc/server/Server.hpp"
 
+<<<<<<< HEAD
 Server::Server():_fd(-1) {}
 
 Server::~Server() {}
@@ -11,11 +12,22 @@ Server::Server(const t_listen &listen) :_fd(-1), _listen(listen)
     _addr.sin_addr.s_addr = 0;
 }
 
+=======
+Server::Server(unsigned int host, int port){
+    setHostPort(host, port);
+    setUpServer();
+}
+Server::Server() {}
+
+Server::~Server() {}
+/*
+>>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 Server::Server(const Server &server)
 {
 	*this = server;
 }
 
+<<<<<<< HEAD
 long Server::getFd(void) const
 {
     return (_fd);
@@ -124,35 +136,27 @@ void    Server::process(long socket, HttpScope* http)
 }
 
 void Server::processChunk(long socket)
+=======
+Server& Server::operator=(const Server &server)
 {
-    const std::string& request = _requests[socket];
+	if (this == &server)
+        return (*this);
+    this->fd = server.fd;
+    this->addr = server.addr;
+    this->_port = server._port;
+    this->_host = server._host;
+    return (*this);
+} */
 
-    // İstek başlığı (header) ile body arasındaki bölgeyi bulur.
-    const std::string::size_type header_end = request.find("\r\n\r\n");
-    if (header_end == std::string::npos) {
-        // İstek başlığı tamamlanmadığı için işlem yapılamaz.
-        return;
-    }
-
-    // Body'yi "chunked" encoding kullanarak parçalara ayırır.
-    std::istringstream body_stream(request.substr(header_end + 4));
-    std::string chunk_str;
-    std::string body;
-    while (std::getline(body_stream, chunk_str), !chunk_str.empty()) {
-        // Chunk boyutunu hex değerinden decimal değere çevirir.
-        const std::string::size_type pos = chunk_str.find(';');
-        const int chunk_size = stoul_cxx98(pos != std::string::npos ? chunk_str.substr(0, pos) : chunk_str, NULL, 16);
-
-        // Chunk boyutu kadar veriyi body'ye ekler.
-        body.append(chunk_str.substr(chunk_str.find('\n') + 1, chunk_size));
-    }
-
-    // İstek başlığı ve yeni body'yi birleştirip isteği günceller.
-    _requests[socket] = request.substr(0, header_end + 4) + body + "\r\n\r\n";
+int Server::getFd(void) const
+>>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
+{
+    return (socketfd);
 }
 
-int Server::recv(long socket)
+int Server::getPort(void) const
 {
+<<<<<<< HEAD
     std::cout << YELLOW <<  "\nReceiving..." << RESET << std::endl;
     int recieved_data_size = 0;
     bool received = false;
@@ -182,10 +186,14 @@ int Server::recv(long socket)
         return (-1);
     }
     return (0);
+=======
+    return (this->_port);
+>>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 }
 
-int Server::send(long socket)
+unsigned int Server::getHost(void) const
 {
+<<<<<<< HEAD
     std::cout << YELLOW << "\nSending..." << RESET << std::endl;
     int send_data_size = 0;
     bool sended = false;
@@ -217,17 +225,20 @@ int Server::send(long socket)
     if (send_data_size == -1)
         return (-1);
     return 0;
+=======
+    return (this->_host);
+>>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61
 }
 
-void Server::close(int socket)
+void    Server::setHostPort(unsigned int host, int port)
 {
-    if (socket > 0)
-        ::close(socket);
-    _requests.erase(socket);
+    this->_host = host;
+    this->_port = port;
 }
 
-void Server::clean()
+void             Server::setUpServer()
 {
+<<<<<<< HEAD
     if (_fd > 0)
         ::close(_fd);
     _fd = -1;
@@ -255,3 +266,38 @@ void  Server::getLocationForRequest(ServerScope *matchedServerScope, const std::
     if (this->_locationScopeIndex == -1)
         std::cerr << RED << "There is no possible location" << RESET << std::endl;
 }
+=======
+	struct sockaddr_in			 srvaddr;
+	int opt = 1;
+	this->socketfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (this->socketfd == -1)
+	{
+		std::cerr << RED << "Could not create server." << RESET << std::endl;
+		return ;
+	}
+	fcntl(this->socketfd, F_SETFL, O_NONBLOCK);
+    if (setsockopt(this->socketfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(int)) < 0)
+	{
+		std::cerr << RED << "Could not re addr." << RESET << std::endl;
+		close(this->socketfd);
+		return ;
+	}
+	memset((char *)&srvaddr, 0, sizeof(srvaddr));
+	srvaddr.sin_family = AF_INET;
+	srvaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	srvaddr.sin_port = htons((unsigned short)this->_port);
+	if (bind(this->socketfd, (struct sockaddr *)&srvaddr, sizeof(srvaddr)) < 0)
+	{
+		//::close(this->socketfd);
+		std::cerr << RED << "Could not bind port " << this->_port << "." << RESET << std::endl;
+		return ;
+	}
+	if (listen(this->socketfd, 100) < 0)
+	{
+		//::close(this->socketfd);
+		std::cerr << RED << "Could not listen." << RESET << std::endl;
+		return ;
+	}
+	std::cout << GREEN << "Setting up " << this->_host << ":" << this->_port << "..." << RESET << std::endl;
+}
+>>>>>>> 287e9f52aed247b7830da53bb64a94fb3e140f61

@@ -4,6 +4,7 @@ Request::Request()
 {
     this->_returnCode = 200;
     this->keywordFill();
+    this->_body = "";
 }
 Request::~Request() {}
 /* Request::Request(const Request& request)
@@ -31,6 +32,10 @@ std::string Request::getBody()
 std::string Request::getQuery()
 {
     return (this->_query);
+}
+int Request::getMulti()
+{
+    return (this->_multi);
 }
 int Request::getPort()
 {
@@ -121,12 +126,12 @@ std::string Request::getContentType()
 {
     return (this->_contentType);
 }
-int Request::getContentLength()
+size_t Request::getContentLength()
 {
-    int numberOfContentLength = 0;
-    std::istringstream portStream(this->_contentLength);
-    portStream >> numberOfContentLength;
-    return (numberOfContentLength);
+    //size_t numberOfContentLength = 0;
+    //std::istringstream portStream(this->_contentLength);
+    //portStream >> numberOfContentLength;
+    return (atoi(this->_contentLength.c_str()));
 }
 
 std::string Request::getHttpMethodName()
@@ -170,11 +175,11 @@ void Request::setQuery(std::string query)
 }
 void Request::setPort(std::string port)
 {
-    this->_port = port;//değişebilir her an adress
+    this->_port = port;
 }
 void Request::setIp(std::string ip)
 {
-    this->_ip = ip;//değişebilir her an adress
+    this->_ip = ip;
 }
 void Request::setAcceptLanguage(std::string acceptLanguage)
 {
