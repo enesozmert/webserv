@@ -7,43 +7,30 @@
 #include <unistd.h>
 #include <cstring>
 #include <map>
+#include <arpa/inet.h>
+#include "../utils/Utils.hpp"
+#include "../error/ServerException.hpp"
 
-#include "../entity/Listen.hpp"
-#include "../entity/HttpScope.hpp"
-#include "../entity/Request.hpp"
-#include "../parser/ParserRequest.hpp"
-#include "../entity/Response.hpp"
-#include "../function/ServerFunc.hpp"
-
-
-# define RECV_SIZE 4096
-
-class Server {
-    private:
-        std::map<long, std::string>	_requests;
-    	t_listen					_listen;//host and port
-    	long						fd;
-    	struct sockaddr_in			addr;//host ve port ayarlanacak
-        int                         locationScopeIndex;
-
+class ServerException;
+class Server 
+{
+    protected:
+    	int					         socketfd;
+        unsigned int                _host;
+        int                         _port;
+        ServerException             _serverException;
     public:
+        Server(unsigned int host, int port);
         Server();
-        Server(const t_listen &listen);
-        Server(const Server &server);
+        //Server(const Server &server);
         //Server &operator=(const Server &server);
         ~Server();
 
-        long            getFd() const;
-        t_listen        getListen() const;
-        int             setUpSocket();
-        void            setAddr();
-        void            clean();
-        void            close(int socket);
-        long            accept();
-        void            process(long socket, HttpScope *httpScope);
-        void            processChunk(long socket);
-        int             send(long socket);
-        int             recv(long socket);
-        ServerScope*    getServerForRequest(t_listen& address, HttpScope* http);
-        void             getLocationForRequest(ServerScope *matchedServerScope, const std::string& path); 
+        int             getFd() const;
+        unsigned int	getHost() const;
+		int				getPort() const;
+        void            setHostPort(unsigned int host, int port);
+        void            setUpServer();
+        void            setUpServerMessage();
+      
 };

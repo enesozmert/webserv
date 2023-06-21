@@ -1,13 +1,30 @@
 #include "../inc/parser/ParserRequest.hpp"
 
-ParserRequest::ParserRequest() {}
+ParserRequest::ParserRequest() {
+	this->status = 0;
+}
 
 ParserRequest::~ParserRequest() {}
 
-ParserRequest::ParserRequest(std::string raw) : _raw(raw){}
+//ParserRequest::ParserRequest(std::string raw) : _raw(raw){}
 
-void ParserRequest::parse(std::string raw)
+int	ParserRequest::getStatus() const { return status; }
+
+int	ParserRequest::getMulti() const { return this->_multi; }
+
+int ParserRequest::parse(std::string raw)
 {
+	this->_raw = raw;
+	writeRequest();
+	if (this->_raw.find("multi") != std::string::npos){
+        this->_multi = 1;
+	}
+    else{
+        this->_multi = 0;
+	}
+	std::cout << PURPLE << "multi " << this->_multi << RESET << std::endl;
+	this->status = 0;
+	this->isPost = false;
     std::string key;
 	std::string value;
 	std::string line;
@@ -34,7 +51,7 @@ void ParserRequest::parse(std::string raw)
 	{
 		line = tempRaw.substr(0, pos + 1);
         lineTrim = trim(line, "\n\r");
-        std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
+        //std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
         this->_lines.push_back(lineTrim);
 		tempRaw.erase(0, pos + 1);
 	}
@@ -42,6 +59,9 @@ void ParserRequest::parse(std::string raw)
 	parseKeyValue();
 	parseBody();
 	parseRequestClone();
+	//this->status hata durumlarında -1 olarak ayarla
+	this->status = 1;
+	return status;
 }
 
 void ParserRequest::parseFirstLine()
@@ -58,6 +78,8 @@ void ParserRequest::parseFirstLine()
 	this->request.setPath(path);
 	this->request.setVersion(version);
 	this->request.setHttpMethodName(method);
+	//if (method == "POST")
+		//this->isPost = true;
 }
 
 void ParserRequest::parseKeyValue()
@@ -80,7 +102,8 @@ void ParserRequest::parseKeyValue()
 
 void ParserRequest::parseBody()
 {
-	this->request.setBody(this->_raw.substr(this->_raw.find("\r\n\r\n") + strlen("\r\n\r\n")));
+	//if (this->isPost == true)
+		this->request.setBody(this->_raw.substr(this->_raw.find("\r\n\r\n") + 4));
 }
 
 void ParserRequest::parseRequestClone()
@@ -104,6 +127,7 @@ std::string ParserRequest::findValue(const std::string &line)
 
 	i = line.find_first_of(':');
 	i = line.find_first_not_of(' ', i + 1);
+
 	if (i != std::string::npos)
 		value.append(line, i, std::string::npos);
     return (trim(value, " \n\r\t\f\v"));
@@ -123,4 +147,14 @@ void ParserRequest::setRaw(std::string raw)
 Request *ParserRequest::getRequest()
 {
     return (this->parsedRequest);
+}
+
+void ParserRequest::writeRequest()
+{
+	std::string request(_raw);
+     if (_raw.size() < 1000)
+        std::cout << PURPLE << "\nRequest :" << std::endl << "[" << request << "]" << RESET << std::endl;
+    else
+        std::cout << PURPLE << "\nRequest :" << std::endl << "[" << request.substr(0, 1500) << "..." << "]" << RESET << std::endl;
+
 }

@@ -5,42 +5,56 @@
 #include <iostream>
 #include <cstring>
 #include <csignal>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
 
 #include "Server.hpp"
+#include "Client.hpp"
 #include "../entity/HttpScope.hpp"
+#include "../error/ClusterException.hpp"
 
 class Server;
 class HttpScope;
+class ClusterException;
 class Cluster
 {
+    private:
+        HttpScope*                  httpScope;
+        std::map<int, Server *>     servers;
+        int                         max_fd;
+        fd_set                      readFds;
+        fd_set                      supReadFds;
+        fd_set                      supWriteFds;
+        fd_set                      writeFds;
+        int                         selected;
+        int                         isMulti;
+        int                         isFav;
+        int                         loopControl;
+        int                         status;
+        size_t                      ContentLen;
+        std::map<int, Client *>     clients;
+        std::string                 method;
+        std::string                 favicon;
+        std::string                 _response;
+        std::string                 MultiBody;
+        std::string                 body;
+        ClusterException            _clusterException;
+    public:
+        Cluster();
+        ~Cluster();
+        /*
+        Cluster(const Cluster &cluster);
+        Cluster &operator=(const Cluster &cluster); */
 
-private:
-    HttpScope*                  httpScope; //http class gelecek
-    std::map<long, Server>      servers;
-    std::map<long, Server *>    sockets; //her server üzerinden kurulan socketleri tutacak
-    std::vector<int>            ready; //veri gönderimine hazır socketler(writing_set'e eklenmiş)
-    long                        max_fd;// select() için ve kontrol amaçlı gerekli
-    fd_set                      fd_master;//(tüm fd'lerin tutulduğu set)
-    fd_set                      reading_set;
-	fd_set                      writing_set;
-	struct timeval              timeout;
-    int                         select_return_value;
-
-public:
-    Cluster();
-    ~Cluster();
-    Cluster(const Cluster &cluster);
-    Cluster &operator=(const Cluster &cluster);
-
-    int     setUpCluster(HttpScope *http);
-    void    run();
-    void    cleanServers();
-    void    cleanSockets();
-    void    cleanReady();
-    void    select_section(); // havuzdan fd seçimi yapılır
-    void    accept_section(); // client'a hizmet için hazır bir socket oluşturulur
-    void    recv_section();
-    void    send_section();
-    void    cleanAll();
-
+        int     setUpCluster(HttpScope *http);
+        void    run();
+        void    cleanServers();
+        void    cleanClients();
+        void    accept_section();
+        void    recv_section();
+        void    send_section();
+        void    cleanAll();
+        void	close_connection(std::map<int, Client *>::iterator it);
+        void	findMaxFd();
 };

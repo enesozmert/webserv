@@ -12,12 +12,16 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <limits>
 #include <sys/stat.h>
 #include <cstring>
 #include <unistd.h>
+#include <sys/time.h>
+#include <stdlib.h>
 #include "../entity/CgiVariable.hpp"
+
 inline std::string	removeAdjacentSlashes(const std::string &str)
 {
 	std::string	ret;
@@ -167,4 +171,48 @@ std::string to_string(const T& value)
     std::stringstream ss;
     ss << value;
     return ss.str();
+}
+
+inline	std::string	openNread(std::string file_path)
+{
+	std::fstream fd(file_path.c_str());
+	std::string tmp;
+	std::string result;
+
+	if (!fd.is_open())
+	{
+		result = "<!DOCTYPE html>\n<html><title>404</title><body>There was an error finding your file</body></html>\n";
+		return result;
+	}
+	while (getline(fd, tmp))
+		result += tmp + '\n';
+	fd.close();
+	return result;
+}
+
+inline	std::string setDate()
+{
+	char buffer[100];
+	struct timeval tv;
+	struct tm *tm;
+
+	gettimeofday(&tv, NULL);
+	tm = gmtime(&tv.tv_sec);
+	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
+	return std::string(buffer);
+}
+
+inline std::string	add_headers_favicon(std::string _body)
+{
+	std::string date = setDate();
+	std::string headers;
+	headers += "HTTP/1.1 200 OK\n";
+	headers += "Date: " + date + "\n";
+	headers += "Server: webserv\n";
+	headers += "Content-Type: image/png\n";
+	headers += "Content-Length: " + to_string(_body.size()) + "\n";
+	headers += "Connection: close\n";
+	std::string res;
+	res = headers + "\n" + _body;
+	return (res);
 }
