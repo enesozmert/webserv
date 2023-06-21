@@ -73,7 +73,7 @@ int Cluster::setUpCluster(HttpScope *http)
 	}
 	if (max_fd == 0)
 	{
-		std::cerr << RED << "Could not setup cluster !" << RESET << std::endl;
+		_clusterException.run(400);
 		return (-1);
 	}
 	return (0);
@@ -124,7 +124,6 @@ void Cluster::recv_section()
 					this->body = it->second->getBody();
 					if (this->isFav == 1)
 					{
-						std::cout << YELLOW << "favicon bulundu" << RESET << std::endl;
 						if (send(it->first, this->favicon.c_str(), this->favicon.length(), 0) > 0)
 							std::cout << CYAN << "Send Successful Favicon!" << RESET << std::endl << std::flush;
 						this->loopControl = 0;
@@ -146,7 +145,6 @@ void Cluster::recv_section()
 							{
 								this->MultiBody += std::string(buffer, ret);
 								this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
-								std::cout << "this->MultiBody.length()body eklenince" << this->MultiBody.length() << std::endl;
 							}
 							this->body = "";
 						}
@@ -159,18 +157,15 @@ void Cluster::recv_section()
 					else
 					{
 						close_connection(it);
-						std::cout << "Wrong Data!" << std::endl << std::flush;
+						_clusterException.run(401);
 					}
 				}
 				else if (this->status == 1 && this->isMulti == 1)
 				{
 					sup_len = this->MultiBody.length();
-					std::cout << "sup_len" << sup_len << std::endl;
 					if (!(sup_len + ret == std::string::npos))
 					{
 						this->MultiBody += std::string(buffer, ret);
-						std::cout << "this->MultiBody.length()" << this->MultiBody.length() << std::endl;
-						std::cout << "this->ContentLen" << this->ContentLen << std::endl;
 						if (this->ContentLen == this->MultiBody.length())
 						{
 							FD_CLR(it->first, &this->readFds);
@@ -179,7 +174,7 @@ void Cluster::recv_section()
 					}
 					else
 					{
-						std::cout << "So Big!" << std::endl << std::flush;
+						_clusterException.run(402);
 						close_connection(it);
 					}
 				}
@@ -187,9 +182,13 @@ void Cluster::recv_section()
 			else
 			{
 				if (ret == 0)
+				{
             		std::cout << RED << "\rConnection was closed by client.\n" << RESET << std::endl;
+				}
         		else if (ret == -1)
-            		std::cout << RED << "\rRead error, closing connection.\n" << RESET << std::endl;
+				{
+					_clusterException.run(403);
+				}
 				close_connection(it);
 				std::cout << "Connection Closed!" << std::endl << std::flush;
 			}
@@ -212,7 +211,7 @@ void Cluster::accept_section()
     		client_fd = ::accept(it->first, NULL, NULL);
     		if (client_fd == -1)
     		{
-      			std::cerr << RED << "Could not create socket. " << RESET << std::endl;
+				_clusterException.run(404);
         		return ;
     		}
 			if (client_fd != -1)

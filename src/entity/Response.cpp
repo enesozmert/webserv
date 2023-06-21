@@ -180,13 +180,12 @@ int Response::setPaths()
 	this->_serverRootPath = _serverScope->getRoot();
 	this->_locationRootPath = _locationScope->getRoot();
 	this->_index = selectIndex();
-
 	if (_locationRootPath != "")
-		this->_path = removeAdjacentSlashes(_locationRootPath + _request->getPath());
+		this->_path = removeAdjacentSlashes(_locationRootPath + this->_uri);
 	else if (_serverRootPath != "" && _locationRootPath == "")
-		this->_path = removeAdjacentSlashes(_serverRootPath + _request->getPath());
-
-	if (!pathIsFile(this->_path))
+		this->_path = removeAdjacentSlashes(_serverRootPath + this->_uri);
+	this->_contentLocation = getPwd() + "/" + this->_path;
+	if (!pathIsFile(this->_contentLocation))
 	{
 		if (_locationRootPath != "")
 			this->_path = removeAdjacentSlashes(_locationRootPath + _index);
@@ -194,7 +193,6 @@ int Response::setPaths()
 			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
 	}
 	this->_contentLocation = this->_path;
-	std::cout << "this->_contentLocation " << this->_contentLocation << std::endl;
 	return 0;
 }
 
@@ -468,8 +466,8 @@ void Response::keywordFill()
 	_keywordDatabase.insertData(Variable<std::string>("Content-Type", &this->_contentType));
 	_keywordDatabase.insertData(Variable<std::string>("Content-Length", &this->_contentLength));
 	_keywordDatabase.insertData(Variable<std::string>("Connection", &this->_status));
-	//_keywordDatabase.insertData(Variable<std::string>("Content-Language", &this->_contentLanguage));
-	//_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Language", &this->_contentLanguage));
+	_keywordDatabase.insertData(Variable<std::string>("Content-Location", &this->_contentLocation));
 }
 
 std::string Response::selectIndex()

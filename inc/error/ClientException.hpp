@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <iostream>
@@ -8,17 +10,17 @@
 #include "MyException.hpp"
 #include "HandleException.hpp"
 
-class ServerException
+class ClientException
 {
     private:
         int _errorCode;
         DataBase<ExceptionVariable<int, std::string> > _errorDatabase;
         ExceptionVariable<int, std::string> _exception;
     public:
-        ServerException(/* args */);
-        ~ServerException();
-        ServerException(const ServerException &serverException);
-        ServerException(int errorCode);
+        ClientException();
+        ~ClientException();
+        ClientException(const ClientException &clientException);
+        ClientException(int errorCode);
 
         DataBase<ExceptionVariable<int, std::string> > getErrorDataBase();
         void setErrorDatabase(DataBase<ExceptionVariable<int, std::string> > errorDatabase);

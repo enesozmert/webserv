@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 #include "../database/DataBase.hpp"
-#include "../entity/ExceptionVariable.hpp"
 #include "../function/ExceptionVariableFunc.hpp"
 #include "MyException.hpp"
 #include "HandleException.hpp"

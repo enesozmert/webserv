@@ -6,14 +6,15 @@
 #include <cstring>
 #include <map>
 
-
 #include "Server.hpp"
 #include "../parser/ParserRequest.hpp"
 #include "../entity/Request.hpp"
 #include "../entity/Response.hpp"
 #include "../function/ServerFunc.hpp"
 #include "../entity/HttpScope.hpp"
+#include "../error/ClientException.hpp"
 
+class ClientException;
 class Client
 {
 	private:
@@ -34,6 +35,7 @@ class Client
 		int									isFav;
 		std::string							body;
 
+		ClientException						_clientException;
 	public:
 		Client(Server *sv, HttpScope* Hscope);
 		/* Client();
