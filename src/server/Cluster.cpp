@@ -54,7 +54,7 @@ int Cluster::setUpCluster(HttpScope *http)
 	this->body = "";
 	this->MultiBody = "";
 
-	this->favicon = add_headers_favicon(openNread(getPwd() + "/" + "index/sponge.png"));
+	this->favicon = add_headers_favicon(openNread(getPwd() + "/" + "index/fv.png"));
 
 	FD_ZERO(&this->writeFds);
 	FD_ZERO(&this->readFds);
@@ -133,7 +133,7 @@ void Cluster::recv_section()
 					}
 					else if (this->status == 1)
 					{
-		 				/* if (this->method == "DELETE")
+		 		/* 		if (this->method == "DELETE")
 						{
 								if (deleteHandle(it->second) == -1)
 									send(it->first, "False!" , 6, 0);
@@ -147,13 +147,10 @@ void Cluster::recv_section()
 							{
 								if (static_cast<size_t>(ret) >= this->ContentLen)
 								{
+									FD_CLR(it->first, &this->readFds);
 									FD_SET(it->first, &this->writeFds);
 									this->MultiBody += std::string(buffer, ret);
 									this->MultiBody = this->MultiBody.substr(this->MultiBody.find("------Web"));
-									this->status = 0;
-									this->isMulti = 0;
-									this->method = "";
-									this->ContentLen = 0;
 								}
 								else if (this->body != "")
 								{
@@ -167,10 +164,6 @@ void Cluster::recv_section()
 							{
 								FD_CLR(it->first, &this->readFds);
 								FD_SET(it->first, &this->writeFds);
-								this->status = 0;
-								this->isMulti = 0;
-								this->method = "";
-								this->ContentLen = 0;
 							}
 						}
 					}
@@ -191,11 +184,8 @@ void Cluster::recv_section()
 						std::cout << "this->ContentLen" << this->ContentLen << std::endl;
 						if (this->ContentLen == this->MultiBody.length())
 						{
+							FD_CLR(it->first, &this->readFds);
 							FD_SET(it->first, &this->writeFds);
-							this->status = 0;
-							this->isMulti = 0;
-							this->method = "";
-							this->ContentLen = 0;
 						}
 					}
 					else
@@ -256,6 +246,8 @@ void Cluster::run()
 		this->selected = 0;
 		while (selected == 0)
 		{
+			FD_ZERO(&supReadFds);
+			FD_ZERO(&supWriteFds);
 			this->supWriteFds = this->writeFds;
 			this->supReadFds = this->readFds;
 			this->selected = select(max_fd, &this->supReadFds, &this->supWriteFds, NULL, NULL);

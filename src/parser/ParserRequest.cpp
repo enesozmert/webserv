@@ -61,7 +61,7 @@ int ParserRequest::parse(std::string raw)
 	parseRequestClone();
 	//this->status hata durumlarında -1 olarak ayarla
 	this->status = 1;
-	return 0;
+	return status;
 }
 
 void ParserRequest::parseFirstLine()
