@@ -41,7 +41,7 @@ class Cgi
     	Cgi(std::string methodName, std::string body, std::string path, int port);
         //~Cgi();
     
-    	std::string		executeCgi(std::string scriptName);	// executes cgi and returns body
+    	std::string		executeCgi(std::string scriptName);
         DataBase<CgiVariable<std::string, std::string> > getEnvDataBase();
         void setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > envDatabase);
         void keywordFill();

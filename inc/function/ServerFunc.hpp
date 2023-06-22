@@ -37,9 +37,6 @@ inline int getMatchLocationPathIndex(ServerScope *matchedServerScope, std::strin
     for (std::vector<LocationScope *>::iterator it = selectedLocationScope.begin(); it != selectedLocationScope.end(); it++)
     {
         index++;
-        //std::cout << PURPLE <<  "location index = " << index << RESET << std::endl;
-        //std::cout << PURPLE <<  "(*it)->getPath() = " << (*it)->getPath() << RESET << std::endl;
-        //std::cout << PURPLE <<  "gelen path = " << path << RESET << std::endl;
         trimmedSelectedPath = trim((*it)->getPath(), "\n\r\t ");
         trimmedPath = trim(path, "\n\r\t ");
         if (trimmedSelectedPath == trimmedPath || trimmedSelectedPath == "/")

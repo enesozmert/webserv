@@ -117,7 +117,6 @@ void   Client::setBody(std::string body)
 
 void   Client::setParserRequest(std::string buffer)
 {
-    std::cout << RED << "setParseRequest'e girdi " << RESET << std::endl;
     this->_parser = new ParserRequest();
     this->_parser->parse(buffer);
     setStatus(this->_parser->getStatus());
@@ -127,10 +126,7 @@ void   Client::setParserRequest(std::string buffer)
 	setContentLen(this->_request->getContentLength());
     setBody(this->_request->getBody());
     if (this->_request->getPath() == "/favicon.ico")
-    {
-        std::cout << "favicooo" << std::endl;
         this->isFav = 1;
-    }
     delete _parser;
 }
 
@@ -139,14 +135,16 @@ std::string    Client::process(std::string multiBody)
     std::cout << RED << "Processing" << RESET << std::endl;
     ServerScope     *matchedServer;
     LocationScope   *matchedLocation;
-    this->response = new Response();
+    int             matchedServerIndex;
 
-    matchedServer = this->getServerForRequest();
+    this->response = new Response();
+    matchedServerIndex = getServerForRequest();
+    matchedServer = this->_http->getServers().at(matchedServerIndex);
     this->getLocationForRequest(matchedServer, _request->getPath());
 
     if (matchedServer == NULL || this->locationIndex == -1)
     {
-        std::cerr << "No matched server/location found" << std::endl;
+        _clientException.run(300);
         return NULL;
     }
     matchedLocation = matchedServer->getLocations().at(this->locationIndex);
@@ -162,18 +160,21 @@ std::string    Client::process(std::string multiBody)
     return _response;
 }
 
-ServerScope*        Client::getServerForRequest()
+int        Client::getServerForRequest()
 {
+    int index;
     std::vector<ServerScope *>  serverScope;
 
     serverScope = this->_http->getServers();
+    index = 0;
     for (std::vector<ServerScope *>::const_iterator it = serverScope.begin() ; it != serverScope.end(); it++)
     {
         if (this->_host == (*it)->getListen().host && this->_port == (*it)->getListen().port)
-            return(*it);
+            return(index);
+        index++;
     }
-    std::cerr << RED << "There is no possible server" << RESET << std::endl;
-    return NULL;
+    _clientException.run(301);
+    return (-1);
 }
 
 
@@ -184,5 +185,7 @@ void  Client::getLocationForRequest(ServerScope *matchedServerScope, const std::
 
     this->locationIndex = getMatchLocationPathIndex(matchedServerScope, path);
     if(this->locationIndex == -1)
-        std::cerr << RED << "There is no possible location" << RESET << std::endl;
+    {
+        _clientException.run(302);
+    }
 }

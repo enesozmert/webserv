@@ -12,9 +12,11 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "../entity/HttpScope.hpp"
+#include "../error/ClusterException.hpp"
 
 class Server;
 class HttpScope;
+class ClusterException;
 class Cluster
 {
     private:
@@ -37,7 +39,7 @@ class Cluster
         std::string                 _response;
         std::string                 MultiBody;
         std::string                 body;
-
+        ClusterException            _clusterException;
     public:
         Cluster();
         ~Cluster();

@@ -73,7 +73,6 @@ public:
     std::string                         getMethodName();
     std::string                         getCgiPass();
     std::map<std::string, std::string>  getQueries();
-    std::string                         getContentDisposition();
     std::string                         getResponse();
     DataBase<Variable<std::string> >    getKeywordDataBase();
     std::string                         getServerName();

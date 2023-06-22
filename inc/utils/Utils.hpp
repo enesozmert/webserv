@@ -19,6 +19,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <sys/time.h>
+#include <stdlib.h>
 #include "../entity/CgiVariable.hpp"
 
 inline std::string	removeAdjacentSlashes(const std::string &str)
@@ -174,7 +175,7 @@ std::string to_string(const T& value)
 
 inline	std::string	openNread(std::string file_path)
 {
-	std::fstream fd(file_path);
+	std::fstream fd(file_path.c_str());
 	std::string tmp;
 	std::string result;
 
@@ -209,7 +210,7 @@ inline std::string	add_headers_favicon(std::string _body)
 	headers += "Date: " + date + "\n";
 	headers += "Server: webserv\n";
 	headers += "Content-Type: image/png\n";
-	headers += "Content-Length: " + std::to_string(_body.size()) + "\n";
+	headers += "Content-Length: " + to_string(_body.size()) + "\n";
 	headers += "Connection: close\n";
 	std::string res;
 	res = headers + "\n" + _body;

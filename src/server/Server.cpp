@@ -52,13 +52,13 @@ void             Server::setUpServer()
 	this->socketfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->socketfd == -1)
 	{
-		std::cerr << RED << "Could not create server." << RESET << std::endl;
+		this->_serverException.run(200);
 		return ;
 	}
 	fcntl(this->socketfd, F_SETFL, O_NONBLOCK);
     if (setsockopt(this->socketfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(int)) < 0)
 	{
-		std::cerr << RED << "Could not re addr." << RESET << std::endl;
+		this->_serverException.run(201);
 		close(this->socketfd);
 		return ;
 	}
@@ -69,14 +69,19 @@ void             Server::setUpServer()
 	if (bind(this->socketfd, (struct sockaddr *)&srvaddr, sizeof(srvaddr)) < 0)
 	{
 		//::close(this->socketfd);
-		std::cerr << RED << "Could not bind port " << this->_port << "." << RESET << std::endl;
+		this->_serverException.run(202);
 		return ;
 	}
 	if (listen(this->socketfd, 100) < 0)
 	{
 		//::close(this->socketfd);
-		std::cerr << RED << "Could not listen." << RESET << std::endl;
+		this->_serverException.run(203);
 		return ;
 	}
+	setUpServerMessage();
+}
+
+void	Server::setUpServerMessage()
+{
 	std::cout << GREEN << "Setting up " << this->_host << ":" << this->_port << "..." << RESET << std::endl;
 }

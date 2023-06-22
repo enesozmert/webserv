@@ -29,7 +29,7 @@ PARSER			=	ParserConfig ParserRequest
 FILE			=	File
 SERVER			=	Server Cluster Client
 HTTP			=	HttpMethod HttpStatusCode HttpContentType
-ERROR			=	ConfigException HandleException
+ERROR			=	ClusterException ClientException ServerException ConfigException HandleException
 SYNTAX			=	SyntaxConfig
 
 SRC_MAIN		= 	main

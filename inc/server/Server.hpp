@@ -8,16 +8,17 @@
 #include <cstring>
 #include <map>
 #include <arpa/inet.h>
-
 #include "../utils/Utils.hpp"
+#include "../error/ServerException.hpp"
 
+class ServerException;
 class Server 
 {
     protected:
     	int					         socketfd;
         unsigned int                _host;
         int                         _port;
-
+        ServerException             _serverException;
     public:
         Server(unsigned int host, int port);
         Server();
@@ -28,7 +29,8 @@ class Server
         int             getFd() const;
         unsigned int	getHost() const;
 		int				getPort() const;
-        void            setUpServer();
         void            setHostPort(unsigned int host, int port);
+        void            setUpServer();
+        void            setUpServerMessage();
       
 };

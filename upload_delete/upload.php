@@ -32,7 +32,7 @@
       {
          $errors[]="extension not allowed, please choose a JPEG or PNG file.";
       }
-      $path = "upload/".$file_name ;
+      $path = "uploads/".$file_name ;
       move_uploaded_file($file_tmp,$path);
       echo "Success <br/>";
       

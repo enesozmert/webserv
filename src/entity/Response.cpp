@@ -26,10 +26,6 @@ std::string Response::getContentLocation()
 {
 	return (this->_contentLocation);
 }
-std::string Response::getContentDisposition()
-{
-	return (this->_contentDisposition);
-}
 
 std::string Response::getContentType()
 {
@@ -108,10 +104,6 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 void Response::setQueries()
 {
-	/* const std::size_t pair_delimiter = _body.find('=');
-	const std::string key = _body.substr(0, pair_delimiter);
-	std::string value = _body.substr(pair_delimiter + 1, _body.length() - (pair_delimiter + 1));
-	this->_queries[key] = value; */
 	std::size_t position = 0;
 	while (position < _body.size())
 	{
@@ -188,7 +180,6 @@ int Response::setPaths()
 	this->_serverRootPath = _serverScope->getRoot();
 	this->_locationRootPath = _locationScope->getRoot();
 	this->_index = selectIndex();
-
 	if (_locationRootPath != "")
 		this->_path = removeAdjacentSlashes(_locationRootPath + this->_uri);
 	else if (_serverRootPath != "" && _locationRootPath == "")
@@ -202,7 +193,6 @@ int Response::setPaths()
 			this->_path = removeAdjacentSlashes(_serverRootPath + _index);
 	}
 	this->_contentLocation = this->_path;
-	std::cout << "this->_contentLocation : " << this->_contentLocation << std::endl;
 	return 0;
 }
 
