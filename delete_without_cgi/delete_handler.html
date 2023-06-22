@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DELETE Metodu Testi</title>
+</head>
+<body>
+    <h1>DELETE Metodu Testi</h1>
+    
+    <form id="deleteForm">
+        <label for="deleteInput">Silinecek veri:</label>
+        <input type="text" id="deleteInput" name="deleteInput">
+        <button type="button" onclick="sendDeleteRequest()">SIL</button>
+    </form>
+    
+    <script>
+        function sendDeleteRequest() {
+            var deleteInput = document.getElementById("deleteInput").value;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "delete_without_cgi/", true);  // DELETE isteği yapılacak URL'yi buraya yazın
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("Veri basariyla silindi.");
+                    // İsteğin başarılı olduğu durumda yapılacak işlemleri buraya ekleyebilirsiniz
+                }
+                else if (xhr.readyState === 4 && xhr.status !== 200) {
+                    alert("Bir hata olustu.");
+                    // İsteğin başarısız olduğu durumda yapılacak işlemleri buraya ekleyebilirsiniz
+                }
+            };
+            
+            xhr.send(JSON.stringify({ data: deleteInput }));  // Silinecek veriyi JSON olarak göndermek için uygun formatı kullanın
+        }
+    </script>
+</body>
+</html>
+

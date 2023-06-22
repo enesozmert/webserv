@@ -167,6 +167,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_host = server->getHost();
 	this->_port = atoi((server->getPort()).c_str());
 	this->_contentLength = request->getContentLength();
+	std::cout << "contentLen: " << this->_contentLength << std::endl;
 	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
 	setStaticErrorPage();
@@ -299,7 +300,7 @@ void Response::deleteMethod()
             filePath = token.substr(startPos + 1, endPos - startPos - 1);
         }
     }
-	delPath = getPwd() + "/" + this->_locationRootPath + filePath;	
+	delPath = getPwd() + "/" + this->_locationRootPath + filePath;
 	if (pathIsFile(delPath))
 	{
 		if (remove(delPath.c_str()) == 0)
@@ -556,6 +557,7 @@ std::string Response::executeCgi()
 
 		execve(av[0], av, env);
 		std::cout << "Execv Err!" << std::endl << std::flush;
+		this->statusCode = 500;
 		exit(-1);
 	}
 	wait(NULL);
