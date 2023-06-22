@@ -17,21 +17,20 @@ class DataBase
         std::vector<T> _data;    
 
         DataBase(){}
+
         DataBase(std::vector<T> data)
         {
             this->_data = data;
         }
-        ~DataBase()
-        {
 
-        }
+        ~DataBase() {}
 
         std::vector<T> getAllData()
         {
             return (this->_data);
         }
 
-        void insertData(T data) // add new element
+        void insertData(T data)
         {
             this->_data.push_back(data);
         }
@@ -80,17 +79,3 @@ class DataBase
         }
 
 };
-
-
-/* int main(){
-    
-    std::vector<std::string> vec;
-    vec.push_back("aa");
-    vec.push_back("bb");
-    vec.push_back("cc");
-    DataBase <std::string>db(vec);
-    db.updateData("cc", "qq");
-    std::cout<<db.isHere("qq")<<std::endl;
-    std::cout<<db.isHere("merhaba")<<std::endl;
-    
-} */

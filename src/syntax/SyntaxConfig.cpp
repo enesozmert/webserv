@@ -2,13 +2,9 @@
 
 typedef int (SyntaxConfig::*method_function)(const int &);
 
-SyntaxConfig::SyntaxConfig() : _httpScopeCount(0), _serverScopeCount(0)
-{
-}
+SyntaxConfig::SyntaxConfig() : _httpScopeCount(0), _serverScopeCount(0) {}
 
-SyntaxConfig::~SyntaxConfig()
-{
-}
+SyntaxConfig::~SyntaxConfig() {}
 
 SyntaxConfig::SyntaxConfig(const SyntaxConfig &syntaxConfig) : _httpScopeCount(0), _serverScopeCount(0)
 {

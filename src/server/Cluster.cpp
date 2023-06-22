@@ -3,39 +3,7 @@
 Cluster::Cluster() {}
 
 Cluster::~Cluster() {}
-/*
 
-Cluster::Cluster(const Cluster &cluster)
-{
-		if (this != &cluster) {
-		*this = cluster;
-	}
-}
-
-Cluster& Cluster::operator=(const Cluster & cluster)
-{
-	if (this == &cluster)
-        return (*this);
-	httpScope = cluster.httpScope;
-	servers = cluster.servers;
-	max_fd = cluster.max_fd;
-	readFds = cluster.readFds;
-	writeFds = cluster.writeFds;
-	supReadFds = cluster.supReadFds;
-	supWriteFds = cluster.supWriteFds;
-	selected = cluster.selected;
-	this->isMulti = cluster.isMulti;
-	this->loopControl = cluster.loopControl;
-	this->status = cluster.status;
-	this->clients = cluster.clients;
-	this->isFav = cluster.isFav;
-	this->ContentLen = cluster.ContentLen;
-	this->method = cluster.method;
-	this->favicon = cluster.favicon;
-	this->_response = cluster._response;
-	this->body = cluster._body;
-	return (*this);
-} */
 
 int Cluster::setUpCluster(HttpScope *http)
 {
@@ -48,7 +16,7 @@ int Cluster::setUpCluster(HttpScope *http)
 	this->status = 0;
 	this->isMulti = 0;
 	this->isFav = 0;
-	this->ContentLen = 0;
+	this->contentLen = 0;
 	this->_response = "";
 	this->method = "";
 	this->body = "";
@@ -120,7 +88,7 @@ void Cluster::recv_section()
 					this->isMulti = it->second->getMulti();
 					this->method = it->second->getMethod();
 					this->isFav = it->second->getIsFav();
-					this->ContentLen = it->second->getContentLen();
+					this->contentLen = it->second->getContentLen();
 					this->body = it->second->getBody();
 					if (this->isFav == 1)
 					{
@@ -134,7 +102,7 @@ void Cluster::recv_section()
 					{
 						if (this->isMulti == 1)
 						{
-							if (static_cast<size_t>(ret) >= this->ContentLen)
+							if (static_cast<size_t>(ret) >= this->contentLen)
 							{
 								FD_CLR(it->first, &this->readFds);
 								FD_SET(it->first, &this->writeFds);
@@ -166,7 +134,7 @@ void Cluster::recv_section()
 					if (!(sup_len + ret == std::string::npos))
 					{
 						this->MultiBody += std::string(buffer, ret);
-						if (this->ContentLen == this->MultiBody.length())
+						if (this->contentLen == this->MultiBody.length())
 						{
 							FD_CLR(it->first, &this->readFds);
 							FD_SET(it->first, &this->writeFds);
@@ -291,7 +259,7 @@ void	Cluster::close_connection(std::map<int, Client *>::iterator it)
 	this->isMulti = 0;
 	this->isFav = 0;
 	this->method = "";
-	this->ContentLen = 0;
+	this->contentLen = 0;
 	this->body = "";
 	this->MultiBody = "";
 	FD_CLR(it->first, &this->readFds);

@@ -1,21 +1,8 @@
 #include "../inc/entity/Response.hpp"
 
-/* Response::Response() {}
+Response::Response() {}
 
 Response::~Response() {}
-
-Response::Response(const Response &response)
-{
-	*this = response;
-}
-
-Response &Response::operator=(const Response &response)
-{
-	if (this == &response)
-		return (*this);
-	this->_response = response._response;
-	return (*this);
-} */
 
 int Response::getStatusCode()
 {
@@ -40,11 +27,6 @@ std::string Response::getPath()
 std::string Response::getServerName()
 {
 	return (this->_server);
-}
-
-std::map<std::string, std::string> Response::getQueries()
-{
-	return (this->_queries);
 }
 
 std::string Response::getResponse()
@@ -99,41 +81,6 @@ void Response::setAllowMethods(std::vector<std::string> methods)
 
 		if (it != methods.end())
 			this->_allows += ", ";
-	}
-}
-
-void Response::setQueries()
-{
-	std::size_t position = 0;
-	while (position < _body.size())
-	{
-		const std::size_t next_delimiter = _body.find('&', position);
-		std::string query;
-		if (next_delimiter == std::string::npos)
-		{
-			query = _body.substr(position);
-		}
-		else
-		{
-			query = _body.substr(position, next_delimiter - position);
-		}
-		const std::size_t pair_delimiter = query.find('=');
-		const std::string name = query.substr(0, pair_delimiter);
-		if (name.empty())
-		{
-			return;
-		}
-		std::string value;
-		if (pair_delimiter != std::string::npos)
-		{
-			value = query.substr(pair_delimiter + 1);
-		}
-		this->_queries[name] = value;
-		if (next_delimiter == std::string::npos)
-		{
-			break;
-		}
-		position = next_delimiter + 1;
 	}
 }
 
@@ -220,6 +167,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_host = server->getHost();
 	this->_port = atoi((server->getPort()).c_str());
 	this->_contentLength = request->getContentLength();
+	std::cout << "contentLen: " << this->_contentLength << std::endl;
 	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
 	setStaticErrorPage();
@@ -229,9 +177,7 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	if (this->_methodName == "GET")
-		setQueries();
-	return 0;
+	return (0);
 }
 
 std::string Response::createResponse(Request *request, ServerScope *serverScope, LocationScope *locationScope, std::string MultiBody)
@@ -246,6 +192,7 @@ std::string Response::createResponse(Request *request, ServerScope *serverScope,
 		this->_body = MultiBody;
 	else
 		this->_body = this->_request->getBody();
+
 	if (setResponse(request, serverScope, locationScope) == -1)
 	{
 		std::cerr << RED << "Error setting response" << RESET << std::endl;
@@ -257,7 +204,7 @@ std::string Response::createResponse(Request *request, ServerScope *serverScope,
 		_response = notAllowed() + "\r\n";
 		return NULL;
 	}
-	else if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
+	if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
 	{
 		this->statusCode = 413;
 		_response = notAllowed() + "\r\n";
@@ -353,7 +300,7 @@ void Response::deleteMethod()
             filePath = token.substr(startPos + 1, endPos - startPos - 1);
         }
     }
-	delPath = getPwd() + "/" + this->_locationRootPath + filePath;	
+	delPath = getPwd() + "/" + this->_locationRootPath + filePath;
 	if (pathIsFile(delPath))
 	{
 		if (remove(delPath.c_str()) == 0)
@@ -582,8 +529,6 @@ std::string Response::executeCgi()
 	tmp = (std::string)cwd + "/" + this->_path;
 	av2 = (char *)tmp.c_str();
 
-	std::cout << "tmp" << tmp << std::endl;
-
 	av[0] = av1;
 	av[1] = av2;
 
@@ -612,6 +557,7 @@ std::string Response::executeCgi()
 
 		execve(av[0], av, env);
 		std::cout << "Execv Err!" << std::endl << std::flush;
+		this->statusCode = 500;
 		exit(-1);
 	}
 	wait(NULL);
@@ -647,7 +593,7 @@ void Response::setEnvDatabase(DataBase<CgiVariable<std::string, std::string> > e
 void Response::keywordFillCgi()
 {
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_FILENAME", this->_path));
-	//_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", this->_path));
+	_envDatabase.insertData(CgiVariable<std::string, std::string>("SCRIPT_NAME", this->_path));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_TYPE", this->_request->getContentType()));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("CONTENT_LENGTH", to_string(this->_request->getContentLength())));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("PATH_INFO", this->_request->getPath()));
@@ -658,13 +604,4 @@ void Response::keywordFillCgi()
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_PROTOCOL", "HTTP/1.1"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("SERVER_SOFTWARE", "webserv"));
 	_envDatabase.insertData(CgiVariable<std::string, std::string>("REDIRECT_STATUS", "200"));
-
-/* 	if (_response->getMethodName() == "GET")
-	{
-		for (std::map<std::string, std::string>::iterator it = _query.begin(); it != _query.end(); it++)
-		{
-			_envDatabase.insertData(CgiVariable<std::string, std::string>(it->first, it->second));
-			std::cout << CYAN << it->first << "=" << it->second << RESET << std::endl;
-		}
-	} */
 }

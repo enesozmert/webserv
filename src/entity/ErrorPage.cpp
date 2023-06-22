@@ -1,15 +1,10 @@
 #include "../inc/entity/ErrorPage.hpp"
 
-ErrorPage::ErrorPage()
-{
-}
+ErrorPage::ErrorPage() {}
 
 ErrorPage::~ErrorPage() {}
 
-ErrorPage::ErrorPage(const ErrorPage &errorPage)
-{
-    *this = errorPage;
-}
+ErrorPage::ErrorPage(const ErrorPage &errorPage) { *this = errorPage; }
 
 ErrorPage	&ErrorPage::operator=(const ErrorPage &errorPage)
 {
@@ -18,6 +13,7 @@ ErrorPage	&ErrorPage::operator=(const ErrorPage &errorPage)
     this->_errorPageCodes = errorPage._errorPageCodes;
     this->_errorPagePath = errorPage._errorPagePath;
     this->_errorPage = errorPage._errorPage;
+    this->_httpStatusCode = errorPage._httpStatusCode;
     return (*this);
 }
 

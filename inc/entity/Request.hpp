@@ -43,8 +43,6 @@ class Request : public IRequest
     public:
         Request();
         ~Request();
-        //Request(const Request& request);
-        //Request &operator=(const Request &request);
 
         int                                         getPort();
         size_t                                      getContentLength();
@@ -78,7 +76,6 @@ class Request : public IRequest
         void                                        setAcceptLanguage(std::string acceptLanguage);
         void                                        setHost(std::string host);
         void                                        setIp(std::string ip);
-        void                                        setUserAgent(std::string userAgent);
         void                                        setAccept(std::string accept);
         void                                        setAcceptEncoding(std::string acceptEncoding);
         void                                        setAcceptCharset(std::string acceptCharset);
@@ -86,12 +83,13 @@ class Request : public IRequest
         void                                        setConnection(std::string connection);
         void                                        setReferer(std::string referer);
         void                                        setContentType(std::string contentType);
-        void                                        setContentLength(std::string contentLength);
+        void                                        setContentLenght(std::string contentLength);
         void                                        setHttpMethodName(std::string httpMethodName);
         void                                        setAuthScheme(std::string authScheme);
         void                                        setAuthorization(std::string authorization);
         void                                        setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
-        void                                        keywordFill();
+
+        void    keywordFill();
      
 
         Request*    clone() const;

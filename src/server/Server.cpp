@@ -7,7 +7,7 @@ Server::Server(unsigned int host, int port){
 Server::Server() {}
 
 Server::~Server() {}
-/*
+
 Server::Server(const Server &server)
 {
 	*this = server;
@@ -17,12 +17,12 @@ Server& Server::operator=(const Server &server)
 {
 	if (this == &server)
         return (*this);
-    this->fd = server.fd;
-    this->addr = server.addr;
+    this->socketfd = server.socketfd;
+    this->_serverException = server._serverException;
     this->_port = server._port;
     this->_host = server._host;
     return (*this);
-} */
+}
 
 int Server::getFd(void) const
 {
@@ -68,13 +68,13 @@ void             Server::setUpServer()
 	srvaddr.sin_port = htons((unsigned short)this->_port);
 	if (bind(this->socketfd, (struct sockaddr *)&srvaddr, sizeof(srvaddr)) < 0)
 	{
-		//::close(this->socketfd);
+		::close(this->socketfd);
 		this->_serverException.run(202);
 		return ;
 	}
 	if (listen(this->socketfd, 100) < 0)
 	{
-		//::close(this->socketfd);
+		::close(this->socketfd);
 		this->_serverException.run(203);
 		return ;
 	}

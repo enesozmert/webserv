@@ -23,6 +23,7 @@ LocationScope	&LocationScope::operator=(const LocationScope &location)
     this->_index = location._index;
     this->_allowMethods = location._allowMethods;
     this->_clientBodyBufferSize = location._clientBodyBufferSize;
+    this->_keywordDatabase = location._keywordDatabase;
     return (*this);
 }
 
@@ -113,10 +114,6 @@ void LocationScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("return", &this->_redirectionUri));
 }
 
-std::string LocationScope::getName() const
-{
-    return (this->name);
-}
-
+std::string LocationScope::getName() const { return (this->name); }
 LocationScope* LocationScope::cloneNew() const { return new LocationScope(); }
 LocationScope* LocationScope::clone() const { return new LocationScope(*this); }

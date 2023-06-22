@@ -22,17 +22,13 @@ class CgiScope : public ISubScope
         CgiScope(const CgiScope &cgiScope);
         CgiScope &operator=(const CgiScope &cgiScope);
 
-        std::vector<std::string> getCgiPass();
-        std::string getCgiParam();
-        std::string getCgiParamKeyword();
-        std::vector<std::string> getCgiParamValues();
+        std::vector<std::string>    getCgiPass();
+        std::string                 getCgiParam();
+        std::string                 getCgiParamKeyword();
+        std::vector<std::string>    getCgiParamValues();
 
         void setCgiPass(std::string pass);
         void setCgiParam(std::string param);
         void setCgiParamKeyword(std::string keyword);
         void setCgiParamValues(std::vector<std::string> values);
-
-        // std::string getName() const;
-        // CgiScope *cloneNew() const;
-        // CgiScope *clone() const;
 };

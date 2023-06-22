@@ -17,8 +17,7 @@ class ErrorPage : public ISubScope
         std::vector<std::string>    _errorPageCodes;
         std::string                 _errorPage;
         std::string                 _errorPagePath;
-        
-        HttpStatusCode _httpStatusCode;
+        HttpStatusCode              _httpStatusCode;
     public:
         ErrorPage();
         ~ErrorPage();
