@@ -7,16 +7,7 @@ Request::Request()
     this->_body = "";
 }
 Request::~Request() {}
-/* Request::Request(const Request& request)
-{
-    (*this) = request;
-}
-Request& Request::operator=(const Request &request)
-{
-	if (this == &request)
-        return (*this);
-    return (*this);
-} */
+
 std::string Request::getVersion()
 {
     return (this->_version);
@@ -128,9 +119,6 @@ std::string Request::getContentType()
 }
 size_t Request::getContentLength()
 {
-    //size_t numberOfContentLength = 0;
-    //std::istringstream portStream(this->_contentLength);
-    //portStream >> numberOfContentLength;
     return (atoi(this->_contentLength.c_str()));
 }
 
@@ -218,23 +206,24 @@ void Request::setContentType(std::string contentType)
 {
     this->_contentType = contentType;
 }
+void    Request::setContentLenght(std::string contentLength)
+{
+    this->_contentLength = contentLength;
+}
 void Request::setHttpMethodName(std::string httpMethodName)
 {
     bool result = _httpMethod.checkMethodName(httpMethodName);
     if (result == true)
         this->_httpMethodName = httpMethodName;
 }
-
 void Request::setAuthScheme(std::string authScheme)
 {
     this->_authScheme = authScheme;
 }
-
 void Request::setAuthorization(std::string authorization)
 {
     this->_authorization = authorization;
 }
-
 void Request::setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase)
 {
     this->_keywordDatabase = keywordDatabase;

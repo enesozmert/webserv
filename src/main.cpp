@@ -54,8 +54,8 @@ int main(int ac, char **av)
 
     parser->parse(av1);
     http = parser->getHttp();
-    std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
-    http->writeListens(http->getListens());
+    //std::cout << RED << "http->writeListens(http->getListens()) : " << RESET << std::endl;
+    //http->writeListens(http->getListens());
     // std::cout << "http->getServers().at(0)->getListen().host : " << http->getServers().at(0)->getListen().host << std::endl;
     // std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getServerName().at(0) << std::endl;
     // std::cout << "http->getServers().at(0)->getServerName().at(0) : " << http->getServers().at(0)->getLocations().at(0)->getIndex().at(1) << std::endl;

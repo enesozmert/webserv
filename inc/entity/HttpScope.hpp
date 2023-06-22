@@ -41,6 +41,7 @@ class HttpScope : public IScope
 
         void        keywordFill();
         void        writeListens(std::vector<t_listen> _listens);
+
         HttpScope*  cloneNew() const;
         HttpScope*  clone() const;
         std::string getName() const;

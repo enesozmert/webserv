@@ -6,8 +6,6 @@ ParserRequest::ParserRequest() {
 
 ParserRequest::~ParserRequest() {}
 
-//ParserRequest::ParserRequest(std::string raw) : _raw(raw){}
-
 int	ParserRequest::getStatus() const { return status; }
 
 int	ParserRequest::getMulti() const { return this->_multi; }
@@ -22,9 +20,8 @@ int ParserRequest::parse(std::string raw)
     else{
         this->_multi = 0;
 	}
-	std::cout << PURPLE << "multi " << this->_multi << RESET << std::endl;
+	std::cout << PURPLE << "multi : " << this->_multi << RESET << std::endl;
 	this->status = 0;
-	this->isPost = false;
     std::string key;
 	std::string value;
 	std::string line;
@@ -51,7 +48,6 @@ int ParserRequest::parse(std::string raw)
 	{
 		line = tempRaw.substr(0, pos + 1);
         lineTrim = trim(line, "\n\r");
-        //std::transform(lineTrim.begin(), lineTrim.end(), lineTrim.begin(), ::tolower);
         this->_lines.push_back(lineTrim);
 		tempRaw.erase(0, pos + 1);
 	}
@@ -59,7 +55,6 @@ int ParserRequest::parse(std::string raw)
 	parseKeyValue();
 	parseBody();
 	parseRequestClone();
-	//this->status hata durumlarında -1 olarak ayarla
 	this->status = 1;
 	return status;
 }
@@ -78,8 +73,6 @@ void ParserRequest::parseFirstLine()
 	this->request.setPath(path);
 	this->request.setVersion(version);
 	this->request.setHttpMethodName(method);
-	//if (method == "POST")
-		//this->isPost = true;
 }
 
 void ParserRequest::parseKeyValue()
@@ -102,8 +95,7 @@ void ParserRequest::parseKeyValue()
 
 void ParserRequest::parseBody()
 {
-	//if (this->isPost == true)
-		this->request.setBody(this->_raw.substr(this->_raw.find("\r\n\r\n") + 4));
+	this->request.setBody(this->_raw.substr(this->_raw.find("\r\n\r\n") + 4));
 }
 
 void ParserRequest::parseRequestClone()

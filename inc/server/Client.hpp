@@ -19,7 +19,7 @@ class Client
 {
 	private:
 
-		size_t								ContentLen;
+		size_t								_contentLen;
 		Server								*sv;
 		ParserRequest* 						_parser;
 		Request*   							_request;
@@ -38,10 +38,8 @@ class Client
 		ClientException						_clientException;
 	public:
 		Client(Server *sv, HttpScope* Hscope);
-		/* Client();
-		Client(const Client &client);
-        Client &operator=(const Client &client);
-		~Client(); */
+		Client();
+		~Client();
 
 		std::string		process(std::string multi);
 	
@@ -62,6 +60,6 @@ class Client
 		void	setIsFav(int isFav);
 		void	setStatus(int status);
 		void	setMethod(std::string method);
-		void	setContentLen(int ContentLen);
+		void	setContentLen(int contentLen);
 		void	setBody(std::string body);
 };

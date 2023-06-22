@@ -122,17 +122,6 @@ void ParserConfig::parseScope(const std::vector<std::string> &lines)
         _parseLineProps.insert(std::pair<size_t, ParseLineProp>((parseLineProp)->getIndex(), *parseLineProp));
         delete parseLineProp;
     }
-    // for (size_t i = 0; i < _parseLineProps.size(); i++)
-    // {
-    //     std::cout << "parseLineProps[i].getIndex() : " << _parseLineProps[i].getIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getLine() : " << _parseLineProps[i].getLine() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _parseLineProps[i].getScopeOpenIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeName() : " << _parseLineProps[i].getScopeName() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _parseLineProps[i].getScopeCloseIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeOpen() : " << _parseLineProps[i].getIsScopeOpen() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeClose() : " << _parseLineProps[i].getIsScopeClose() << std::endl;
-    //     std::cout << "****************************" << std::endl;
-    // } 
 }
 
 void ParserConfig::parseMatchClass()
@@ -161,17 +150,6 @@ void ParserConfig::parseScopeFill()
     method_function p[3] = {&ParserConfig::parseHttp, &ParserConfig::parseServer, &ParserConfig::parseLocation};
 
     tempCloseIndex = _orderParseLineProps[0].getScopeCloseIndex();
-    // for (size_t i = 0; i < _orderParseLineProps.size(); i++)
-    // {
-    //     std::cout << "parseLineProps[i].getIndex() : " << _orderParseLineProps[i].getIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getLine() : " << _orderParseLineProps[i].getLine() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeOpenIndex() : " << _orderParseLineProps[i].getScopeOpenIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeName() : " << _orderParseLineProps[i].getScopeName() << std::endl;
-    //     std::cout << "parseLineProps[i].getScopeCloseIndex() : " << _orderParseLineProps[i].getScopeCloseIndex() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeOpen() : " << _orderParseLineProps[i].getIsScopeOpen() << std::endl;
-    //     std::cout << "parseLineProps[i].getIsScopeClose() : " << _orderParseLineProps[i].getIsScopeClose() << std::endl;
-    //     std::cout << "****************************" << std::endl;
-    // }
     for (size_t i = 0; i < _orderParseLineProps.size() + 1; i++)
     {
         if (tempCloseIndex != _orderParseLineProps[i].getScopeCloseIndex())
@@ -238,7 +216,6 @@ void ParserConfig::parseHttp(std::vector<size_t> tempScopes)
     if (this->httpPtr == NULL)
     {
         this->_configException.run(115);
-        // std::cout << "nulll" << _matchedClassIndex << std::endl;
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
@@ -249,9 +226,7 @@ void ParserConfig::parseHttp(std::vector<size_t> tempScopes)
         {
             this->httpPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        // std::cout << "http ok : " << tempScopes[i] << std::endl;
     }
-    // std::cout << "**********parseHttp" << std::endl;
 }
 
 void ParserConfig::parseServer(std::vector<size_t> tempScopes)
@@ -263,7 +238,6 @@ void ParserConfig::parseServer(std::vector<size_t> tempScopes)
     if (this->serverPtr == NULL)
     {
         this->_configException.run(116);
-        // std::cout << "nulll" << _matchedClassIndex << std::endl;
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
@@ -274,9 +248,7 @@ void ParserConfig::parseServer(std::vector<size_t> tempScopes)
         {
             this->serverPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        // std::cout << "ServerScope ok : " << tempScopes[i] << std::endl;
     }
-    // std::cout << "**********parseServer" << std::endl;
 }
 
 void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
@@ -288,7 +260,6 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
     if (this->locationPtr == NULL)
     {
         this->_configException.run(117);
-        // std::cout << "nulll" << _matchedClassIndex << std::endl;
     }
     for (size_t i = 0; i < tempScopes.size(); i++)
     {
@@ -299,11 +270,8 @@ void ParserConfig::parseLocation(std::vector<size_t> tempScopes)
         {
             this->locationPtr->getKeywordDataBase().updateData<IsVariableNameEqual, std::string>(tempVariableName, tempVariableValue);
         }
-        // std::cout << "location ok : " << tempScopes[i] << std::endl;
     }
     _matchedClass.at(_matchedClassIndex) = this->locationPtr;
-
-    // std::cout << "**********parseLocation" << std::endl;
 }
 
 size_t ParserConfig::findClosingScopeIndex(const std::vector<std::string> &lines, size_t startingIndex)

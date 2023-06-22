@@ -1,12 +1,16 @@
 #include "../inc/server/Client.hpp"
 
+Client::Client() {}
+
+Client::~Client() {}
+
 Client::Client(Server *sv, HttpScope *Hscope)
 {
 	this->_response = "";
 	this->sv = sv;
 	this->multi = 0;
 	this->status = 0;
-	this->ContentLen = 0;
+	this->_contentLen = 0;
 	this->_parser = NULL;
 	this->_request = NULL;
 	this->_http = Hscope;
@@ -18,36 +22,6 @@ Client::Client(Server *sv, HttpScope *Hscope)
     this->isFav = 0;
 }
 
-/* Client::Client() {};
-
-Client::Client(const Client &client)
-{
-	*this = client;
-}
-
-Client& Client::operator=(const Client &client)
-{
-	if (this == &client)
-        return (*this);
-	this->_response = client._response;
-	this->sv = client.sv;
-	this->multi = client.multi;
-	this->status = client.status;
-	this->postLen = client.postLen;
-	this->postVal = client.postVal;
-	this->_parser = client._parser;
-	this->_request = client._request;
-	this->_http = client._http;
-	this->response = client.response;
-	this->locationIndex = client.locationIndex;
-	this->_response = client._response;
-	this->_host = client._host;
-	this->_port = client._port;
-    this->_isFav = client._isFav;
-	return (*this);
-}
-
-Client::~Client() {}*/
 
 int	Client::getStatus() const
 {
@@ -71,7 +45,7 @@ std::string		Client::getMethod() const
 
 size_t			Client::getContentLen() const
 {
-	return this->ContentLen;
+	return this->_contentLen;
 }
 
 std::string		Client::getBody() const
@@ -99,9 +73,9 @@ void   Client::setMethod(std::string method)
     this->method = method;
 }
 
-void   Client::setContentLen(int ContentLen)
+void   Client::setContentLen(int contentLen)
 {
-    this->ContentLen = ContentLen;
+    this->_contentLen = contentLen;
 }
 
 void   Client::setIsFav(int isFav)
@@ -132,7 +106,7 @@ void   Client::setParserRequest(std::string buffer)
 
 std::string    Client::process(std::string multiBody)
 {
-    std::cout << RED << "Processing" << RESET << std::endl;
+    std::cout << YELLOW << "Processing..." << RESET << std::endl;
     ServerScope     *matchedServer;
     LocationScope   *matchedLocation;
     int             matchedServerIndex;
@@ -177,8 +151,6 @@ int        Client::getServerForRequest()
     return (-1);
 }
 
-
-//benim yazdığım daha basic olan
 void  Client::getLocationForRequest(ServerScope *matchedServerScope, const std::string& path) 
 {
     this->locationIndex = 0;

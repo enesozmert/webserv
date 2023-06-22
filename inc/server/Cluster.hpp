@@ -32,7 +32,7 @@ class Cluster
         int                         isFav;
         int                         loopControl;
         int                         status;
-        size_t                      ContentLen;
+        size_t                      contentLen;
         std::map<int, Client *>     clients;
         std::string                 method;
         std::string                 favicon;
@@ -43,18 +43,15 @@ class Cluster
     public:
         Cluster();
         ~Cluster();
-        /*
-        Cluster(const Cluster &cluster);
-        Cluster &operator=(const Cluster &cluster); */
 
         int     setUpCluster(HttpScope *http);
         void    run();
-        void    cleanServers();
-        void    cleanClients();
         void    accept_section();
         void    recv_section();
         void    send_section();
-        void    cleanAll();
         void	close_connection(std::map<int, Client *>::iterator it);
         void	findMaxFd();
+        void    cleanServers();
+        void    cleanClients();
+        void    cleanAll();
 };

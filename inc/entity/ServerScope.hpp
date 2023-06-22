@@ -62,6 +62,7 @@ class ServerScope : public IScope, public CgiScope
         DataBase<Variable<std::string> >    getKeywordDataBase();
         
         void                                keywordFill();
+
         ServerScope*                        cloneNew() const;
         ServerScope*                        clone() const;
         std::string                         getName() const;

@@ -1,7 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import cgi, cgitb
+import cgi
+import cgitb
+import os
 
 cgitb.enable()
 
@@ -10,11 +12,10 @@ form = cgi.FieldStorage()
 
 # Get the uploaded file
 file_item = form['file']
-# file_item = os.environ['file']
 
 if file_item.filename:
     # Set the path to save the uploaded file
-    file_path = 'uploads/' + file_item.filename
+    file_path = '/Users/fatmaozturk/Desktop/webserv/Website_to_test/uploads/' + file_item.filename
 
     # Save the file to the specified path
     with open(file_path, 'wb') as file:

@@ -11,7 +11,7 @@ class HttpVariable
     private:
         std::pair<T, K> _variable;
     public:
-        HttpVariable(){}
+        HttpVariable() {}
         HttpVariable(T key, K value) {_variable = std::make_pair(key, value);}
         ~HttpVariable() {}
     

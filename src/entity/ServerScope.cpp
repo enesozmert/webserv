@@ -22,6 +22,12 @@ ServerScope	&ServerScope::operator=(const ServerScope &server)
     this->_index = server._index;
     this->_serverNames = server._serverNames;
     this->_listen = server._listen;
+    this->listen = server.listen;
+    this->_locations = server._locations;
+    this->_ip = server._ip;
+    this->_isServerNameNothing = server._isServerNameNothing;
+    this->_errorPage = server._errorPage;
+    this->_keywordDatabase = server._keywordDatabase;
     return (*this);
 }
 
@@ -171,8 +177,5 @@ void ServerScope::keywordFill()
 
 ServerScope *ServerScope::cloneNew() const { return new ServerScope(); }
 ServerScope *ServerScope::clone() const { return new ServerScope(*this); }
-std::string ServerScope::getName() const
-{
-    return (this->name);
-}
+std::string ServerScope::getName() const { return (this->name); }
 

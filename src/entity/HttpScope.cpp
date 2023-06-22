@@ -17,6 +17,10 @@ HttpScope	&HttpScope::operator=(const HttpScope &http)
     if (this == &http)
         return (*this);
     this->_clientMaxBodySize = http._clientMaxBodySize;
+    this->_errorPage = http._errorPage;
+    this->_keywordDatabase = http._keywordDatabase;
+    this->_listens = http._listens;
+    this->_servers = http._servers;
     return (*this);
 }
 
@@ -88,7 +92,4 @@ void HttpScope::writeListens(std::vector<t_listen> _listens)
 
 HttpScope* HttpScope::cloneNew() const { return new HttpScope(); }
 HttpScope* HttpScope::clone() const { return new HttpScope(*this); }
-std::string HttpScope::getName() const
-{
-    return (this->name);
-}
+std::string HttpScope::getName() const { return (this->name); }

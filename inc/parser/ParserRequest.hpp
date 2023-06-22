@@ -22,17 +22,15 @@ class ParserRequest
         std::string                 _firstLine;
         int                         status;
         int                         _multi;
-        bool                        isPost;
     public:
         ParserRequest();
         ~ParserRequest();
-        ParserRequest(std::string raw);
 
-        int parse(std::string raw = "");
-        void parseFirstLine();
-        void parseKeyValue();
-        void parseBody();
-        void parseRequestClone();
+        int     parse(std::string raw = "");
+        void    parseFirstLine();
+        void    parseKeyValue();
+        void    parseBody();
+        void    parseRequestClone();
 
         std::string  findKey(const std::string &line);
         std::string  findValue(const std::string &line);
@@ -42,6 +40,7 @@ class ParserRequest
         Request*                    getRequest();
         int	                        getStatus() const;
         int	                        getMulti() const;
+    
         void                        setRaw(std::string raw);
         void                        writeRequest();
 };

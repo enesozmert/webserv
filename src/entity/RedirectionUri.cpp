@@ -16,6 +16,7 @@ RedirectionUri &RedirectionUri::operator=(const RedirectionUri &redirectionUri)
     this->_redirectionCode = redirectionUri._redirectionCode;
     this->_redirectionValue = redirectionUri._redirectionValue;
     this->_redirectionUri = redirectionUri._redirectionUri;
+    this->_httpStatusCode = redirectionUri._httpStatusCode;
     return (*this);
 }
 

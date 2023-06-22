@@ -22,8 +22,8 @@ class Server
     public:
         Server(unsigned int host, int port);
         Server();
-        //Server(const Server &server);
-        //Server &operator=(const Server &server);
+        Server(const Server &server);
+        Server &operator=(const Server &server);
         ~Server();
 
         int             getFd() const;

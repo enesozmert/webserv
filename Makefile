@@ -2,8 +2,8 @@
 NAME        	=   webserv
 CC				=	c++
 USER_NAME1		=	eozmert
-USER_NAME2		=	cyanliz
-USER_NAME3		=	fozturk
+USER_NAME2		=	cyalniz
+USER_NAME3		=	faozturk
 CFLAGS			=	-Wall -Wextra -Werror -std=c++98 -g -I
 RM				=	rm -f
 
