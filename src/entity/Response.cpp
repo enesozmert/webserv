@@ -167,7 +167,6 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	this->_host = server->getHost();
 	this->_port = atoi((server->getPort()).c_str());
 	this->_contentLength = request->getContentLength();
-	std::cout << "contentLen: " << this->_contentLength << std::endl;
 	setAutoIndex(location->getAutoindex());
 	setLanguage(request->getAcceptLanguages());
 	setStaticErrorPage();
@@ -185,8 +184,6 @@ std::string Response::createResponse(Request *request, ServerScope *serverScope,
 	this->_request = request;
 	this->_serverScope = serverScope;
 	this->_locationScope = locationScope;
-	std::cout << "multiBody: " << MultiBody << std::endl;
-	std::cout << "this->_request->getBody(): " << this->_request->getBody() << std::endl;
 
 	if (MultiBody != "")
 		this->_body = MultiBody;
@@ -440,7 +437,6 @@ void Response::selectCgiPass()
 			if (_locationScope->getCgiPass()[i].find(cgiNames[j]) != std::string::npos && cgiExtension == cgiExtensions[j])
 			{
 				this->_cgiPass = _locationScope->getCgiPass()[i];
-				std::cout << PURPLE << "this->_cgiPass " << RESET << this->_cgiPass << std::endl;
 				return;
 			}
 		}
@@ -508,8 +504,6 @@ std::string Response::executeCgi()
 {
 	std::cout << GREEN << "/*******CGI*********/" << RESET << std::endl;
 	this->keywordFillCgi();
-	std::cout << "body\n " << _body << std::endl;
-	std::cout << "body_len " << _body.length() << std::endl;
 
 	char	output[4096];
 	int		readed;
@@ -574,7 +568,6 @@ std::string Response::executeCgi()
 		free(env[i]);
 	free(env);
 
-	std::cout << "std::string(output, readed)\n" << std::string(output, readed) << std::endl;
 	return (std::string(output, readed));
 }
 

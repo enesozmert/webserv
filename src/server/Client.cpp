@@ -100,7 +100,10 @@ void   Client::setParserRequest(std::string buffer)
 	setContentLen(this->_request->getContentLength());
     setBody(this->_request->getBody());
     if (this->_request->getPath() == "/favicon.ico")
+    {
         this->isFav = 1;
+        delete this->_request;
+    }
     delete _parser;
 }
 

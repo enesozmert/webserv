@@ -22,7 +22,7 @@ int Cluster::setUpCluster(HttpScope *http)
 	this->body = "";
 	this->MultiBody = "";
 
-	this->favicon = add_headers_favicon(openNread(getPwd() + "/" + "index/fv.png"));
+	this->favicon = add_headers_favicon(openNread(getPwd() + "/" + "favicon/favicon.ico"));
 
 	FD_ZERO(&this->writeFds);
 	FD_ZERO(&this->readFds);
@@ -78,7 +78,6 @@ void Cluster::recv_section()
 		{
     		std::cout << YELLOW <<  "\nReceiving..." << RESET << std::endl;
 			ret = recv(it->first, buffer, 4095, 0);
-			std::cout << YELLOW <<  "ret..." << ret << RESET << std::endl;
 			if (ret > 0)
 			{
 				if (this->status == 0)
