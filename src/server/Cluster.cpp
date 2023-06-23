@@ -22,7 +22,7 @@ int Cluster::setUpCluster(HttpScope *http)
 	this->body = "";
 	this->MultiBody = "";
 
-	this->favicon = add_headers_favicon(openNread(getPwd() + "/" + "index/fv.png"));
+	this->favicon = add_headers_favicon(openNread(getPwd() + "/" + "favicon/favicon.ico"));
 
 	FD_ZERO(&this->writeFds);
 	FD_ZERO(&this->readFds);
