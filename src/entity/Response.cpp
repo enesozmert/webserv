@@ -188,7 +188,7 @@ std::string Response::createResponse(Request *request, ServerScope *serverScope,
 		this->_body = this->_request->getBody();
 
 	setResponse(request, serverScope, locationScope);
-	if (this->_clientBodyBufferSize < static_cast<int>(_request->getContentLength()))
+	if (this->_clientBodyBufferSize != 0 && this->_clientBodyBufferSize < static_cast<int>(_request->getContentLength()))
 	{
 		this->statusCode = 403;
 		_response = this->staticErrorPage[403];
