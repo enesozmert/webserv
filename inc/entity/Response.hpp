@@ -6,6 +6,7 @@
 #include <sstream>
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/wait.h>
 #include "../entity/HttpScope.hpp"
 #include "../http/HttpStatusCode.hpp"
 #include "../http/HttpContentType.hpp"
