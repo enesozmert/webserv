@@ -78,7 +78,6 @@ void Cluster::recv_section()
 		{
     		std::cout << YELLOW <<  "\nReceiving..." << RESET << std::endl;
 			ret = recv(it->first, buffer, 4095, 0);
-			std::cout << YELLOW <<  "ret..." << ret << RESET << std::endl;
 			if (ret > 0)
 			{
 				if (this->status == 0)

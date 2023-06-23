@@ -20,7 +20,6 @@ int ParserRequest::parse(std::string raw)
     else{
         this->_multi = 0;
 	}
-	std::cout << PURPLE << "multi : " << this->_multi << RESET << std::endl;
 	this->status = 0;
     std::string key;
 	std::string value;
