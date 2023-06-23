@@ -64,7 +64,7 @@ void             Server::setUpServer()
 	}
 	memset((char *)&srvaddr, 0, sizeof(srvaddr));
 	srvaddr.sin_family = AF_INET;
-	srvaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	srvaddr.sin_addr.s_addr = htonl(this->_host);
 	srvaddr.sin_port = htons((unsigned short)this->_port);
 	if (bind(this->socketfd, (struct sockaddr *)&srvaddr, sizeof(srvaddr)) < 0)
 	{
