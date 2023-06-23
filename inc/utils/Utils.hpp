@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <stdlib.h>
+#include <iostream>
 #include "../entity/CgiVariable.hpp"
 
 inline std::string	removeAdjacentSlashes(const std::string &str)

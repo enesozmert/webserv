@@ -5,10 +5,8 @@
 #include "../inc/syntax/SyntaxConfig.hpp"
 #include "../inc/utils/Utils.hpp"
 
-#include <iostream>
-#include <string>
-
 Cluster *clusterEnd;
+
 void signalHandler(int signum)
 {
     if (signum == SIGINT)
@@ -30,7 +28,7 @@ int main(int ac, char **av)
     SyntaxConfig syntaxConfig;
     ConfigException configException;
 
-  if (ac != 2)
+    if (ac != 2)
     {
         configException.run(106);
         return (-1);
