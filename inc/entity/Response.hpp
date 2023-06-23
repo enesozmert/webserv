@@ -75,7 +75,7 @@ public:
     void                                setStaticErrorPage();
     int                                 setPaths();
     void                                setClientBodyBufferSize(std::string bodyBufferSize);
-    int                                 setResponse(Request *request, ServerScope *server, LocationScope *location);
+    void                                setResponse(Request *request, ServerScope *server, LocationScope *location);
     void                                setLanguage(std::vector<std::pair<std::string, float> > languages);
     void                                setKeywordDatabase(DataBase<Variable<std::string> > keywordDatabase);
     
