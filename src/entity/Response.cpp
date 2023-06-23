@@ -146,8 +146,6 @@ int Response::setPaths()
 void Response::setClientBodyBufferSize(std::string bodyBufferSize)
 {
 	this->_clientBodyBufferSize = atoi(bodyBufferSize.c_str());
-	if (this->_clientBodyBufferSize == 0)
-		this->_clientBodyBufferSize = _request->getContentLength();
 }
 
 void Response::setAutoIndex(std::string _autoIndex)
@@ -158,7 +156,7 @@ void Response::setAutoIndex(std::string _autoIndex)
 		this->_isAutoIndex = false;
 }
 
-int Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
+void Response::setResponse(Request *request, ServerScope *server, LocationScope *location)
 {
 	this->statusCode = 200;
 	this->_server = "webserv";
@@ -176,7 +174,6 @@ int Response::setResponse(Request *request, ServerScope *server, LocationScope *
 	setPaths();
 	setContentType();
 	setClientBodyBufferSize(location->getClientBodyBufferSize());
-	return (0);
 }
 
 std::string Response::createResponse(Request *request, ServerScope *serverScope, LocationScope *locationScope, std::string MultiBody)
@@ -190,22 +187,20 @@ std::string Response::createResponse(Request *request, ServerScope *serverScope,
 	else
 		this->_body = this->_request->getBody();
 
-	if (setResponse(request, serverScope, locationScope) == -1)
+	setResponse(request, serverScope, locationScope);
+	if (this->_clientBodyBufferSize < static_cast<int>(_request->getContentLength()))
 	{
-		std::cerr << RED << "Error setting response" << RESET << std::endl;
-		return NULL;
+		this->statusCode = 403;
+		_response = this->staticErrorPage[403];
+		_response = getHeader() + _response;
+		writeResponse();
+		return _response;
 	}
 	if (std::find(_allow_methods.begin(), _allow_methods.end(), this->_methodName) == _allow_methods.end())
 	{
 		this->statusCode = 405;
-		_response = notAllowed() + "\r\n";
-		return NULL;
-	}
-	if (this->_clientBodyBufferSize < static_cast<int>(this->_body.size()))
-	{
-		this->statusCode = 413;
-		_response = notAllowed() + "\r\n";
-		return NULL;
+		_response = notAllowed();
+		return _response;
 	}
 	selectCgiPass();
 	handleMethods();

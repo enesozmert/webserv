@@ -112,6 +112,7 @@ void LocationScope::keywordFill()
     _keywordDatabase.insertData(Variable<std::string>("cgi_param", &this->_param));
     _keywordDatabase.insertData(Variable<std::string>("error_page", &this->_errorPage));
     _keywordDatabase.insertData(Variable<std::string>("return", &this->_redirectionUri));
+    _keywordDatabase.insertData(Variable<std::string>("request_max_body_size", &this->_clientBodyBufferSize));
 }
 
 std::string LocationScope::getName() const { return (this->name); }
