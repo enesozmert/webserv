@@ -15,7 +15,7 @@ file_item = form['file']
 
 if file_item.filename:
     # Set the path to save the uploaded file
-    file_path = '/Users/fatmaozturk/Desktop/webserv/Website_to_test/uploads/' + file_item.filename
+    file_path = './Website_to_test/uploads/' + file_item.filename
 
     # Save the file to the specified path
     with open(file_path, 'wb') as file:
